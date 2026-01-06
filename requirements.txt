@@ -1,0 +1,24 @@
+-i https://pypi.org/simple
+Django>=4.2
+Pillow>=10.0.0
+django-crispy-forms>=2.0
+django-allauth>=0.54.0
+django-debug-toolbar>=4.1.0
+djangorestframework>=3.14.0
+psycopg2-binary>=2.9.0
+gunicorn>=20.1.0
+whitenoise>=6.4.0
+python-dotenv>=1.0.0
+celery>=5.4.0
+redis>=4.5.0
+boto3>=1.26.0
+django-storages>=1.13.0
+markdown>=3.4.0
+drf-yasg>=1.21.0
+pytest-django>=4.5.0
+pytest-cov>=4.0.0
+coverage>=7.2.0
+
+black>=23.3.0
+isort>=5.12.0
+flake8>=6.0.0

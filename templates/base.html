@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}مكتبة الكتب{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .book-card {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+        }
+        
+        .dashboard-card {
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-800 font-cairo" dir="rtl">
+    <!-- شريط التنقل -->
+    <nav id="navbar" class="bg-white shadow-lg fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <a href="{% url 'home' %}" class="text-2xl font-bold text-primary-600">
+                    <i class="fas fa-book mr-2"></i>
+                    مكتبة الكتب
+                </a>
+                <div class="hidden md:flex space-x-6 space-x-reverse">
+                    <a href="{% url 'home' %}" class="nav-link text-primary-600 hover:text-primary-800 font-medium">الرئيسية</a>
+                    <a href="{% url 'book_list' %}" class="nav-link text-gray-600 hover:text-primary-600 font-medium">الكـتب</a>
+                    {% for category in categories|slice:":5" %}
+                    <a href="{% url 'books_by_category' category.slug %}" class="nav-link text-gray-600 hover:text-primary-600 font-medium">{{ category.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="relative hidden md:block">
+                    <form method="GET" action="{% url 'book_list' %}" id="search-form">
+                        <input type="text" name="q" placeholder="ابحث عن كتاب..." 
+                               class="py-2 px-4 pr-10 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                               id="search-input">
+                        <button type="submit" class="absolute left-3 top-2.5 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    <div id="search-results" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg hidden z-50"></div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 space-x-reverse">
+                        <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-primary-600"></i>
+                        </div>
+                        <span class="hidden md:inline">{{ user.username }}</span>
+                    </button>
+                    <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block z-50">
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-user-circle ml-2"></i>الملف الشخصي
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-tachometer-alt ml-2"></i>لوحة التحكم
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-cog ml-2"></i>إدارة الموقع
+                        </a>
+                        {% endif %}
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt ml-2"></i>تسجيل الخروج
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg">
+                    <i class="fas fa-sign-in-alt ml-2"></i>تسجيل الدخول
+                </a>
+                {% endif %}
+                
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <button id="theme-toggle" class="p-2 rounded-full bg-gray-100">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- القائمة المتنقلة للهواتف -->
+        <div id="mobile-menu" class="md:hidden bg-white border-t hidden">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="{% url 'home' %}" class="py-2 text-primary-600 font-medium">الرئيسية</a>
+                <a href="{% url 'book_list' %}" class="py-2 text-gray-600 font-medium">الكـتب</a>
+                {% for category in categories %}
+                <a href="{% url 'books_by_category' category.slug %}" class="py-2 text-gray-600 font-medium">{{ category.name }}</a>
+                {% endfor %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="py-2 text-gray-600 font-medium">لوحة التحكم</a>
+                <a href="{% url 'logout' %}" class="py-2 text-red-600 font-medium">تسجيل الخروج</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="py-2 text-primary-600 font-medium">تسجيل الدخول</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- الرسائل -->
+    {% if messages %}
+    <div class="container mx-auto px-4 mt-20">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-100 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-400 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-700 px-4 py-3 rounded-lg mb-4" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- المحتوى الرئيسي -->
+    <main class="pt-16 min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- التذييل -->
+    <footer class="bg-gray-800 text-white py-12 mt-20">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold mb-4">
+                        <i class="fas fa-book mr-2"></i>
+                        مكتبة الكتب
+                    </div>
+                    <p class="text-gray-300">منصة رقمية شاملة للكتب العربية والعالمية. نهدف إلى نشر المعرفة والثقافة من خلال توفير محتوى قرائي مميز.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-xl font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'home' %}" class="text-gray-300 hover:text-white">الرئيسية</a></li>
+                        <li><a href="{% url 'book_list' %}" class="text-gray-300 hover:text-white">جميع الكتب</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">عن المكتبة</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-xl font-bold mb-4">فئات الكتب</h4>
+                    <ul class="space-y-2">
+                        {% for category in categories|slice:":5" %}
+                        <li><a href="{% url 'books_by_category' category.slug %}" class="text-gray-300 hover:text-white">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-xl font-bold mb-4">اشترك في النشرة البريدية</h4>
+                    <p class="text-gray-300 mb-4">كن أول من يعلم عن إصداراتنا الجديدة والعروض الخاصة.</p>
+                    <form method="POST" action="#" class="flex">
+                        {% csrf_token %}
+                        <input type="email" name="email" placeholder="بريدك الإلكتروني" class="py-3 px-4 rounded-r-lg flex-grow focus:outline-none text-gray-800" required>
+                        <button type="submit" class="bg-primary-600 hover:bg-primary-700 py-3 px-4 rounded-l-lg">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© {% now "Y" %} مكتبة الكتب. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript العام -->
+    <script>
+        // تهيئة GSAP
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // بيانات الكتب (يمكن استبدالها بطلبات AJAX)
+        const booksData = [];
+        
+        // العناصر الأساسية في DOM
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const themeToggle = document.getElementById('theme-toggle');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        
+        // البحث عن الكتب
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+                
+                // طلب AJAX للبحث
+                fetch(`/api/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results.length > 0) {
+                            let html = '<div class="py-2">';
+                            data.results.forEach(book => {
+                                html += `
+                                    <a href="${book.url}" class="flex items-center px-4 py-2 hover:bg-gray-100">
+                                        <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center ml-3">
+                                            ${book.cover_url ? 
+                                                `<img src="${book.cover_url}" alt="${book.title}" class="w-full h-full object-cover rounded">` : 
+                                                `<i class="fas fa-book text-gray-500"></i>`
+                                            }
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">${book.title}</p>
+                                            <p class="text-sm text-gray-500">${book.author}</p>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            html += '</div>';
+                            searchResults.innerHTML = html;
+                            searchResults.classList.remove('hidden');
+                        } else {
+                            searchResults.innerHTML = '<div class="px-4 py-2 text-gray-500">لا توجد نتائج</div>';
+                            searchResults.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+            
+            // إخفاء نتائج البحث عند النقر خارجها
+            document.addEventListener('click', function(event) {
+                if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+        }
+        
+        // أحداث القائمة المتنقلة للهواتف
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                gsap.fromTo(mobileMenu,
+                    { opacity: 0, height: 0 },
+                    { opacity: 1, height: 'auto', duration: 0.3 }
+                );
+            });
+        }
+        
+        // تبديل السمة (الوضع المظلم/الفاتح)
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const body = document.body;
+                
+                if (icon.classList.contains('fa-moon')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    
+                    // تأثير على الزر
+                    gsap.fromTo(this,
+                        { rotate: 0 },
+                        { rotate: 360, duration: 0.5 }
+                    );
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                    body.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    
+                    // تأثير على الزر
+                    gsap.fromTo(this,
+                        { rotate: 0 },
+                        { rotate: 360, duration: 0.5 }
+                    );
+                }
+            });
+            
+            // تحميل السمة المحفوظة
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                themeToggle.querySelector('i').classList.remove('fa-moon');
+                themeToggle.querySelector('i').classList.add('fa-sun');
+            }
+        }
+        
+        // وظيفة للرسوم المتحركة عند التمرير
+        function initScrollAnimations() {
+            // عناصر للرسوم المتحركة عند التمرير
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            animatedElements.forEach(el => {
+                gsap.fromTo(el,
+                    {
+                        opacity: 0,
+                        y: 30
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 80%",
+                            toggleActions: "play none none none"
+                        }
+                    }
+                );
+            });
+            
+            // تأثيرات على بطاقات الكتب
+            const bookCards = document.querySelectorAll('.book-card');
+            bookCards.forEach((card, index) => {
+                gsap.fromTo(card,
+                    {
+                        opacity: 0,
+                        y: 40
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6,
+                        delay: index * 0.1,
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 85%",
+                            toggleActions: "play none none none"
+                        }
+                    }
+                );
+            });
+        }
+        
+        // تهيئة الرسوم المتحركة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأثيرات على شريط التنقل
+            gsap.from('#navbar', {
+                opacity: 0,
+                y: -20,
+                duration: 0.8
+            });
+            
+            // تهيئة الرسوم المتحركة عند التمرير
+            initScrollAnimations();
+        });
+        
+        // تحديث الرسوم المتحركة عند تغيير المحتوى (للتطبيقات ذات الصفحة الواحدة)
+        document.addEventListener('contentChanged', function() {
+            initScrollAnimations();
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1039 @@
+<!-- templates/dashboard/settings.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}إعدادات النظام - لوحة التحكم{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- رأس الصفحة -->
+        <div class="mb-8 animate-on-scroll">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">إعدادات النظام</h1>
+                    <p class="text-lg text-gray-600">إدارة إعدادات الموقع والتكوين</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <p class="text-sm text-gray-600 bg-white px-4 py-2 rounded-lg shadow">
+                        <i class="fas fa-database ml-2"></i>
+                        سعة التخزين: <span class="font-bold">{{ total_storage|filesizeformat }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- الشريط الجانبي -->
+            <div class="lg:w-1/4">
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="space-y-2">
+                        <button class="settings-tab w-full text-right p-3 rounded-lg bg-primary-50 text-primary-600 font-medium" data-tab="general">
+                            <i class="fas fa-cog ml-3"></i> الإعدادات العامة
+                        </button>
+                        <button class="settings-tab w-full text-right p-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium" data-tab="appearance">
+                            <i class="fas fa-palette ml-3"></i> المظهر
+                        </button>
+                        <button class="settings-tab w-full text-right p-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium" data-tab="notifications">
+                            <i class="fas fa-bell ml-3"></i> الإشعارات
+                        </button>
+                        <button class="settings-tab w-full text-right p-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium" data-tab="security">
+                            <i class="fas fa-shield-alt ml-3"></i> الأمان
+                        </button>
+                        <button class="settings-tab w-full text-right p-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium" data-tab="backup">
+                            <i class="fas fa-database ml-3"></i> النسخ الاحتياطي
+                        </button>
+                        <button class="settings-tab w-full text-right p-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium" data-tab="advanced">
+                            <i class="fas fa-sliders-h ml-3"></i> إعدادات متقدمة
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- حالة النظام -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">حالة النظام</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">استخدام التخزين</span>
+                                <span class="text-sm font-medium text-gray-800">65%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">استخدام الذاكرة</span>
+                                <span class="text-sm font-medium text-gray-800">42%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 42%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">استخدام CPU</span>
+                                <span class="text-sm font-medium text-gray-800">28%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-600 h-2 rounded-full" style="width: 28%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-600">وقت تشغيل الخادم</span>
+                            <span class="font-medium text-gray-800">15 يوم</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">آخر نسخة احتياطية</span>
+                            <span class="font-medium text-gray-800">أمس</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- المحتوى الرئيسي -->
+            <div class="lg:w-3/4">
+                <!-- تبويب الإعدادات العامة -->
+                <div id="general-tab" class="settings-content active">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">الإعدادات العامة</h3>
+                        
+                        <form method="POST" class="space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="general">
+                            
+                            <!-- معلومات الموقع -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">معلومات الموقع</h4>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">اسم الموقع</label>
+                                    <input type="text" name="site_name" value="مكتبة الكتب"
+                                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">وصف الموقع</label>
+                                    <textarea name="site_description" rows="3"
+                                              class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">منصة رقمية شاملة للكتب العربية والعالمية</textarea>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">البريد الإلكتروني للاتصال</label>
+                                    <input type="email" name="contact_email" value="info@library.com"
+                                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                </div>
+                            </div>
+                            
+                            <!-- إعدادات القراءة -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">إعدادات القراءة</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">عدد الكتب في الصفحة</label>
+                                        <input type="number" name="books_per_page" value="12"
+                                               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">الوقت المقدر للقراءة (صفحة/دقيقة)</label>
+                                        <input type="number" name="reading_time_per_page" value="2"
+                                               class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">تمكين التعليقات</h5>
+                                        <p class="text-sm text-gray-600">السماح للمستخدمين بإضافة تعليقات على الكتب</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="enable_comments" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">تمكين التقييمات</h5>
+                                        <p class="text-sm text-gray-600">السماح للمستخدمين بتقييم الكتب</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="enable_ratings" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- إعدادات التسجيل -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">إعدادات التسجيل</h4>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">التسجيل العام</h5>
+                                        <p class="text-sm text-gray-600">السماح للمستخدمين الجدد بالتسجيل</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="allow_registration" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">التحقق من البريد الإلكتروني</h5>
+                                        <p class="text-sm text-gray-600">طلب تأكيد البريد الإلكتروني بعد التسجيل</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="email_verification" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- أزرار الحفظ -->
+                            <div class="pt-6 border-t border-gray-100">
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save ml-2"></i> حفظ الإعدادات
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- تبويب المظهر -->
+                <div id="appearance-tab" class="settings-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">إعدادات المظهر</h3>
+                        
+                        <form method="POST" class="space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="appearance">
+                            
+                            <!-- الثيمات -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">الثيم</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="theme-option bg-blue-50 border-2 border-blue-500 rounded-xl p-4 cursor-pointer">
+                                        <div class="flex items-center mb-3">
+                                            <div class="w-4 h-4 bg-blue-500 rounded-full ml-2"></div>
+                                            <h5 class="font-medium text-gray-800">فاتح</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">الثيم الفاتح الافتراضي</p>
+                                    </div>
+                                    
+                                    <div class="theme-option bg-gray-800 border-2 border-gray-300 rounded-xl p-4 cursor-pointer">
+                                        <div class="flex items-center mb-3">
+                                            <div class="w-4 h-4 bg-gray-500 rounded-full ml-2"></div>
+                                            <h5 class="font-medium text-white">مظلم</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-400">الثيم المظلم المريح للعين</p>
+                                    </div>
+                                    
+                                    <div class="theme-option bg-gradient-to-r from-blue-100 to-purple-100 border-2 border-gray-300 rounded-xl p-4 cursor-pointer">
+                                        <div class="flex items-center mb-3">
+                                            <div class="w-4 h-4 bg-purple-500 rounded-full ml-2"></div>
+                                            <h5 class="font-medium text-gray-800">مختلط</h5>
+                                        </div>
+                                        <p class="text-sm text-gray-600">مزيج من الألوان الزاهية</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- الألوان -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">الألوان الرئيسية</h4>
+                                
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="color-option">
+                                        <div class="w-full h-20 bg-blue-600 rounded-lg mb-2"></div>
+                                        <p class="text-center text-sm text-gray-700">أزرق</p>
+                                    </div>
+                                    
+                                    <div class="color-option">
+                                        <div class="w-full h-20 bg-green-600 rounded-lg mb-2"></div>
+                                        <p class="text-center text-sm text-gray-700">أخضر</p>
+                                    </div>
+                                    
+                                    <div class="color-option">
+                                        <div class="w-full h-20 bg-purple-600 rounded-lg mb-2"></div>
+                                        <p class="text-center text-sm text-gray-700">بنفسجي</p>
+                                    </div>
+                                    
+                                    <div class="color-option">
+                                        <div class="w-full h-20 bg-orange-600 rounded-lg mb-2"></div>
+                                        <p class="text-center text-sm text-gray-700">برتقالي</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- التخطيط -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">تخطيط الصفحة</h4>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">شريط التنقل الثابت</h5>
+                                        <p class="text-sm text-gray-600">إبقاء شريط التنقل ثابتاً عند التمرير</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="fixed_navbar" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">وضع القراءة</h5>
+                                        <p class="text-sm text-gray-600">إخفاء العناصر المشتتة أثناء القراءة</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="reading_mode" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- أزرار الحفظ -->
+                            <div class="pt-6 border-t border-gray-100">
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save ml-2"></i> حفظ التغييرات
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- تبويب الإشعارات -->
+                <div id="notifications-tab" class="settings-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">إعدادات الإشعارات</h3>
+                        
+                        <form method="POST" class="space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="notifications">
+                            
+                            <!-- إشعارات البريد الإلكتروني -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">إشعارات البريد الإلكتروني</h4>
+                                
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات الكتب الجديدة</h5>
+                                            <p class="text-sm text-gray-600">إرسال إشعار عند إضافة كتب جديدة</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="new_books_notifications" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات التحديثات</h5>
+                                            <p class="text-sm text-gray-600">إرسال إشعار بالتحديثات والميزات الجديدة</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="updates_notifications" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات التقييمات</h5>
+                                            <p class="text-sm text-gray-600">إرسال إشعار عند تلقي تقييمات جديدة</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="reviews_notifications" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- إشعارات النظام -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">إشعارات النظام</h4>
+                                
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات الأمان</h5>
+                                            <p class="text-sm text-gray-600">إشعارات تسجيل الدخول والأنشطة المشبوهة</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="security_notifications" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات النسخ الاحتياطي</h5>
+                                            <p class="text-sm text-gray-600">إشعارات نجاح أو فشل النسخ الاحتياطي</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="backup_notifications" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إشعارات الصيانة</h5>
+                                            <p class="text-sm text-gray-600">إشعارات حول أعمال الصيانة والتحديثات</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="maintenance_notifications" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- تفضيلات الإشعارات -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">تفضيلات الإشعارات</h4>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">تردد الإشعارات</label>
+                                    <select name="notification_frequency" class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        <option value="instant">فوري</option>
+                                        <option value="daily" selected>يومي</option>
+                                        <option value="weekly">أسبوعي</option>
+                                        <option value="never">عدم الإرسال</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">وقت إرسال الإشعارات اليومية</label>
+                                    <input type="time" name="daily_notification_time" value="18:00"
+                                           class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                </div>
+                            </div>
+                            
+                            <!-- أزرار الحفظ -->
+                            <div class="pt-6 border-t border-gray-100">
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save ml-2"></i> حفظ الإعدادات
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- تبويب النسخ الاحتياطي -->
+                <div id="backup-tab" class="settings-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">النسخ الاحتياطي والاستعادة</h3>
+                        
+                        <form method="POST" class="space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="backup">
+                            
+                            <!-- النسخ الاحتياطي التلقائي -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">النسخ الاحتياطي التلقائي</h4>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">تفعيل النسخ الاحتياطي التلقائي</h5>
+                                        <p class="text-sm text-gray-600">إنشاء نسخة احتياطية تلقائية حسب الجدول</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="auto_backup" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">تردد النسخ الاحتياطي</label>
+                                    <select name="backup_frequency" class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        <option value="daily">يومي</option>
+                                        <option value="weekly" selected>أسبوعي</option>
+                                        <option value="monthly">شهري</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">وقت النسخ الاحتياطي</label>
+                                    <input type="time" name="backup_time" value="02:00"
+                                           class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                </div>
+                            </div>
+                            
+                            <!-- النسخ الاحتياطي اليدوي -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">نسخ احتياطي يدوي</h4>
+                                
+                                <div class="bg-blue-50 p-6 rounded-xl">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center ml-4">
+                                            <i class="fas fa-database text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">إنشاء نسخة احتياطية الآن</h5>
+                                            <p class="text-sm text-gray-600">سيتم حفظ نسخة من جميع البيانات الحالية</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex flex-wrap gap-4">
+                                        <button type="button" id="create-backup" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                                            <i class="fas fa-download ml-2"></i> إنشاء نسخة احتياطية
+                                        </button>
+                                        
+                                        <button type="button" id="download-backup" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg">
+                                            <i class="fas fa-file-export ml-2"></i> تحميل آخر نسخة
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- النسخ الاحتياطية السابقة -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">النسخ الاحتياطية السابقة</h4>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead>
+                                            <tr class="bg-gray-50">
+                                                <th class="py-3 px-4 text-right text-gray-700 font-semibold">التاريخ</th>
+                                                <th class="py-3 px-4 text-right text-gray-700 font-semibold">الحجم</th>
+                                                <th class="py-3 px-4 text-right text-gray-700 font-semibold">النوع</th>
+                                                <th class="py-3 px-4 text-right text-gray-700 font-semibold">الإجراءات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-t border-gray-100">
+                                                <td class="py-3 px-4">2023-10-15 02:00</td>
+                                                <td class="py-3 px-4">45.2 MB</td>
+                                                <td class="py-3 px-4">
+                                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">تلقائي</span>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <button class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr class="border-t border-gray-100">
+                                                <td class="py-3 px-4">2023-10-08 02:00</td>
+                                                <td class="py-3 px-4">44.8 MB</td>
+                                                <td class="py-3 px-4">
+                                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">تلقائي</span>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <button class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr class="border-t border-gray-100">
+                                                <td class="py-3 px-4">2023-10-01 14:30</td>
+                                                <td class="py-3 px-4">45.5 MB</td>
+                                                <td class="py-3 px-4">
+                                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">يدوي</span>
+                                                </td>
+                                                <td class="py-3 px-4">
+                                                    <button class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- استعادة النسخ الاحتياطي -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">استعادة البيانات</h4>
+                                
+                                <div class="bg-yellow-50 p-6 rounded-xl">
+                                    <div class="flex items-center mb-4">
+                                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-4">
+                                            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">تحذير هام</h5>
+                                            <p class="text-sm text-gray-600">استعادة البيانات ستحل محل جميع البيانات الحالية. تأكد من وجود نسخة احتياطية حديثة.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4">
+                                        <input type="file" id="restore-file" class="hidden">
+                                        <label for="restore-file" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg cursor-pointer">
+                                            <i class="fas fa-file-upload ml-2"></i> اختر ملف الاستعادة
+                                        </label>
+                                        <button type="button" id="restore-backup" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">
+                                            <i class="fas fa-undo ml-2"></i> استعادة البيانات
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- تبويب الأمان -->
+                <div id="security-tab" class="settings-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">إعدادات الأمان</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- تسجيل الدخول -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">إعدادات تسجيل الدخول</h4>
+                                
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">مصادقة ثنائية العوامل</h5>
+                                        <p class="text-sm text-gray-600">طلب رمز تحقق إضافي عند تسجيل الدخول</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="two_factor_auth" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">تسجيل الدخول من متصفحات جديدة</h5>
+                                        <p class="text-sm text-gray-600">طلب تأكيد الهوية عند تسجيل الدخول من متصفح جديد</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="new_browser_auth" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- قوة كلمة المرور -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">متطلبات كلمة المرور</h4>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">الحد الأدنى لطول كلمة المرور</label>
+                                    <select class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                        <option value="6">6 أحرف</option>
+                                        <option value="8" selected>8 أحرف</option>
+                                        <option value="10">10 أحرف</option>
+                                        <option value="12">12 أحرف</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="require_uppercase" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                                        <label for="require_uppercase" class="mr-2 text-gray-700">مطلوب حرف كبير واحد على الأقل</label>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="require_number" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                                        <label for="require_number" class="mr-2 text-gray-700">مطلوب رقم واحد على الأقل</label>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="require_special" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                                        <label for="require_special" class="mr-2 text-gray-700">مطلوب رمز خاص واحد على الأقل</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- الحماية -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">الحماية</h4>
+                                
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">منع هجمات Brute Force</h5>
+                                        <p class="text-sm text-gray-600">منع محاولات تسجيل الدخول المتكررة</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="brute_force_protection" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div>
+                                        <h5 class="font-medium text-gray-800">حماية من SQL Injection</h5>
+                                        <p class="text-sm text-gray-600">فحص الاستعلامات لمنع الهجمات</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="sql_injection_protection" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- سجلات الأمان -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-800">سجلات الأمان</h4>
+                                
+                                <div class="bg-red-50 p-6 rounded-xl">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">سجلات الأنشطة المشبوهة</h5>
+                                            <p class="text-sm text-gray-600">عرض سجلات محاولات الاختراق والأنشطة المشبوهة</p>
+                                        </div>
+                                        <button type="button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">
+                                            <i class="fas fa-eye ml-2"></i> عرض السجلات
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">آخر محاولة تسجيل دخول فاشلة</span>
+                                            <span class="font-medium">منذ 15 دقيقة</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">آخر نشاط مشبوه</span>
+                                            <span class="font-medium">منذ 3 أيام</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">إجمالي المحاولات الفاشلة</span>
+                                            <span class="font-medium">24 هذا الشهر</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- أزرار الحفظ -->
+                            <div class="pt-6 border-t border-gray-100">
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save ml-2"></i> حفظ إعدادات الأمان
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // تأثيرات GSAP للإعدادات
+    document.addEventListener('DOMContentLoaded', function() {
+        // التبديل بين التبويبات
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-content');
+        
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // تحديث التبويبات النشطة
+                settingsTabs.forEach(t => {
+                    t.classList.remove('bg-primary-50', 'text-primary-600');
+                    t.classList.add('hover:bg-gray-50', 'text-gray-700');
+                });
+                
+                this.classList.add('bg-primary-50', 'text-primary-600');
+                this.classList.remove('hover:bg-gray-50', 'text-gray-700');
+                
+                // إظهار المحتوى المحدد
+                settingsContents.forEach(content => {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                });
+                
+                const activeContent = document.getElementById(`${tabId}-tab`);
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('active');
+                
+                // تأثير GSAP
+                gsap.from(activeContent, {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.5
+                });
+                
+                // تأثير على التبويب
+                gsap.fromTo(this,
+                    { scale: 1 },
+                    { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+                );
+            });
+        });
+        
+        // تأثيرات على خيارات الثيم
+        const themeOptions = document.querySelectorAll('.theme-option');
+        themeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                themeOptions.forEach(opt => {
+                    opt.classList.remove('border-blue-500');
+                    opt.classList.add('border-gray-300');
+                });
+                
+                this.classList.remove('border-gray-300');
+                this.classList.add('border-blue-500');
+                
+                // تأثير GSAP
+                gsap.fromTo(this,
+                    { scale: 1 },
+                    { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+                );
+            });
+        });
+        
+        // تأثيرات على خيارات الألوان
+        const colorOptions = document.querySelectorAll('.color-option');
+        colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // تأثير GSAP
+                gsap.fromTo(this.querySelector('div'),
+                    { scale: 1 },
+                    { scale: 0.9, duration: 0.2, yoyo: true, repeat: 1 }
+                );
+            });
+        });
+        
+        // تأثيرات على شرائط التقدم
+        const progressBars = document.querySelectorAll('.bg-green-600, .bg-blue-600, .bg-purple-600');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            
+            gsap.to(bar, {
+                width: width,
+                duration: 1.5,
+                delay: 0.3,
+                ease: "power2.out"
+            });
+        });
+        
+        // إنشاء نسخة احتياطية
+        const createBackupBtn = document.getElementById('create-backup');
+        if (createBackupBtn) {
+            createBackupBtn.addEventListener('click', function() {
+                // إظهار مؤشر التحميل
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الإنشاء...';
+                this.disabled = true;
+                
+                // محاكاة إنشاء النسخة الاحتياطية
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    this.disabled = false;
+                    
+                    // عرض رسالة النجاح
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
+                    successDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 ml-3"></i>
+                            <div>
+                                <p class="font-bold">نجاح</p>
+                                <p class="text-sm">تم إنشاء النسخة الاحتياطية بنجاح</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successDiv);
+                    
+                    // تأثير ظهور رسالة النجاح
+                    gsap.from(successDiv, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3
+                    });
+                    
+                    // إزالة رسالة النجاح بعد 3 ثواني
+                    setTimeout(() => {
+                        gsap.to(successDiv, {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            onComplete: () => {
+                                successDiv.remove();
+                            }
+                        });
+                    }, 3000);
+                }, 2000);
+                
+                // تأثير GSAP
+                gsap.fromTo(this,
+                    { scale: 1 },
+                    { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+                );
+            });
+        }
+        
+        // تحميل آخر نسخة احتياطية
+        const downloadBackupBtn = document.getElementById('download-backup');
+        if (downloadBackupBtn) {
+            downloadBackupBtn.addEventListener('click', function() {
+                // إظهار مؤشر التحميل
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري التحميل...';
+                
+                // محاكاة تحميل الملف
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    
+                    // تأثير GSAP
+                    gsap.fromTo(this,
+                        { scale: 1 },
+                        { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+                    );
+                    
+                    // عرض رسالة النجاح
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
+                    successDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 ml-3"></i>
+                            <div>
+                                <p class="font-bold">نجاح</p>
+                                <p class="text-sm">بدأ تحميل ملف النسخة الاحتياطية</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successDiv);
+                    
+                    // تأثير ظهور رسالة النجاح
+                    gsap.from(successDiv, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3
+                    });
+                    
+                    // إزالة رسالة النجاح بعد 3 ثواني
+                    setTimeout(() => {
+                        gsap.to(successDiv, {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            onComplete: () => {
+                                successDiv.remove();
+                            }
+                        });
+                    }, 3000);
+                }, 1500);
+            });
+        }
+        
+        // استعادة النسخة الاحتياطية
+        const restoreBackupBtn = document.getElementById('restore-backup');
+        const restoreFileInput = document.getElementById('restore-file');
+        
+        if (restoreBackupBtn && restoreFileInput) {
+            restoreBackupBtn.addEventListener('click', function() {
+                if (!restoreFileInput.files.length) {
+                    alert('يرجى اختيار ملف الاستعادة أولاً');
+                    return;
+                }
+                
+                if (!confirm('تحذير: استعادة البيانات ستحل محل جميع البيانات الحالية. هل أنت متأكد؟')) {
+                    return;
+                }
+                
+                // إظهار مؤشر التحميل
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الاستعادة...';
+                this.disabled = true;
+                
+                // محاكاة استعادة البيانات
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    this.disabled = false;
+                    
+                    // عرض رسالة النجاح
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
+                    successDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 ml-3"></i>
+                            <div>
+                                <p class="font-bold">نجاح</p>
+                                <p class="text-sm">تم استعادة البيانات بنجاح</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successDiv);
+                    
+                    // تأثير ظهور رسالة النجاح
+                    gsap.from(successDiv, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3
+                    });
+                    
+                    // إزالة رسالة النجاح بعد 3 ثواني
+                    setTimeout(() => {
+                        gsap.to(successDiv, {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            onComplete: () => {
+                                successDiv.remove();
+                            }
+                        });
+                    }, 3000);
+                }, 3000);
+            });
+        }
+        
+        // تأثيرات على مفاتيح التبديل
+        const toggleSwitches = document.querySelectorAll('input[type="checkbox"]');
+        toggleSwitches.forEach(switchEl => {
+            switchEl.addEventListener('change', function() {
+                const switchDiv = this.nextElementSibling;
+                
+                if (this.checked) {
+                    gsap.to(switchDiv, {
+                        backgroundColor: '#2563eb',
+                        duration: 0.2
+                    });
+                } else {
+                    gsap.to(switchDiv, {
+                        backgroundColor: '#d1d5db',
+                        duration: 0.2
+                    });
+                }
+                
+                // تأثير اهتزاز
+                gsap.fromTo(this.parentElement,
+                    { x: 0 },
+                    { x: [-5, 5, -5, 5, 0], duration: 0.3 }
+                );
+            });
+        });
+        
+        // تأثيرات على الأزرار
+        const buttons = document.querySelectorAll('button[type="submit"], button[type="button"]');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    y: -2,
+                    duration: 0.2
+                });
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    y: 0,
+                    duration: 0.2
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

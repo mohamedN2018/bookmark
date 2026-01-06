@@ -1,0 +1,630 @@
+<!-- templates/auth/profile.html -->
+{% extends 'base.html' %}
+
+{% block title %}الملف الشخصي - مكتبة الكتب{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- رأس الصفحة -->
+            <div class="mb-8 animate-on-scroll">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">الملف الشخصي</h1>
+                <p class="text-lg text-gray-600">إدارة معلومات حسابك وتفضيلات القراءة</p>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- الشريط الجانبي -->
+                <div class="lg:w-1/4">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <div class="flex items-center mb-6">
+                            <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-user text-3xl text-primary-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-xl">{{ user.username }}</h3>
+                                <p class="text-gray-600">{{ user.email }}</p>
+                                <p class="text-sm text-gray-500">عضو منذ {{ user.date_joined|date:"Y/m/d" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <a href="#profile-info" class="profile-nav flex items-center p-3 rounded-lg bg-primary-50 text-primary-600">
+                                <i class="fas fa-user-circle ml-3"></i>
+                                <span>معلومات الشخصية</span>
+                            </a>
+                            <a href="#reading-stats" class="profile-nav flex items-center p-3 rounded-lg hover:bg-gray-50 text-gray-700">
+                                <i class="fas fa-chart-bar ml-3"></i>
+                                <span>إحصائيات القراءة</span>
+                            </a>
+                            <a href="#bookmarks" class="profile-nav flex items-center p-3 rounded-lg hover:bg-gray-50 text-gray-700">
+                                <i class="fas fa-bookmark ml-3"></i>
+                                <span>الكتب المحفوظة</span>
+                            </a>
+                            <a href="#reviews" class="profile-nav flex items-center p-3 rounded-lg hover:bg-gray-50 text-gray-700">
+                                <i class="fas fa-star ml-3"></i>
+                                <span>التقييمات والمراجعات</span>
+                            </a>
+                            <a href="#settings" class="profile-nav flex items-center p-3 rounded-lg hover:bg-gray-50 text-gray-700">
+                                <i class="fas fa-cog ml-3"></i>
+                                <span>الإعدادات</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- بطاقات الإحصائيات -->
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center ml-3">
+                                    <i class="fas fa-book text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">الكتب المقروءة</p>
+                                    <h4 class="text-2xl font-bold text-gray-800">{{ reading_history_count }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center ml-3">
+                                    <i class="fas fa-bookmark text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">الكتب المحفوظة</p>
+                                    <h4 class="text-2xl font-bold text-gray-800">{{ bookmarks_count }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-3">
+                                    <i class="fas fa-star text-yellow-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">التقييمات</p>
+                                    <h4 class="text-2xl font-bold text-gray-800">{{ reviews_count }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- المحتوى الرئيسي -->
+                <div class="lg:w-3/4">
+                    <!-- قسم المعلومات الشخصية -->
+                    <div id="profile-info" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">معلومات الشخصية</h3>
+                            <button id="edit-profile-btn" class="text-primary-600 hover:text-primary-800 font-medium">
+                                <i class="fas fa-edit ml-2"></i> تعديل
+                            </button>
+                        </div>
+                        
+                        <form id="profile-form" method="POST" action="{% url 'profile' %}" class="space-y-6">
+                            {% csrf_token %}
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">اسم المستخدم</label>
+                                    <input type="text" value="{{ user.username }}" 
+                                           class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50" disabled>
+                                    <p class="text-xs text-gray-500 mt-1">لا يمكن تغيير اسم المستخدم</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">البريد الإلكتروني</label>
+                                    <input type="email" name="email" value="{{ user.email }}" 
+                                           class="w-full p-3 border border-gray-300 rounded-lg" id="email-input" disabled>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">الاسم الأول</label>
+                                    <input type="text" name="first_name" value="{{ user.first_name|default:'' }}" 
+                                           class="w-full p-3 border border-gray-300 rounded-lg" id="first-name-input" disabled>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-700 mb-2">الاسم الأخير</label>
+                                    <input type="text" name="last_name" value="{{ user.last_name|default:'' }}" 
+                                           class="w-full p-3 border border-gray-300 rounded-lg" id="last-name-input" disabled>
+                                </div>
+                            </div>
+                            
+                            <!-- تغيير كلمة المرور -->
+                            <div class="border-t border-gray-200 pt-6 mt-6">
+                                <h4 class="text-lg font-medium text-gray-800 mb-4">تغيير كلمة المرور</h4>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">كلمة المرور الجديدة</label>
+                                        <input type="password" name="password" 
+                                               class="w-full p-3 border border-gray-300 rounded-lg" id="password-input" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">تأكيد كلمة المرور</label>
+                                        <input type="password" 
+                                               class="w-full p-3 border border-gray-300 rounded-lg" id="confirm-password-input" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- أزرار الحفظ والإلغاء -->
+                            <div class="flex justify-end space-x-4 space-x-reverse hidden" id="profile-buttons">
+                                <button type="button" id="cancel-edit-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg">
+                                    إلغاء
+                                </button>
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg">
+                                    <i class="fas fa-save ml-2"></i> حفظ التغييرات
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- قسم إحصائيات القراءة -->
+                    <div id="reading-stats" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">إحصائيات القراءة</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-blue-50 p-6 rounded-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p class="text-gray-600">إجمالي وقت القراءة</p>
+                                        <h4 class="text-2xl font-bold text-gray-800">42 ساعة</h4>
+                                    </div>
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-clock text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-600"><i class="fas fa-arrow-up ml-1"></i> 15% زيادة عن الشهر الماضي</p>
+                            </div>
+                            
+                            <div class="bg-green-50 p-6 rounded-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p class="text-gray-600">متوسط الصفحات/يوم</p>
+                                        <h4 class="text-2xl font-bold text-gray-800">24 صفحة</h4>
+                                    </div>
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-green-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-600"><i class="fas fa-arrow-up ml-1"></i> 8% زيادة عن الشهر الماضي</p>
+                            </div>
+                            
+                            <div class="bg-purple-50 p-6 rounded-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <p class="text-gray-600">الكتب المكتملة</p>
+                                        <h4 class="text-2xl font-bold text-gray-800">7 كتب</h4>
+                                    </div>
+                                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check-circle text-purple-600"></i>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-green-600"><i class="fas fa-arrow-up ml-1"></i> 2 كتب هذا الشهر</p>
+                            </div>
+                        </div>
+                        
+                        <!-- رسم بياني مبسط -->
+                        <div>
+                            <h4 class="text-lg font-medium text-gray-800 mb-4">نشاط القراءة الشهري</h4>
+                            <div class="h-48 flex items-end space-x-4 space-x-reverse justify-center" id="reading-chart">
+                                {% for i in "123456"|make_list %}
+                                <div class="flex flex-col items-center">
+                                    <div class="w-8 bg-primary-500 rounded-t-lg mb-2" style="height: {{ forloop.counter|add:'2' }}px;"></div>
+                                    <span class="text-gray-600 text-sm">الشهر {{ forloop.counter }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- قسم التفضيلات -->
+                    <div id="settings" class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6">التفضيلات والإعدادات</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-gray-800">الإشعارات البريدية</h4>
+                                    <p class="text-sm text-gray-600">تلقي إشعارات عن الكتب الجديدة والعروض</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-gray-800">توصيات مخصصة</h4>
+                                    <p class="text-sm text-gray-600">اقتراح كتب بناءً على اهتماماتك</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-medium text-gray-800">الوضع المظلم</h4>
+                                    <p class="text-sm text-gray-600">تفعيل الوضع المظلم للموقع</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" id="dark-mode-toggle">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium text-gray-800 mb-3">لغة الواجهة</h4>
+                                <select class="w-full md:w-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option>العربية</option>
+                                    <option>English</option>
+                                    <option>Français</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- زر حذف الحساب -->
+                        <div class="border-t border-gray-200 pt-6 mt-6">
+                            <button id="delete-account-btn" class="text-red-600 hover:text-red-800 font-medium">
+                                <i class="fas fa-trash-alt ml-2"></i> حذف الحساب
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة حذف الحساب -->
+<div id="delete-account-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">حذف الحساب</h3>
+                <button id="close-delete-modal" class="text-gray-500 hover:text-gray-700 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                </div>
+                <p class="text-gray-600 text-center mb-4">هل أنت متأكد من رغبتك في حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+                <p class="text-sm text-gray-500 text-center">سيتم حذف جميع بياناتك بما في ذلك سجل القراءة والكتب المحفوظة والتقييمات.</p>
+            </div>
+            
+            <div class="flex justify-end space-x-4 space-x-reverse">
+                <button id="cancel-delete" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg">
+                    إلغاء
+                </button>
+                <button id="confirm-delete" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">
+                    <i class="fas fa-trash-alt ml-2"></i> حذف الحساب
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // تأثيرات GSAP لصفحة الملف الشخصي
+    document.addEventListener('DOMContentLoaded', function() {
+        // تأثيرات التمرير للروابط الجانبية
+        const profileNavs = document.querySelectorAll('.profile-nav');
+        profileNavs.forEach(nav => {
+            nav.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    x: 5,
+                    duration: 0.2
+                });
+            });
+            
+            nav.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    x: 0,
+                    duration: 0.2
+                });
+            });
+        });
+        
+        // تأثيرات على بطاقات الإحصائيات
+        const statCards = document.querySelectorAll('.bg-blue-50, .bg-green-50, .bg-purple-50');
+        statCards.forEach((card, index) => {
+            gsap.from(card, {
+                opacity: 0,
+                y: 20,
+                duration: 0.6,
+                delay: 0.2 + (index * 0.1),
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+        
+        // تأثيرات على أعمدة الرسم البياني
+        const chartBars = document.querySelectorAll('#reading-chart > div');
+        chartBars.forEach((bar, index) => {
+            const barDiv = bar.querySelector('div');
+            const originalHeight = barDiv.style.height;
+            barDiv.style.height = '0px';
+            
+            gsap.to(barDiv, {
+                height: originalHeight,
+                duration: 1,
+                delay: index * 0.1,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#reading-chart',
+                    start: "top 80%",
+                    toggleActions: "play none none none"
+                }
+            });
+        });
+        
+        // تفعيل/تعطيل تعديل الملف الشخصي
+        const editBtn = document.getElementById('edit-profile-btn');
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        const profileButtons = document.getElementById('profile-buttons');
+        const editableInputs = ['email-input', 'first-name-input', 'last-name-input', 'password-input', 'confirm-password-input'];
+        
+        if (editBtn) {
+            editBtn.addEventListener('click', function() {
+                // تفعيل الحقول
+                editableInputs.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) {
+                        input.disabled = false;
+                        gsap.to(input, {
+                            backgroundColor: '#ffffff',
+                            duration: 0.3
+                        });
+                    }
+                });
+                
+                // إظهار أزرار الحفظ والإلغاء
+                profileButtons.classList.remove('hidden');
+                gsap.from(profileButtons, {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.3
+                });
+                
+                // إخفاء زر التعديل
+                gsap.to(this, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                // تعطيل الحقول
+                editableInputs.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) {
+                        input.disabled = true;
+                        gsap.to(input, {
+                            backgroundColor: '#f9fafb',
+                            duration: 0.3
+                        });
+                    }
+                });
+                
+                // إعادة تعيين القيم
+                document.getElementById('email-input').value = '{{ user.email }}';
+                document.getElementById('first-name-input').value = '{{ user.first_name|default:'' }}';
+                document.getElementById('last-name-input').value = '{{ user.last_name|default:'' }}';
+                document.getElementById('password-input').value = '';
+                document.getElementById('confirm-password-input').value = '';
+                
+                // إخفاء أزرار الحفظ والإلغاء
+                gsap.to(profileButtons, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        profileButtons.classList.add('hidden');
+                    }
+                });
+                
+                // إظهار زر التعديل
+                editBtn.style.display = 'block';
+                gsap.fromTo(editBtn,
+                    { opacity: 0 },
+                    { opacity: 1, duration: 0.3 }
+                );
+            });
+        }
+        
+        // التحقق من تطابق كلمة المرور
+        const passwordInput = document.getElementById('password-input');
+        const confirmPasswordInput = document.getElementById('confirm-password-input');
+        
+        function checkPasswordsMatch() {
+            if (passwordInput.value && confirmPasswordInput.value) {
+                if (passwordInput.value === confirmPasswordInput.value) {
+                    // تأثير نجاح
+                    gsap.fromTo([passwordInput, confirmPasswordInput],
+                        { borderColor: '#d1d5db' },
+                        { borderColor: '#10b981', duration: 0.3 }
+                    );
+                } else {
+                    // تأثير خطأ
+                    gsap.fromTo([passwordInput, confirmPasswordInput],
+                        { borderColor: '#d1d5db' },
+                        { borderColor: '#ef4444', duration: 0.3 }
+                    );
+                }
+            }
+        }
+        
+        if (passwordInput && confirmPasswordInput) {
+            passwordInput.addEventListener('input', checkPasswordsMatch);
+            confirmPasswordInput.addEventListener('input', checkPasswordsMatch);
+        }
+        
+        // التحكم في الوضع المظلم
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        if (darkModeToggle) {
+            // تحميل الإعداد المحفوظ
+            const savedMode = localStorage.getItem('darkMode') === 'true';
+            darkModeToggle.checked = savedMode;
+            
+            if (savedMode) {
+                document.body.classList.add('dark');
+            }
+            
+            darkModeToggle.addEventListener('change', function() {
+                const isDark = this.checked;
+                localStorage.setItem('darkMode', isDark);
+                
+                if (isDark) {
+                    document.body.classList.add('dark');
+                    gsap.to(document.body, {
+                        backgroundColor: '#1a202c',
+                        color: '#e2e8f0',
+                        duration: 0.5
+                    });
+                } else {
+                    document.body.classList.remove('dark');
+                    gsap.to(document.body, {
+                        backgroundColor: '#f9fafb',
+                        color: '#1f2937',
+                        duration: 0.5
+                    });
+                }
+            });
+        }
+        
+        // التحكم في نافذة حذف الحساب
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const deleteModal = document.getElementById('delete-account-modal');
+        const closeDeleteModal = document.getElementById('close-delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const confirmDelete = document.getElementById('confirm-delete');
+        
+        if (deleteAccountBtn) {
+            deleteAccountBtn.addEventListener('click', function() {
+                deleteModal.classList.remove('hidden');
+                gsap.fromTo(deleteModal,
+                    { opacity: 0 },
+                    { opacity: 1, duration: 0.3 }
+                );
+                
+                const modalContent = deleteModal.querySelector('.bg-white');
+                gsap.fromTo(modalContent,
+                    { scale: 0.8, opacity: 0 },
+                    { scale: 1, opacity: 1, duration: 0.4 }
+                );
+            });
+        }
+        
+        function closeDeleteModalHandler() {
+            const modalContent = deleteModal.querySelector('.bg-white');
+            gsap.to(modalContent, {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    deleteModal.classList.add('hidden');
+                }
+            });
+            
+            gsap.to(deleteModal, {
+                opacity: 0,
+                duration: 0.3
+            });
+        }
+        
+        if (closeDeleteModal) {
+            closeDeleteModal.addEventListener('click', closeDeleteModalHandler);
+        }
+        
+        if (cancelDelete) {
+            cancelDelete.addEventListener('click', closeDeleteModalHandler);
+        }
+        
+        if (confirmDelete) {
+            confirmDelete.addEventListener('click', function() {
+                // هنا سيتم إرسال طلب AJAX لحذف الحساب
+                fetch('/api/delete-account/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء حذف الحساب. يرجى المحاولة مرة أخرى.');
+                });
+            });
+        }
+        
+        // إغلاق النافذة عند النقر خارجها
+        window.addEventListener('click', function(e) {
+            if (e.target === deleteModal) {
+                closeDeleteModalHandler();
+            }
+        });
+        
+        // تأثيرات على مفاتيح التبديل
+        const toggleSwitches = document.querySelectorAll('input[type="checkbox"]');
+        toggleSwitches.forEach(switchEl => {
+            switchEl.addEventListener('change', function() {
+                const switchDiv = this.nextElementSibling;
+                
+                if (this.checked) {
+                    gsap.to(switchDiv, {
+                        backgroundColor: '#2563eb',
+                        duration: 0.2
+                    });
+                    
+                    // تأثير على النقطة
+                    const afterElement = switchDiv.querySelector('.after');
+                    if (afterElement) {
+                        gsap.to(afterElement, {
+                            x: 20,
+                            duration: 0.2
+                        });
+                    }
+                } else {
+                    gsap.to(switchDiv, {
+                        backgroundColor: '#d1d5db',
+                        duration: 0.2
+                    });
+                    
+                    // تأثير على النقطة
+                    const afterElement = switchDiv.querySelector('.after');
+                    if (afterElement) {
+                        gsap.to(afterElement, {
+                            x: 0,
+                            duration: 0.2
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,475 @@
+<!-- templates/auth/register.html -->
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}إنشاء حساب - مكتبة الكتب{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-green-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 animate-on-scroll">
+        <div>
+            <div class="text-center">
+                <a href="{% url 'home' %}" class="text-3xl font-bold text-primary-600">
+                    <i class="fas fa-book mr-2"></i>
+                    مكتبة الكتب
+                </a>
+                <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+                    إنشاء حساب جديد
+                </h2>
+                <p class="mt-2 text-sm text-gray-600">
+                    أو
+                    <a href="{% url 'login' %}" class="font-medium text-primary-600 hover:text-primary-500">
+                        سجل الدخول إلى حسابك الحالي
+                    </a>
+                </p>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-white py-8 px-4 shadow-lg rounded-2xl sm:px-10">
+            <form class="space-y-6" method="POST" id="register-form">
+                {% csrf_token %}
+                
+                <!-- رسائل الخطأ -->
+                {% if form.errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                    <div class="flex">
+                        <div class="py-1">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                        </div>
+                        <div class="mr-3">
+                            <p class="font-bold">خطأ في التسجيل</p>
+                            <ul class="list-disc mr-4 text-sm">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- حقل اسم المستخدم -->
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-700 mb-2">
+                        اسم المستخدم
+                    </label>
+                    <div class="mt-1">
+                        {{ form.username }}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">يجب أن يكون اسم المستخدم فريداً وحروف إنجليزية وأرقام فقط</p>
+                </div>
+                
+                <!-- حقل البريد الإلكتروني -->
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-700 mb-2">
+                        البريد الإلكتروني
+                    </label>
+                    <div class="mt-1">
+                        {{ form.email }}
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">سنرسل إليه رسالة تأكيد</p>
+                </div>
+                
+                <!-- حقل كلمة المرور -->
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-700 mb-2">
+                        كلمة المرور
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password1 }}
+                    </div>
+                    <div class="mt-2">
+                        <div class="progress-bar bg-gray-200 rounded-full h-2 mb-2">
+                            <div id="password-strength-bar" class="bg-red-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="password-strength-text" class="text-xs text-gray-500">قوة كلمة المرور: ضعيفة</p>
+                    </div>
+                    <ul class="mt-2 text-xs text-gray-500 list-disc mr-4 space-y-1">
+                        <li>يجب أن تحتوي على 8 أحرف على الأقل</li>
+                        <li>يجب أن تحتوي على حرف كبير واحد على الأقل</li>
+                        <li>يجب أن تحتوي على رقم واحد على الأقل</li>
+                        <li>يجب أن تحتوي على حرف خاص واحد على الأقل</li>
+                    </ul>
+                </div>
+                
+                <!-- حقل تأكيد كلمة المرور -->
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-700 mb-2">
+                        تأكيد كلمة المرور
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password2 }}
+                    </div>
+                    <div class="mt-2 flex items-center hidden" id="password-match">
+                        <i class="fas fa-check-circle text-green-500 ml-2"></i>
+                        <span class="text-xs text-green-500">كلمة المرور متطابقة</span>
+                    </div>
+                    <div class="mt-2 flex items-center hidden" id="password-mismatch">
+                        <i class="fas fa-times-circle text-red-500 ml-2"></i>
+                        <span class="text-xs text-red-500">كلمة المرور غير متطابقة</span>
+                    </div>
+                </div>
+                
+                <!-- اتفاقية الشروط -->
+                <div class="flex items-center">
+                    <input id="terms" name="terms" type="checkbox" required
+                           class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="terms" class="mr-2 block text-sm text-gray-900">
+                        أوافق على
+                        <a href="#" class="font-medium text-primary-600 hover:text-primary-500">الشروط والأحكام</a>
+                        و
+                        <a href="#" class="font-medium text-primary-600 hover:text-primary-500">سياسة الخصوصية</a>
+                    </label>
+                </div>
+                
+                <!-- زر التسجيل -->
+                <div>
+                    <button type="submit" 
+                            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            id="submit-btn">
+                        <span class="absolute right-0 inset-y-0 flex items-center pr-3">
+                            <i class="fas fa-user-plus"></i>
+                        </span>
+                        إنشاء حساب
+                    </button>
+                </div>
+            </form>
+            
+            <!-- تسجيل الدخول باستخدام حسابات أخرى -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">
+                            أو سجل باستخدام
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <button type="button" 
+                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-300">
+                        <i class="fab fa-google text-red-500 ml-2"></i>
+                        Google
+                    </button>
+                    
+                    <button type="button" 
+                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-300">
+                        <i class="fab fa-facebook text-blue-600 ml-2"></i>
+                        Facebook
+                    </button>
+                </div>
+            </div>
+            
+            <!-- رابط تسجيل الدخول -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    لديك حساب بالفعل؟
+                    <a href="{% url 'login' %}" class="font-medium text-primary-600 hover:text-primary-500">
+                        سجل الدخول
+                    </a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- مزايا التسجيل -->
+        <div class="mt-6 bg-white p-6 rounded-2xl shadow-lg">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">مزايا الانضمام إلى مكتبتنا</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-3 mx-auto">
+                        <i class="fas fa-book text-blue-600"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-gray-900 text-center">وصول غير محدود</h4>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-3 mx-auto">
+                        <i class="fas fa-bookmark text-green-600"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-gray-900 text-center">حفظ الكتب المفضلة</h4>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-3 mx-auto">
+                        <i class="fas fa-star text-purple-600"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-gray-900 text-center">تقييم ومراجعة</h4>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mb-3 mx-auto">
+                        <i class="fas fa-bell text-yellow-600"></i>
+                    </div>
+                    <h4 class="text-sm font-medium text-gray-900 text-center">توصيات ذكية</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // تأثيرات GSAP لصفحة التسجيل
+    document.addEventListener('DOMContentLoaded', function() {
+        // تأثيرات على حقول الإدخال
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                gsap.to(this.parentElement, {
+                    y: -5,
+                    duration: 0.2
+                });
+            });
+            
+            input.addEventListener('blur', function() {
+                gsap.to(this.parentElement, {
+                    y: 0,
+                    duration: 0.2
+                });
+            });
+        });
+        
+        // تأثيرات على زر التسجيل
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('mouseenter', function() {
+                if (!this.disabled) {
+                    gsap.to(this, {
+                        boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
+                        duration: 0.3
+                    });
+                }
+            });
+            
+            submitBtn.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    duration: 0.3
+                });
+            });
+        }
+        
+        // تأثيرات على أزرار التسجيل بالوسائط الاجتماعية
+        const socialBtns = document.querySelectorAll('button[type="button"]');
+        socialBtns.forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    y: -3,
+                    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.1)',
+                    duration: 0.2
+                });
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    y: 0,
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    duration: 0.2
+                });
+            });
+        });
+        
+        // تأثيرات ظهور العناصر
+        const formContainer = document.querySelector('.max-w-md');
+        if (formContainer) {
+            gsap.from(formContainer, {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: 0.2
+            });
+        }
+        
+        // تأثيرات على بطاقات المزايا
+        const featureCards = document.querySelectorAll('.bg-blue-50, .bg-green-50, .bg-purple-50, .bg-yellow-50');
+        featureCards.forEach((card, index) => {
+            gsap.from(card, {
+                opacity: 0,
+                scale: 0.8,
+                duration: 0.5,
+                delay: 0.5 + (index * 0.1)
+            });
+        });
+        
+        // التحقق من قوة كلمة المرور
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        const strengthBar = document.getElementById('password-strength-bar');
+        const strengthText = document.getElementById('password-strength-text');
+        const passwordMatch = document.getElementById('password-match');
+        const passwordMismatch = document.getElementById('password-mismatch');
+        const registerForm = document.getElementById('register-form');
+        const termsCheckbox = document.getElementById('terms');
+        
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            // طول كلمة المرور
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 10;
+            
+            // وجود أحرف كبيرة
+            if (/[A-Z]/.test(password)) strength += 25;
+            
+            // وجود أرقام
+            if (/[0-9]/.test(password)) strength += 25;
+            
+            // وجود رموز خاصة
+            if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+            
+            // تحديث شريط القوة
+            gsap.to(strengthBar, {
+                width: strength + '%',
+                duration: 0.5,
+                ease: 'power2.out'
+            });
+            
+            // تحديث النص
+            if (strength < 50) {
+                strengthBar.className = 'bg-red-500 h-2 rounded-full';
+                strengthText.textContent = 'قوة كلمة المرور: ضعيفة';
+                strengthText.className = 'text-xs text-red-500';
+            } else if (strength < 75) {
+                strengthBar.className = 'bg-yellow-500 h-2 rounded-full';
+                strengthText.textContent = 'قوة كلمة المرور: متوسطة';
+                strengthText.className = 'text-xs text-yellow-500';
+            } else {
+                strengthBar.className = 'bg-green-500 h-2 rounded-full';
+                strengthText.textContent = 'قوة كلمة المرور: قوية';
+                strengthText.className = 'text-xs text-green-500';
+            }
+            
+            return strength;
+        }
+        
+        function checkPasswordMatch() {
+            if (password1.value && password2.value) {
+                if (password1.value === password2.value) {
+                    passwordMatch.classList.remove('hidden');
+                    passwordMismatch.classList.add('hidden');
+                    
+                    // تأثير GSAP
+                    gsap.fromTo(passwordMatch,
+                        { scale: 0.8, opacity: 0 },
+                        { scale: 1, opacity: 1, duration: 0.3 }
+                    );
+                    
+                    return true;
+                } else {
+                    passwordMatch.classList.add('hidden');
+                    passwordMismatch.classList.remove('hidden');
+                    
+                    // تأثير GSAP
+                    gsap.fromTo(passwordMismatch,
+                        { scale: 0.8, opacity: 0 },
+                        { scale: 1, opacity: 1, duration: 0.3 }
+                    );
+                    
+                    return false;
+                }
+            }
+            return false;
+        }
+        
+        function validateForm() {
+            const passwordStrength = checkPasswordStrength(password1.value);
+            const passwordsMatch = checkPasswordMatch();
+            const termsAccepted = termsCheckbox.checked;
+            
+            const isValid = passwordStrength >= 50 && passwordsMatch && termsAccepted;
+            
+            if (submitBtn) {
+                submitBtn.disabled = !isValid;
+                
+                if (isValid) {
+                    gsap.to(submitBtn, {
+                        backgroundColor: '#2563eb',
+                        duration: 0.3
+                    });
+                } else {
+                    gsap.to(submitBtn, {
+                        backgroundColor: '#3b82f6',
+                        duration: 0.3
+                    });
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // إضافة مستمعي الأحداث
+        if (password1) {
+            password1.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+                checkPasswordMatch();
+                validateForm();
+            });
+        }
+        
+        if (password2) {
+            password2.addEventListener('input', function() {
+                checkPasswordMatch();
+                validateForm();
+            });
+        }
+        
+        if (termsCheckbox) {
+            termsCheckbox.addEventListener('change', validateForm);
+        }
+        
+        // التحقق الأولي
+        validateForm();
+        
+        // التحقق قبل الإرسال
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    
+                    // تأثير اهتزاز للنموذج
+                    gsap.to(registerForm, {
+                        x: [-10, 10, -10, 10, 0],
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                    
+                    // رسالة خطأ
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mt-4';
+                    errorDiv.innerHTML = `
+                        <div class="flex">
+                            <div class="py-1">
+                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                            </div>
+                            <div class="mr-3">
+                                <p class="font-bold">خطأ في النموذج</p>
+                                <p class="text-sm">يرجى التحقق من جميع الحقول وتأكيد قبول الشروط.</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const existingError = registerForm.querySelector('.bg-red-50');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    
+                    registerForm.insertBefore(errorDiv, registerForm.firstChild);
+                    
+                    // تأثير ظهور رسالة الخطأ
+                    gsap.from(errorDiv, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}
