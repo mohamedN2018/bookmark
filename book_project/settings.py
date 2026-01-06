@@ -10,24 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from decouple import config
 from django.utils.translation import gettext_lazy as _
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# =========================
+# BASE & SECURITY
+# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w0i#&%moaxrz&ug$0slx#p#(i$2kh$*nceu@908(zl@+x=-8yr'
-
-# SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = config('MY_SECRET_KEY')
 DEBUG = True
 
-ALLOWED_HOSTS = []
+MAIN_DOMAIN = config('MAIN_DOMAIN', default='localhost')
+
+ALLOWED_HOSTS = ["*"]
+
+CORS_ORIGIN_WHITELIST = ["*"]
+
+CSRF_TRUSTED_ORIGINS = [
+    f"{MAIN_DOMAIN}",
+]
 
 
 # Application definition
