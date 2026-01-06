@@ -86,29 +86,53 @@ def book_list(request):
 def book_detail(request, slug):
     book = get_object_or_404(Book, slug=slug)
     reviews = book.reviews.all().order_by('-created_at')
-    similar_books = Book.objects.filter(category=book.category).exclude(id=book.id)[:4]
-    
-    # التحقق مما إذا كان المستخدم قد أضاف الكتاب إلى المفضلة
+    similar_books = Book.objects.filter(
+        category=book.category
+    ).exclude(id=book.id)[:4]
+
     is_bookmarked = False
     if request.user.is_authenticated:
-        is_bookmarked = Bookmark.objects.filter(user=request.user, book=book).exists()
-    
-    # إضافة إلى سجل القراءة
-    if request.user.is_authenticated:
+        is_bookmarked = Bookmark.objects.filter(
+            user=request.user,
+            book=book
+        ).exists()
+
         ReadingHistory.objects.update_or_create(
             user=request.user,
             book=book,
             defaults={'progress': 0}
         )
-    
+
+    # ✅ تجهيز توزيع التقييمات
+    ratings_qs = (
+        book.reviews
+        .values('rating')
+        .annotate(count=Count('id'))
+    )
+
+    ratings_map = {r['rating']: r['count'] for r in ratings_qs}
+
+    ratings_data = []
+    for i in range(5, 0, -1):
+        ratings_data.append({
+            'stars': i,
+            'count': ratings_map.get(i, 0)
+        })
+
+    total_reviews = book.reviews.count()
+
     context = {
         'book': book,
         'reviews': reviews,
         'similar_books': similar_books,
         'is_bookmarked': is_bookmarked,
         'review_form': ReviewForm(),
+        'ratings_data': ratings_data,
+        'total_reviews': total_reviews,
     }
+
     return render(request, 'books/detail.html', context)
+
 
 @login_required
 def add_review(request, book_id):

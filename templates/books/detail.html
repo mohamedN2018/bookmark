@@ -210,28 +210,30 @@
                         </div>
                     </div>
                     
-                    <!-- توزيع التقييمات -->
-                    <div class="mb-8">
-                        {% for rating in "54321"|make_list %}
-                        <div class="flex items-center mb-3">
-                            <span class="w-10 text-gray-600">{{ rating }} نجوم</span>
-                            <div class="flex-1 mx-4">
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    {% with rating_count=book.reviews.filter|get_rating_count:rating %}
-                                    <div class="bg-yellow-500 h-2 rounded-full" 
-                                         style="width: {% widthratio rating_count book.reviews.count 100 %}%"></div>
-                                    {% endwith %}
-                                </div>
-                            </div>
-                            <span class="w-10 text-gray-600 text-right">
-                                {% with rating_count=book.reviews.filter|get_rating_count:rating %}
-                                {{ rating_count }}
-                                {% endwith %}
-                            </span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    
+<!-- توزيع التقييمات -->
+<div class="mb-8">
+    {% for item in ratings_data %}
+    <div class="flex items-center mb-3">
+        <span class="w-10 text-gray-600">{{ item.stars }} نجوم</span>
+
+        <div class="flex-1 mx-4">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                     style="width:
+                     {% if total_reviews %}
+                         {% widthratio item.count total_reviews 100 %}
+                     {% else %}
+                         0
+                     {% endif %}%">
+                </div>
+            </div>
+        </div>
+
+        <span class="w-10 text-gray-600 text-right">
+            {{ item.count }}
+        </span>
+    </div>
+    {% endfor %}                    
                     <!-- نموذج إضافة تقييم -->
                     {% if user.is_authenticated and not user_review %}
                     <div id="review-form-container" class="hidden">
