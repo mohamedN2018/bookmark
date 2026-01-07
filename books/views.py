@@ -14,7 +14,10 @@ from .models import Book, Category, Review, Bookmark, ReadingHistory
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 import json
-
+from django.utils import timezone
+from django.db import models
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 def home(request):
     # الكتب المميزة
@@ -37,7 +40,8 @@ def home(request):
 
 def book_list(request):
     books = Book.objects.all().order_by('-created_at')
-    
+    featured_books = Book.objects.filter(is_featured=True)[:8]
+
     # ===== التصفية حسب التصنيف =====
     category_slug = request.GET.get('category')
     current_category = None
@@ -69,22 +73,24 @@ def book_list(request):
     # ===== الترقيم =====
     paginator = Paginator(books, 12)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    books = paginator.get_page(page_number)
     
     context = {
-        'page_obj': page_obj,
+        'books': books,
         'categories': Category.objects.all(),
         'languages': Book.objects.values_list('language', flat=True).distinct(),
         'current_category': current_category,  # <--- أضفنا هذا
         'current_query': query,
         'current_price': price_filter,
         'current_language': language,
+        'featured_books': featured_books,
     }
     
     return render(request, 'books/list.html', context)
 
 def book_detail(request, slug):
     book = get_object_or_404(Book, slug=slug)
+    books = Book.objects.all()
     reviews = book.reviews.all().order_by('-created_at')
     similar_books = Book.objects.filter(
         category=book.category
@@ -129,6 +135,7 @@ def book_detail(request, slug):
         'review_form': ReviewForm(),
         'ratings_data': ratings_data,
         'total_reviews': total_reviews,
+        'books': books,
     }
 
     return render(request, 'books/detail.html', context)
@@ -137,19 +144,24 @@ def book_detail(request, slug):
 @login_required
 def add_review(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            review = form.save(commit=False)
-            review.book = book
-            review.user = request.user
-            review.save()
-            messages.success(request, 'تم إضافة تقييمك بنجاح!')
+            Review.objects.update_or_create(
+                book=book,
+                user=request.user,
+                defaults={
+                    'rating': form.cleaned_data['rating'],
+                    'comment': form.cleaned_data['comment'],
+                }
+            )
+            messages.success(request, 'تم حفظ تقييمك بنجاح')
         else:
-            messages.error(request, 'حدث خطأ في إضافة التقييم.')
-    
+            messages.error(request, 'حدث خطأ في التقييم')
+
     return redirect('book_detail', slug=book.slug)
+
 
 @login_required
 @require_POST
@@ -186,6 +198,186 @@ def books_by_category(request, slug):
 
 @login_required
 def dashboard(request):
+    user = request.user
+    
+    # إحصائيات عامة للمستخدم
+    bookmarks_count = Bookmark.objects.filter(user=user).count()
+    
+    # حساب وقت القراءة الكلي
+    total_reading_time = ReadingHistory.objects.filter(
+        user=user
+    ).aggregate(
+        total_time=Sum('reading_duration_minutes')
+    )['total_time'] or 0
+    
+    # إذا لم يكن هناك حقل reading_duration_minutes في النموذج، يمكننا استخدام التقدم كنسبة مئوية
+    # أو نعتبر أن كل 1% تقدم = دقيقة واحدة (كمثال افتراضي)
+    if total_reading_time == 0:
+        # استخدم التقدم كنسبة مئوية واعتبرها دقائق (للتوضيح فقط)
+        total_reading_time = ReadingHistory.objects.filter(
+            user=user
+        ).aggregate(
+            total_progress=Sum('progress')
+        )['total_progress'] or 0
+    
+    reviews_count = Review.objects.filter(user=user).count()
+    
+    # تاريخ القراءة (آخر 10 سجلات)
+    reading_history = ReadingHistory.objects.filter(
+        user=user
+    ).select_related('book').order_by('-last_read')[:10]
+    
+    # الكتب المقروءة مؤخراً (آخر 6 كتب للعرض)
+    recent_books = ReadingHistory.objects.filter(
+        user=user
+    ).select_related('book').order_by('-last_read')[:6]
+    
+    context = {
+        'bookmarks_count': bookmarks_count,
+        'total_reading_time': total_reading_time / 60 if total_reading_time > 0 else 0,  # تحويل إلى ساعات
+        'reviews_count': reviews_count,
+        'reading_history': reading_history,
+        'recent_books': recent_books,
+    }
+    
+    # إحصائيات إضافية للـ staff
+    if user.is_staff:
+        # احصائيات إدارية
+        today = timezone.now().date()
+        today_visitors = UserActivity.objects.filter(
+            visited_at__date=today
+        ).values('user').distinct().count()
+        
+        # إذا لم يكن هناك نموذج UserActivity، يمكن استخدام ReadingHistory
+        if today_visitors == 0:
+            today_visitors = ReadingHistory.objects.filter(
+                last_read__date=today
+            ).values('user').distinct().count()
+        
+        total_books = Book.objects.count()
+        total_users = User.objects.filter(is_active=True).count()
+        total_reviews = Review.objects.count()
+        
+        # حساب متوسط التقييمات
+        avg_rating = Review.objects.aggregate(
+            avg=Avg('rating')
+        )['avg'] or 0
+        
+        # إحصائيات الشهور الستة الماضية
+        monthly_stats = []
+        for i in range(5, -1, -1):
+            target_date = timezone.now() - timedelta(days=30*i)
+            month = target_date.month
+            year = target_date.year
+            
+            # كتب هذا الشهر
+            month_books = Book.objects.filter(
+                created_at__month=month,
+                created_at__year=year
+            ).count()
+            
+            # مستخدمين جدد هذا الشهر
+            month_users = User.objects.filter(
+                date_joined__month=month,
+                date_joined__year=year
+            ).count()
+            
+            monthly_stats.append({
+                'month': month,
+                'year': year,
+                'books': month_books,
+                'users': month_users,
+            })
+        
+        context.update({
+            'total_books': total_books,
+            'total_users': total_users,
+            'total_reviews': total_reviews,
+            'today_visitors': today_visitors,
+            'avg_rating': round(avg_rating, 1),
+            'monthly_stats': monthly_stats,
+        })
+    
+    return render(request, 'dashboard/index.html', context)
+
+
+# إضافة نموذج UserActivity إذا لم يكن موجوداً
+class UserActivity(models.Model):
+    """نموذج لتتبع نشاط المستخدمين"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activities')
+    activity_type = models.CharField(max_length=50, choices=[
+        ('login', 'تسجيل دخول'),
+        ('view_book', 'عرض كتاب'),
+        ('read_book', 'قراءة كتاب'),
+        ('review', 'إضافة تقييم'),
+        ('bookmark', 'إضافة إشارة مرجعية'),
+    ])
+    details = models.TextField(blank=True, null=True)
+    visited_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "نشاط المستخدم"
+        verbose_name_plural = "أنشطة المستخدمين"
+        ordering = ['-visited_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.activity_type} - {self.visited_at}"
+
+
+# view للاستعلام AJAX لتحديث الإحصائيات
+@login_required
+def get_statistics(request):
+    """API للحصول على إحصائيات محدثة"""
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'غير مصرح'}, status=403)
+    
+    try:
+        today = timezone.now().date()
+        
+        # احصائيات اليوم
+        today_visitors = UserActivity.objects.filter(
+            visited_at__date=today
+        ).values('user').distinct().count()
+        
+        if today_visitors == 0:
+            today_visitors = ReadingHistory.objects.filter(
+                last_read__date=today
+            ).values('user').distinct().count()
+        
+        # إحصائيات عامة
+        total_books = Book.objects.count()
+        total_users = User.objects.filter(is_active=True).count()
+        total_reviews = Review.objects.count()
+        
+        # إحصائيات الشهر الحالي
+        current_month = timezone.now().month
+        current_year = timezone.now().year
+        
+        monthly_books = Book.objects.filter(
+            created_at__month=current_month,
+            created_at__year=current_year
+        ).count()
+        
+        monthly_users = User.objects.filter(
+            date_joined__month=current_month,
+            date_joined__year=current_year
+        ).count()
+        
+        return JsonResponse({
+            'success': True,
+            'stats': {
+                'total_books': total_books,
+                'total_users': total_users,
+                'total_reviews': total_reviews,
+                'today_visitors': today_visitors,
+                'monthly_books': monthly_books,
+                'monthly_users': monthly_users,
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+    
     user = request.user
     
     # إحصائيات عامة للمستخدم
@@ -434,74 +626,6 @@ def toggle_staff_status(request, user_id):
     status = "منح" if user.is_staff else "سحب"
     return JsonResponse({'success': True, 'message': f'تم {status} صلاحيات الموظف للمستخدم "{user.username}" بنجاح.', 'is_staff': user.is_staff})
 
-@login_required
-def get_statistics(request):
-    # التحقق من صلاحيات الموظفين
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'غير مصرح'}, status=403)
-    
-    # إحصائيات الشهر الحالي
-    current_month = datetime.now().month
-    current_year = datetime.now().year
-    
-    # عدد الكتب المضافة هذا الشهر
-    monthly_books = Book.objects.filter(
-        created_at__month=current_month,
-        created_at__year=current_year
-    ).count()
-    
-    # عدد المستخدمين الجدد هذا الشهر
-    monthly_users = User.objects.filter(
-        date_joined__month=current_month,
-        date_joined__year=current_year
-    ).count()
-    
-    # إحصائيات القراءة لهذا الشهر
-    monthly_reading = ReadingHistory.objects.filter(
-        last_read__month=current_month,
-        last_read__year=current_year
-    ).count()
-    
-    # إحصائيات التقييمات
-    monthly_reviews = Review.objects.filter(
-        created_at__month=current_month,
-        created_at__year=current_year
-    ).count()
-    
-    # إحصائيات الشهور الستة الماضية
-    monthly_stats = []
-    for i in range(5, -1, -1):
-        month = (current_month - i) % 12 or 12
-        year = current_year if (current_month - i) > 0 else current_year - 1
-        
-        books_count = Book.objects.filter(
-            created_at__month=month,
-            created_at__year=year
-        ).count()
-        
-        users_count = User.objects.filter(
-            date_joined__month=month,
-            date_joined__year=year
-        ).count()
-        
-        monthly_stats.append({
-            'month': month,
-            'year': year,
-            'books': books_count,
-            'users': users_count,
-        })
-    
-    return JsonResponse({
-        'monthly_stats': monthly_stats,
-        'current_month': {
-            'books': monthly_books,
-            'users': monthly_users,
-            'reading': monthly_reading,
-            'reviews': monthly_reviews,
-        }
-    })
-
-
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -550,11 +674,13 @@ def user_login(request):
     }
     return render(request, 'auth/login.html', context)
 
+
 def user_logout(request):
     logout(request)
     messages.success(request, 'تم تسجيل الخروج بنجاح.')
     return redirect('home')
 
+@login_required
 def profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -587,7 +713,7 @@ def profile(request):
     }
     return render(request, 'auth/profile.html', context)
 
-
+@login_required
 def custom_logout(request):
     if request.method == 'POST':
         logout(request)

@@ -1,267 +1,1227 @@
+[file name]: home.html
+[file content begin]
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}الصفحة الرئيسية - مكتبة الكتب{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Improved Dark Mode */
+    .dark body {
+        background-color: #0f172a;
+        color: #f8fafc;
+    }
+    
+    .dark .bg-white {
+        background-color: #1e293b !important;
+    }
+    
+    .dark .bg-gray-50 {
+        background-color: #0f172a !important;
+    }
+    
+    .dark .text-gray-800 {
+        color: #f1f5f9 !important;
+    }
+    
+    .dark .text-gray-600 {
+        color: #cbd5e1 !important;
+    }
+    
+    /* Modern Hero Section */
+    .hero-gradient {
+        background: linear-gradient(135deg, 
+            rgba(59, 130, 246, 0.9) 0%, 
+            rgba(147, 51, 234, 0.9) 50%, 
+            rgba(239, 68, 68, 0.9) 100%);
+    }
+    
+    .hero-pattern {
+        background-image: 
+            radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+            radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+    }
+    
+    /* Floating Animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    .float-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Glassmorphism Effect */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dark .glass-card {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Card Hover Effects */
+    .hover-card {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hover-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .hover-card:hover::before {
+        transform: translateX(0);
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark .hover-card:hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Book Cover Animation */
+    .book-cover {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+    
+    .book-cover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .book-cover:hover::after {
+        opacity: 1;
+    }
+    
+    /* Category Badges */
+    .category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .category-badge:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Loading State Fix */
+    .content-wrapper {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* Category Card Styles */
+    .category-card {
+        transition: all 0.3s ease;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .category-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .category-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .category-card:hover .category-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- قسم البطل -->
-<div class="relative overflow-hidden bg-gradient-to-br from-primary-50 to-indigo-100 py-20">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-10 md:mb-0 animate-on-scroll">
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
-                    اكتشف عالماً من <span class="text-primary-600">المعرفة</span> والكتب الرائعة
+<!-- Hero Section with Fixed Issues -->
+<section class="hero-gradient min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
+    <!-- Background Pattern -->
+    <div class="hero-pattern absolute inset-0 opacity-10"></div>
+    
+    <!-- Animated Background Elements -->
+    <div class="absolute top-1/4 left-10 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl float-animation"></div>
+    <div class="absolute bottom-1/4 right-10 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl float-animation" style="animation-delay: 2s;"></div>
+    <div class="absolute top-1/3 right-1/3 w-40 h-40 bg-pink-400/10 rounded-full blur-2xl float-animation" style="animation-delay: 4s;"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <!-- Hero Content -->
+            <div class="lg:w-1/2">
+                <!-- Badge -->
+                <div class="inline-flex items-center glass-card px-4 py-2 rounded-full mb-8 animate-fade-in">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse ml-2"></span>
+                    <span class="text-white font-medium">منصة القراءة الرقمية الرائدة</span>
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                    <span class="block">رحلة في عالم</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-400">
+                        الكتب والمعرفة
+                    </span>
                 </h1>
-                <p class="text-lg text-gray-600 mb-8">
-                    مرحباً بكم في مكتبتنا الرقمية حيث يمكنك استكشاف آلاف الكتب في مختلف المجالات، من الأدب إلى العلوم والتكنولوجيا. اقرأ، استمتع، وتعلم معنا.
+                
+                <!-- Description -->
+                <p class="text-xl text-white/80 mb-8 max-w-2xl">
+                    اكتشف آلاف الكتب الرقمية في مختلف المجالات. انضم إلى مجتمع القراء واستمتع بتجربة قراءة فريدة مع ميزات متقدمة تتناسب مع اهتماماتك.
                 </p>
-                <div class="flex space-x-4 space-x-reverse">
-                    <a href="{% url 'book_list' %}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 transform hover:-translate-y-1">
-                        <i class="fas fa-book-open mr-2"></i> استعرض الكتب
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-2" data-counter="{{ book_count }}">0</div>
+                        <div class="text-white/70">كتاب إلكتروني</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-2" data-counter="{{ user_count }}">0</div>
+                        <div class="text-white/70">قارئ نشط</div>
+                    </div>
+                    <div class="text-center md:col-span-1">
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-2" data-counter="150">0</div>
+                        <div class="text-white/70">كاتب ومؤلف</div>
+                    </div>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-wrap gap-4">
+                    <a href="{% url 'book_list' %}" 
+                       class="bg-white text-gray-900 hover:bg-gray-100 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl group relative overflow-hidden">
+                        <span class="relative z-10">
+                            <i class="fas fa-book-open ml-2 group-hover:rotate-12 transition-transform duration-300"></i>
+                            استعرض الكتب
+                        </span>
                     </a>
+                    
                     {% if not user.is_authenticated %}
-                    <a href="{% url 'register' %}" class="bg-white hover:bg-gray-100 text-primary-600 font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 border border-primary-200">
-                        <i class="fas fa-user-plus mr-2"></i> انضم إلينا
+                    <a href="{% url 'register' %}" 
+                       class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-8 rounded-full transition-all duration-300 group">
+                        <i class="fas fa-user-plus ml-2"></i>
+                        انضم مجاناً
                     </a>
                     {% endif %}
                 </div>
             </div>
-            <div class="md:w-1/2 animate-on-scroll">
+            
+            <!-- Hero Image -->
+            <div class="lg:w-1/2">
                 <div class="relative">
-                    <img src="{% static 'images/hero-books.jpg' %}" alt="كتب" class="rounded-2xl shadow-2xl transform -rotate-3">
-                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-2xl transform rotate-3 w-64">
-                        <div class="flex items-center mb-3">
-                            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center ml-3">
-                                <i class="fas fa-star text-yellow-500"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-800">+{{ book_count }} كتاب</p>
-                                <p class="text-sm text-gray-600">متاح للقراءة</p>
+                    <!-- Floating Book -->
+                    <div class="relative w-80 h-96 mx-auto">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-3xl blur-xl"></div>
+                        
+                        <!-- Book Stack -->
+                        <div class="relative w-full h-full">
+                            <div class="absolute w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-2xl transform rotate-3"></div>
+                            <div class="absolute w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-2xl transform -rotate-2 -translate-y-4"></div>
+                            <div class="absolute w-full h-full bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl shadow-2xl transform rotate-1 -translate-y-8">
+                                <div class="absolute inset-0 flex items-center justify-center p-8">
+                                    <i class="fas fa-book-open text-white text-8xl"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center ml-3">
-                                <i class="fas fa-users text-green-500"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-800">+{{ user_count }} قارئ</p>
-                                <p class="text-sm text-gray-600">ينضمون شهرياً</p>
-                            </div>
+                        
+                        <!-- Floating Badge -->
+                        <div class="absolute -top-6 -left-6 bg-white dark:bg-gray-800 p-3 rounded-full shadow-xl animate-bounce">
+                            <i class="fas fa-crown text-2xl text-yellow-500"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    
+    <!-- Scroll Indicator -->
+    <a href="#categories" 
+       class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white hover:text-yellow-300 transition-colors animate-bounce">
+        <i class="fas fa-chevron-down text-2xl"></i>
+    </a>
+</section>
 
-<!-- قسم الميزات -->
-<div class="py-20 bg-white">
+<!-- Categories Section with Icons -->
+<section id="categories" class="py-20 bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4">
-        <div class="text-center mb-16 animate-on-scroll">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">مميزات منصتنا</h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">نقدم لكم تجربة قراءة فريدة مع مجموعة من المميزات التي تجعل من القراءة متعة حقيقية</p>
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full font-medium mb-4 dark:bg-primary-900 dark:text-primary-300">
+                <i class="fas fa-tags ml-2"></i> تصفح حسب التصنيف
+            </span>
+            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">اكتشف الكتب المفضلة لديك</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                اختر من بين مجموعة واسعة من التصنيفات التي تناسب جميع اهتمامات القراءة
+            </p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="feature-card bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition duration-300 animate-on-scroll">
-                <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                    <i class="fas fa-book-reader text-2xl text-primary-600"></i>
+        <!-- Categories Grid with Icons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Category 1: الأدب -->
+            <a href="#" class="category-card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                        <i class="fas fa-pen-nib text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">الأدب والروايات</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">٢٥٤ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">قراءة غير محدودة</h3>
-                <p class="text-gray-600 text-center">احصل على وصول غير محدود إلى آلاف الكتب في جميع التخصصات. اقرأ ما تريد وقتما تريد.</p>
-            </div>
+            </a>
             
-            <div class="feature-card bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition duration-300 animate-on-scroll">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                    <i class="fas fa-mobile-alt text-2xl text-green-600"></i>
+            <!-- Category 2: العلمية -->
+            <a href="#" class="category-card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-green-500 to-green-600 text-white">
+                        <i class="fas fa-flask text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">العلوم والتكنولوجيا</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٨٩ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">متعدد المنصات</h3>
-                <p class="text-gray-600 text-center">استمتع بتجربة قراءة رائعة على جميع أجهزتك. هاتفك، حاسوبك اللوحي، أو حاسوبك المكتبي.</p>
-            </div>
+            </a>
             
-            <div class="feature-card bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition duration-300 animate-on-scroll">
-                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                    <i class="fas fa-bookmark text-2xl text-purple-600"></i>
+            <!-- Category 3: التاريخ -->
+            <a href="#" class="category-card bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-amber-500 to-amber-600 text-white">
+                        <i class="fas fa-landmark text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">التاريخ والجغرافيا</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٦٧ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">توصيات ذكية</h3>
-                <p class="text-gray-600 text-center">نقترح عليك كتبًا جديدة بناءً على اهتماماتك وتفضيلاتك في القراءة لتجربة مخصصة.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- قسم الكتب المميزة -->
-<div class="py-20 bg-gradient-to-r from-primary-50 to-indigo-50">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center mb-12">
-            <div class="animate-on-scroll">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">كتب مميزة</h2>
-                <p class="text-lg text-gray-600">اكتشف أفضل الكتب التي نرشحها لك</p>
-            </div>
-            <a href="{% url 'book_list' %}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 animate-on-scroll">
-                عرض جميع الكتب
+            </a>
+            
+            <!-- Category 4: تطوير الذات -->
+            <a href="#" class="category-card bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                        <i class="fas fa-brain text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">تطوير الذات</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">٢١٣ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
+                </div>
+            </a>
+            
+            <!-- Category 5: الأعمال -->
+            <a href="#" class="category-card bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-cyan-500 to-cyan-600 text-white">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">الأعمال والاقتصاد</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٤٥ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
+                </div>
+            </a>
+            
+            <!-- Category 6: الدين -->
+            <a href="#" class="category-card bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+                        <i class="fas fa-mosque text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">العلوم الدينية</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">٣٢١ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
+                </div>
+            </a>
+            
+            <!-- Category 7: الأطفال -->
+            <a href="#" class="category-card bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-pink-500 to-pink-600 text-white">
+                        <i class="fas fa-child text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">كتب الأطفال</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٧٨ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
+                </div>
+            </a>
+            
+            <!-- Category 8: اللغات -->
+            <a href="#" class="category-card bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 p-6 hover-card">
+                <div class="flex items-center">
+                    <div class="category-icon bg-gradient-to-br from-violet-500 to-violet-600 text-white">
+                        <i class="fas fa-language text-2xl"></i>
+                    </div>
+                    <div class="flex-grow mr-4">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">تعلم اللغات</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">٩٨ كتاب</p>
+                    </div>
+                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
+                </div>
             </a>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {% for book in featured_books %}
-            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="h-48 bg-gradient-to-r from-primary-100 to-indigo-100 flex items-center justify-center">
-                    {% if book.cover_image %}
-                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
-                    {% else %}
-                    <i class="fas fa-book-open text-6xl text-primary-300"></i>
-                    {% endif %}
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-xl font-bold text-gray-800">{{ book.title|truncatechars:30 }}</h3>
-                        {% if book.is_free %}
-                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">مجاني</span>
-                        {% endif %}
-                    </div>
-                    <p class="text-gray-600 mb-4">{{ book.author }}</p>
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex">
-                            {% with avg_rating=book.average_rating %}
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= avg_rating|add:"0"|floatformat:"0"|add:"0" %}
-                                <i class="fas fa-star text-yellow-500"></i>
-                                {% else %}
-                                <i class="far fa-star text-yellow-500"></i>
-                                {% endif %}
-                            {% endfor %}
-                            <span class="mr-2">{{ avg_rating|floatformat:1 }}</span>
-                            {% endwith %}
-                        </div>
-                        <span class="text-gray-500">{{ book.published_year }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <a href="{% url 'book_detail' book.slug %}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300">
-                            <i class="fas fa-eye ml-2"></i> التفاصيل
-                        </a>
-                        {% if user.is_authenticated %}
-                        <button class="bookmark-btn bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm" data-book-id="{{ book.id }}">
-                            <i class="fas fa-bookmark ml-2"></i> حفظ
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-span-4 text-center py-8">
-                <p class="text-gray-500">لا توجد كتب مميزة حالياً.</p>
-            </div>
-            {% endfor %}
+        <!-- View All Categories -->
+        <div class="text-center">
+            <a href="#" class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium hover:underline">
+                <i class="fas fa-list-alt ml-2"></i>
+                <span>عرض جميع التصنيفات</span>
+            </a>
         </div>
     </div>
-</div>
+</section>
 
-<!-- قسم أحدث الكتب -->
-<div class="py-20 bg-white">
+<!-- Popular Authors Section -->
+<section class="py-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
     <div class="container mx-auto px-4">
-        <div class="text-center mb-12 animate-on-scroll">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">أحدث الكتب</h2>
-            <p class="text-lg text-gray-600">اكتشف أحدث الإضافات إلى مكتبتنا</p>
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full font-medium mb-4 dark:bg-blue-900 dark:text-blue-300">
+                <i class="fas fa-users ml-2"></i> أشهر المؤلفين
+            </span>
+            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">تعرف على مؤلفينا المميزين</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                اكتشف أعمال أشهر الكتاب والمؤلفين في مختلف المجالات
+            </p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {% for book in latest_books %}
-            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="h-48 bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center">
-                    {% if book.cover_image %}
-                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
-                    {% else %}
-                    <i class="fas fa-book-open text-6xl text-blue-300"></i>
-                    {% endif %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Author 1 -->
+            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author1" alt="Author" class="w-full h-full object-cover">
                 </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-xl font-bold text-gray-800">{{ book.title|truncatechars:30 }}</h3>
-                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{{ book.category.name|truncatechars:10 }}</span>
+                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">د. أحمد محمد</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">متخصص في العلوم والتكنولوجيا</p>
+                <div class="flex items-center justify-center mb-4">
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
                     </div>
-                    <p class="text-gray-600 mb-4">{{ book.author }}</p>
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex">
-                            {% with avg_rating=book.average_rating %}
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= avg_rating|add:"0"|floatformat:"0"|add:"0" %}
-                                <i class="fas fa-star text-yellow-500"></i>
-                                {% else %}
-                                <i class="far fa-star text-yellow-500"></i>
-                                {% endif %}
-                            {% endfor %}
-                            <span class="mr-2">{{ avg_rating|floatformat:1 }}</span>
-                            {% endwith %}
-                        </div>
-                        <span class="text-gray-500">{{ book.pages }} صفحة</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <a href="{% url 'book_detail' book.slug %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-300">
-                            <i class="fas fa-eye ml-2"></i> التفاصيل
-                        </a>
-                        {% if book.is_free %}
-                        <button class="bg-green-100 hover:bg-green-200 text-green-800 font-bold py-2 px-4 rounded-lg text-sm">
-                            <i class="fas fa-download ml-2"></i> تحميل
-                        </button>
-                        {% endif %}
-                    </div>
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٧</span>
                 </div>
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">٢٥ كتاب • ١٢٤٥ قارئ</p>
+                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
+                </a>
             </div>
-            {% empty %}
-            <div class="col-span-4 text-center py-8">
-                <p class="text-gray-500">لا توجد كتب حالياً.</p>
+            
+            <!-- Author 2 -->
+            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author2" alt="Author" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">سارة عبد الله</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">كاتبة روائية وكاتبة قصة قصيرة</p>
+                <div class="flex items-center justify-center mb-4">
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">٥.٠</span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">١٨ كتاب • ٢١٤٥ قارئ</p>
+                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
+                </a>
             </div>
-            {% endfor %}
+            
+            <!-- Author 3 -->
+            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author3" alt="Author" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">يوسف الخليفة</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">خبير في الأعمال والاقتصاد</p>
+                <div class="flex items-center justify-center mb-4">
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٠</span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">١٤ كتاب • ٨٧٦ قارئ</p>
+                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
+                </a>
+            </div>
+            
+            <!-- Author 4 -->
+            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author4" alt="Author" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">فاطمة علي</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">متخصصة في تطوير الذات</p>
+                <div class="flex items-center justify-center mb-4">
+                    <div class="flex text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٥</span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">٢٢ كتاب • ١٩٨٧ قارئ</p>
+                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
+                </a>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Featured Books Section -->
+<section id="featured-books" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+            <div class="mb-6 md:mb-0">
+                <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-2">الكتب المميزة</h2>
+                <p class="text-gray-600 dark:text-gray-300">أفضل الكتب التي يوصي بها قراؤنا</p>
+            </div>
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <div class="flex space-x-2 space-x-reverse">
+                    <button class="featured-prev w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-md flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="featured-next w-10 h-10 rounded-full bg-primary-600 text-white shadow-md flex items-center justify-center hover:bg-primary-700">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Books Carousel -->
+        <div class="relative">
+            <div class="featured-carousel overflow-x-hidden">
+                <div class="featured-carousel-track flex gap-6 transition-transform duration-500">
+                    {% for book in featured_books %}
+                    <div class="featured-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
+                        <div class="hover-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg h-full">
+                            <!-- Book Cover -->
+                            <div class="book-cover h-48 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover">
+                                {% else %}
+                                <div class="text-center">
+                                    <i class="fas fa-book-open text-6xl text-blue-300 dark:text-blue-400"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Book Info -->
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-white flex-grow">{{ book.title|truncatechars:40 }}</h3>
+                                    {% if book.is_free %}
+                                    <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium">
+                                        مجاني
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p class="text-gray-600 dark:text-gray-300 mb-4">بواسطة {{ book.author }}</p>
+                                
+                                <!-- Rating -->
+                                <div class="flex items-center mb-4">
+                                    <div class="flex text-yellow-400 ml-2">
+                                        {% with avg_rating=book.average_rating %}
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= avg_rating|add:"0"|floatformat:"0"|add:"0" %}
+                                            <i class="fas fa-star"></i>
+                                            {% else %}
+                                            <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                    <span class="text-gray-500 dark:text-gray-400">{{ book.average_rating|floatformat:1 }}</span>
+                                </div>
+                                
+                                <!-- Actions -->
+                                <div class="flex justify-between items-center">
+                                    <a href="{% url 'book_detail' book.slug %}" 
+                                       class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                                        <i class="fas fa-eye ml-2"></i> قراءة
+                                    </a>
+                                    
+                                    <div class="flex space-x-2 space-x-reverse">
+                                        <button class="text-gray-500 hover:text-yellow-500 transition-colors" title="إضافة للمفضلة">
+                                            <i class="far fa-bookmark"></i>
+                                        </button>
+                                        <button class="text-gray-500 hover:text-blue-500 transition-colors" title="مشاركة">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="w-full text-center py-12">
+                        <i class="fas fa-book-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-500 dark:text-gray-400">لا توجد كتب مميزة حالياً</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mobile App Section -->
+<section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <!-- Content -->
+            <div class="lg:w-1/2 text-white">
+                <span class="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full font-medium mb-6">
+                    <i class="fas fa-mobile-alt ml-2"></i> تطبيق الجوال
+                </span>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">اقرأ في أي وقت وأي مكان</h2>
+                <p class="text-xl mb-8 opacity-90">
+                    حمّل تطبيقنا المجاني وتمتع بتجربة قراءة مذهلة على هاتفك الذكي. اقرأ بدون اتصال بالإنترنت وحفظ تقدمك تلقائياً.
+                </p>
+                
+                <div class="flex flex-wrap gap-4 mb-8">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-2xl text-green-300 ml-3"></i>
+                        <span>قراءة بدون اتصال</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-2xl text-green-300 ml-3"></i>
+                        <span>مزامنة تلقائية</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-2xl text-green-300 ml-3"></i>
+                        <span>إشعارات بالكتب الجديدة</span>
+                    </div>
+                </div>
+                
+                <!-- App Store Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#" class="bg-white text-gray-900 hover:bg-gray-100 font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center">
+                        <i class="fab fa-google-play text-2xl ml-3"></i>
+                        <div class="text-right">
+                            <div class="text-xs">حمّله من</div>
+                            <div class="text-lg">Google Play</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="bg-white text-gray-900 hover:bg-gray-100 font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center">
+                        <i class="fab fa-apple text-2xl ml-3"></i>
+                        <div class="text-right">
+                            <div class="text-xs">حمّله من</div>
+                            <div class="text-lg">App Store</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Phone Mockup -->
+            <div class="lg:w-1/2 relative">
+                <div class="relative w-80 mx-auto">
+                    <!-- Phone Frame -->
+                    <div class="relative w-80 h-[600px] bg-gray-900 rounded-[40px] p-4 shadow-2xl">
+                        <!-- Notch -->
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-6 bg-gray-900 rounded-b-2xl"></div>
+                        
+                        <!-- Screen -->
+                        <div class="w-full h-full bg-gradient-to-b from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-[32px] overflow-hidden">
+                            <!-- App Content -->
+                            <div class="p-6 h-full flex flex-col">
+                                <!-- Header -->
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="font-bold text-gray-800 dark:text-white text-lg">مكتبة الكتب</h3>
+                                    <i class="fas fa-user-circle text-2xl text-gray-600 dark:text-gray-400"></i>
+                                </div>
+                                
+                                <!-- Current Book -->
+                                <div class="bg-white dark:bg-gray-700 rounded-2xl p-4 mb-6 shadow-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-16 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-4">
+                                            <i class="fas fa-book text-white text-2xl"></i>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <h4 class="font-bold text-gray-800 dark:text-white mb-1">الكتاب الحالي</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 text-sm">٦٥٪ مكتمل</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Reading Stats -->
+                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                    <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center">
+                                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">٣٦</div>
+                                        <div class="text-gray-600 dark:text-gray-400 text-sm">يوم متتالي</div>
+                                    </div>
+                                    <div class="bg-white dark:bg-gray-700 rounded-xl p-4 text-center">
+                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">١٢٤٥</div>
+                                        <div class="text-gray-600 dark:text-gray-400 text-sm">صفحة مقروءة</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Book Cover -->
+                                <div class="flex-grow flex items-center justify-center">
+                                    <div class="w-48 h-64 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-2xl flex items-center justify-center">
+                                        <i class="fas fa-book-open text-white text-5xl"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Bottom Navigation -->
+                                <div class="flex justify-around pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <button class="text-blue-600 dark:text-blue-400">
+                                        <i class="fas fa-home text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-400 dark:text-gray-500">
+                                        <i class="fas fa-search text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-400 dark:text-gray-500">
+                                        <i class="fas fa-bookmark text-xl"></i>
+                                    </button>
+                                    <button class="text-gray-400 dark:text-gray-500">
+                                        <i class="fas fa-user text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-4 -right-4 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center shadow-xl">
+                        <i class="fas fa-download text-white text-2xl"></i>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 w-12 h-12 bg-green-400 rounded-full flex items-center justify-center shadow-xl">
+                        <i class="fas fa-book text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-20 bg-white dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 bg-green-100 text-green-600 rounded-full font-medium mb-4 dark:bg-green-900 dark:text-green-300">
+                <i class="fas fa-cogs ml-2"></i> كيف تعمل المنصة
+            </span>
+            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">ابدأ رحلتك في 3 خطوات</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                انضم إلى آلاف القراء واستمتع بتجربة قراءة فريدة بخطوات بسيطة
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="text-center hover-card bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl">
+                <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-full flex items-center justify-center mb-6 mx-auto relative">
+                    <div class="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <i class="fas fa-user-plus text-2xl text-blue-600 dark:text-blue-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">انضم إلينا</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    سجل حساباً مجانياً في ثوانٍ معدودة وابدأ رحلتك في عالم القراءة
+                </p>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="text-center hover-card bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl">
+                <div class="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-full flex items-center justify-center mb-6 mx-auto relative">
+                    <div class="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <i class="fas fa-book-open text-2xl text-purple-600 dark:text-purple-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">اكتشف الكتب</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    تصفح مكتبتنا الشاملة وابحث عن الكتب التي تثير اهتمامك
+                </p>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="text-center hover-card bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 rounded-full flex items-center justify-center mb-6 mx-auto relative">
+                    <div class="absolute -top-2 -right-2 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <i class="fas fa-star text-2xl text-green-600 dark:text-green-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">استمتع بالقراءة</h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    ابدأ القراءة وشارك ملاحظاتك مع مجتمع القراء المتحمسين
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full font-medium mb-4 dark:bg-blue-900 dark:text-blue-300">
+                <i class="fas fa-comments ml-2"></i> آراء القراء
+            </span>
+            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">ماذا يقول قراؤنا؟</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="hover-card bg-white dark:bg-gray-700 p-8 rounded-2xl">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center ml-4">
+                        <span class="text-white font-bold">م</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">محمد أحمد</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">قارئ منذ 2022</p>
+                    </div>
+                    <div class="flex text-yellow-400 mr-auto">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 italic">
+                    "أفضل منصة للقراءة الرقمية! التنوع في الكتب مذهل وواجهة الموقع سهلة الاستخدام."
+                </p>
+            </div>
+            
+            <!-- Testimonial 2 -->
+            <div class="hover-card bg-white dark:bg-gray-700 p-8 rounded-2xl">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center ml-4">
+                        <span class="text-white font-bold">س</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">سارة خالد</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">قارئة منذ 2023</p>
+                    </div>
+                    <div class="flex text-yellow-400 mr-auto">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 italic">
+                    "التوصيات الذكية مذهلة! دائماً تجدني كتباً جديدة تناسب ذوقي في القراءة."
+                </p>
+            </div>
+            
+            <!-- Testimonial 3 -->
+            <div class="hover-card bg-white dark:bg-gray-700 p-8 rounded-2xl">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center ml-4">
+                        <span class="text-white font-bold">ي</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 dark:text-white">يوسف سالم</h4>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">قارئ منذ 2021</p>
+                    </div>
+                    <div class="flex text-yellow-400 mr-auto">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 italic">
+                    "المكتبة الرقمية غيرت تجربة القراءة لدي. الوصول السهل للكتب في أي وقت وأي مكان."
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-primary-600 to-purple-600">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">ابدأ رحلتك القرائية اليوم</h2>
+            <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                انضم إلى مجتمع القراء واستمتع بتجربة قراءة فريدة مع آلاف الكتب في مختلف المجالات
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'book_list' %}" 
+                   class="bg-white text-primary-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <i class="fas fa-book-open ml-2"></i>
+                    استكشف الكتب
+                </a>
+                
+                {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" 
+                   class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-4 px-8 rounded-full transition-all duration-300">
+                    <i class="fas fa-user-plus ml-2"></i>
+                    سجل مجاناً
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Stats Footer -->
+            <div class="mt-12 grid grid-cols-3 gap-6 text-white/80">
+                <div>
+                    <div class="text-3xl font-bold mb-1">{{ book_count|default:"0" }}+</div>
+                    <div class="text-sm">كتاب إلكتروني</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold mb-1">{{ user_count|default:"0" }}+</div>
+                    <div class="text-sm">قارئ نشط</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold mb-1">24/7</div>
+                    <div class="text-sm">دعم متواصل</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
 {% block extra_js %}
 <script>
-    // إضافة/إزالة من المفضلة
+    // Fixed GSAP Issues - Proper Initialization
     document.addEventListener('DOMContentLoaded', function() {
-        const bookmarkBtns = document.querySelectorAll('.bookmark-btn');
+        console.log('DOM loaded, initializing animations...');
         
-        bookmarkBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const bookId = this.getAttribute('data-book-id');
-                const icon = this.querySelector('i');
-                
-                // طلب AJAX لإضافة/إزالة من المفضلة
-                fetch(`/books/${bookId}/bookmark/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json',
+        // Register GSAP Plugins
+        if (typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+            console.log('GSAP plugins registered');
+        } else {
+            console.error('GSAP not loaded!');
+        }
+        
+        // Fix for disappearing elements - Ensure all content is visible
+        gsap.set('.content-wrapper', {
+            opacity: 1,
+            visibility: 'visible'
+        });
+        
+        // Smooth Counter Animation
+        const counters = document.querySelectorAll('[data-counter]');
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-counter'));
+            const duration = 2000;
+            
+            gsap.to(counter, {
+                innerText: target,
+                duration: duration / 1000,
+                snap: { innerText: 1 },
+                scrollTrigger: {
+                    trigger: counter,
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
+        
+        // Hero Section Animations
+        const heroTimeline = gsap.timeline();
+        
+        // Animate hero elements in sequence
+        heroTimeline
+            .from('.hero-gradient', {
+                opacity: 0,
+                duration: 1,
+                ease: 'power2.out'
+            })
+            .from('.hero-gradient h1', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            }, '-=0.5')
+            .from('.hero-gradient p', {
+                y: 30,
+                opacity: 0,
+                duration: 0.8
+            }, '-=0.3')
+            .from('.hero-gradient [data-counter]', {
+                scale: 0,
+                opacity: 0,
+                duration: 0.5,
+                stagger: 0.1
+            }, '-=0.2')
+            .from('.hero-gradient a', {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2
+            }, '-=0.2');
+        
+        // Featured Books Carousel
+        const carouselTrack = document.querySelector('.featured-carousel-track');
+        const carouselSlides = document.querySelectorAll('.featured-slide');
+        const prevBtn = document.querySelector('.featured-prev');
+        const nextBtn = document.querySelector('.featured-next');
+        
+        if (carouselTrack && carouselSlides.length > 0) {
+            let currentSlide = 0;
+            const slideWidth = carouselSlides[0].offsetWidth + 24; // 24px for gap
+            
+            // Initial setup
+            gsap.set(carouselTrack, { x: 0 });
+            
+            // Next button
+            nextBtn?.addEventListener('click', () => {
+                if (currentSlide < carouselSlides.length - 1) {
+                    currentSlide++;
+                    gsap.to(carouselTrack, {
+                        x: -currentSlide * slideWidth,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                }
+            });
+            
+            // Previous button
+            prevBtn?.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    gsap.to(carouselTrack, {
+                        x: -currentSlide * slideWidth,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                }
+            });
+        }
+        
+        // Scroll Animations for Sections
+        const sections = document.querySelectorAll('section');
+        sections.forEach((section, index) => {
+            if (index > 0) { // Skip hero section
+                gsap.from(section, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top 80%',
+                        end: 'bottom 60%',
+                        toggleActions: 'play none none none'
                     },
-                    body: JSON.stringify({})
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.bookmarked) {
-                        this.classList.remove('bg-gray-100', 'text-gray-800');
-                        this.classList.add('bg-yellow-100', 'text-yellow-800');
-                        icon.classList.remove('fa-bookmark');
-                        icon.classList.add('fa-bookmark');
-                        
-                        // تأثير GSAP
-                        gsap.fromTo(this,
-                            { scale: 1 },
-                            { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1 }
-                        );
-                    } else {
-                        this.classList.remove('bg-yellow-100', 'text-yellow-800');
-                        this.classList.add('bg-gray-100', 'text-gray-800');
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: index * 0.1
+                });
+            }
+        });
+        
+        // Category Card Animations
+        const categoryCards = document.querySelectorAll('.category-card');
+        categoryCards.forEach((card, index) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                delay: index * 0.1
+            });
+        });
+        
+        // Author Card Animations
+        const authorCards = document.querySelectorAll('.hover-card');
+        authorCards.forEach((card, index) => {
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, {
+                    scale: 1.02,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+        
+        // Mobile App Section Phone Animation
+        const phoneMockup = document.querySelector('.bg-gray-900.rounded-\\[40px\\]');
+        if (phoneMockup) {
+            gsap.from(phoneMockup, {
+                scrollTrigger: {
+                    trigger: phoneMockup,
+                    start: 'top 75%',
+                    toggleActions: 'play none none none'
+                },
+                y: 50,
+                opacity: 0,
+                rotation: -5,
+                duration: 1,
+                ease: 'back.out(1.7)'
+            });
+        }
+        
+        // Floating Download Icons Animation
+        const floatingIcons = document.querySelectorAll('.absolute.-top-4, .absolute.-bottom-4');
+        floatingIcons.forEach(icon => {
+            gsap.to(icon, {
+                y: -10,
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+        });
+        
+        // Book Cover Animations
+        const bookCovers = document.querySelectorAll('.book-cover');
+        bookCovers.forEach(cover => {
+            cover.addEventListener('mouseenter', () => {
+                gsap.to(cover, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            
+            cover.addEventListener('mouseleave', () => {
+                gsap.to(cover, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+        
+        // Floating Elements Animation
+        const floatingElements = document.querySelectorAll('.float-animation');
+        floatingElements.forEach(el => {
+            gsap.to(el, {
+                y: -20,
+                duration: 3,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+        });
+        
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
+                }
+            });
+        });
+        
+        // Category Icon Hover Animation
+        const categoryIcons = document.querySelectorAll('.category-icon');
+        categoryIcons.forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                gsap.to(icon, {
+                    scale: 1.1,
+                    rotation: 5,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                gsap.to(icon, {
+                    scale: 1,
+                    rotation: 0,
+                    duration: 0.3,
+                    ease: 'power2.out'
                 });
             });
         });
     });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        // Re-calculate carousel positions on resize
+        const carouselTrack = document.querySelector('.featured-carousel-track');
+        if (carouselTrack) {
+            gsap.set(carouselTrack, { x: 0 });
+        }
+    });
 </script>
-{% endblock %}
 {% endblock %}

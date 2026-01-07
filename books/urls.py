@@ -26,7 +26,7 @@ urlpatterns = [
     path('dashboard/users/<int:user_id>/toggle-status/', views.toggle_user_status, name='toggle_user_status'),
     path('dashboard/users/<int:user_id>/toggle-staff/', views.toggle_staff_status, name='toggle_staff_status'),
     path('dashboard/statistics/', views.get_statistics, name='get_statistics'),
-    
+
     # API
     # path('api/search/', views.search_books, name='search_books'),
     path('books/<int:book_id>/review/', views.add_review, name='add_review'),

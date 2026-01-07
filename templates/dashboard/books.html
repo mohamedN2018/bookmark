@@ -1,749 +1,2349 @@
-<!-- templates/dashboard/books.html -->
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}إدارة الكتب - لوحة التحكم{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* تنسيقات عامة */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --danger-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --dark-bg: #1a202c;
+        --darker-bg: #0f1419;
+        --light-bg: #f7fafc;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --card-dark-bg: rgba(30, 41, 59, 0.95);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+        --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+        --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dark {
+        --card-bg: rgba(30, 41, 59, 0.95);
+        --light-bg: #0f1419;
+    }
+
+    /* خلفية GSAP المتحركة */
+    #animated-background {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .floating-element {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.3;
+    }
+
+    .floating-element:nth-child(1) {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        top: 10%;
+        left: 10%;
+        animation: float1 20s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(2) {
+        width: 250px;
+        height: 250px;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        bottom: 15%;
+        right: 10%;
+        animation: float2 25s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(3) {
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        top: 50%;
+        left: 80%;
+        animation: float3 30s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(50px, 50px) rotate(120deg); }
+        66% { transform: translate(-30px, -30px) rotate(240deg); }
+    }
+
+    @keyframes float2 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(-60px, 40px) rotate(120deg); }
+        66% { transform: translate(40px, -60px) rotate(240deg); }
+    }
+
+    @keyframes float3 {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(30px, -50px) rotate(120deg); }
+        66% { transform: translate(-50px, 30px) rotate(240deg); }
+    }
+
+    /* زر Dark Mode */
+    .dark-mode-toggle {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+        z-index: 50;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        border: 2px solid transparent;
+    }
+
+    .dark-mode-toggle:hover {
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: var(--shadow-xl);
+        border-color: #667eea;
+    }
+
+    .dark-mode-toggle i {
+        font-size: 1.25rem;
+        color: #4a5568;
+        transition: var(--transition-smooth);
+    }
+
+    .dark .dark-mode-toggle i {
+        color: #f6ad55;
+    }
+
+    /* الحاوية الرئيسية */
+    .main-container {
+        min-height: 100vh;
+        background: var(--light-bg);
+        transition: background-color 0.5s ease;
+        position: relative;
+    }
+
+    .dark .main-container {
+        background: var(--darker-bg);
+    }
+
+    /* رأس الصفحة */
+    .page-header {
+        padding: 2rem 1rem 0;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-gradient);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-xl);
+        transition: var(--transition-smooth);
+    }
+
+    .logo-icon:hover {
+        transform: rotateY(180deg) scale(1.1);
+    }
+
+    .logo-icon i {
+        font-size: 1.75rem;
+        color: white;
+    }
+
+    .header-text h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .header-text p {
+        color: #4a5568;
+        font-size: 1.125rem;
+    }
+
+    .dark .header-text p {
+        color: #cbd5e0;
+    }
+
+    /* بطاقات الإحصائيات */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition-smooth);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark .stat-card {
+        background: var(--card-dark-bg);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-2xl);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .stat-card:nth-child(1)::before { background: var(--primary-gradient); }
+    .stat-card:nth-child(2)::before { background: var(--success-gradient); }
+    .stat-card:nth-child(3)::before { background: var(--secondary-gradient); }
+
+    .stat-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-info h3 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+    }
+
+    .dark .stat-info h3 {
+        color: #f7fafc;
+    }
+
+    .stat-info p {
+        color: #718096;
+        font-size: 0.875rem;
+    }
+
+    .dark .stat-info p {
+        color: #a0aec0;
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .dark .stat-icon {
+        background: rgba(102, 126, 234, 0.2);
+    }
+
+    .stat-card:nth-child(1) .stat-icon { color: #667eea; }
+    .stat-card:nth-child(2) .stat-icon { color: #4facfe; }
+    .stat-card:nth-child(3) .stat-icon { color: #f093fb; }
+
+    /* المحتوى الرئيسي */
+    .main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1rem 2rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 1200px) {
+        .main-content {
+            grid-template-columns: 400px 1fr;
+        }
+    }
+
+    /* لوحة النموذج */
+    .form-panel {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .form-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow-xl);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition-smooth);
+    }
+
+    .dark .form-container {
+        background: var(--card-dark-bg);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .form-container:hover {
+        box-shadow: var(--shadow-2xl);
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .form-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .dark .form-header h2 {
+        color: #f7fafc;
+    }
+
+    .form-header p {
+        color: #718096;
+        font-size: 0.875rem;
+    }
+
+    /* تنسيقات حقول النموذج */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dark .form-label {
+        color: #cbd5e0;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: rgba(247, 250, 252, 0.5);
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        color: #2d3748;
+        transition: var(--transition-smooth);
+    }
+
+    .dark .form-control {
+        background: rgba(45, 55, 72, 0.5);
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .dark .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    .textarea-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* منطقة رفع الصور */
+    .upload-area {
+        border: 3px dashed #e2e8f0;
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        background: rgba(247, 250, 252, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark .upload-area {
+        border-color: #4a5568;
+        background: rgba(45, 55, 72, 0.3);
+    }
+
+    .upload-area:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #a0aec0;
+        margin-bottom: 1rem;
+        transition: var(--transition-smooth);
+    }
+
+    .upload-area:hover .upload-icon {
+        color: #667eea;
+        transform: translateY(-5px);
+    }
+
+    .upload-text h4 {
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .dark .upload-text h4 {
+        color: #f7fafc;
+    }
+
+    .upload-text p {
+        color: #718096;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+        color: #a0aec0 !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* خيارات التبديل */
+    .toggle-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .toggle-option {
+        position: relative;
+    }
+
+    .toggle-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(247, 250, 252, 0.5);
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .dark .toggle-label {
+        background: rgba(45, 55, 72, 0.5);
+        border-color: #4a5568;
+    }
+
+    .toggle-input:checked + .toggle-label {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .toggle-label i {
+        font-size: 1.25rem;
+    }
+
+    /* أزرار النموذج */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .btn-secondary {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(102, 126, 234, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* لوحة التحكم */
+    .control-panel {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: var(--shadow-xl);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 2rem;
+        transition: var(--transition-smooth);
+    }
+
+    .dark .control-panel {
+        background: var(--card-dark-bg);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .control-panel:hover {
+        box-shadow: var(--shadow-2xl);
+    }
+
+    /* شريط البحث */
+    .search-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3.5rem;
+        background: rgba(247, 250, 252, 0.5);
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        color: #2d3748;
+        transition: var(--transition-smooth);
+    }
+
+    .dark .search-input {
+        background: rgba(45, 55, 72, 0.5);
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        font-size: 1.125rem;
+    }
+
+    /* أزرار التحكم */
+    .control-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .control-btn {
+        padding: 0.75rem 1.25rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dark .control-btn {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #cbd5e0;
+    }
+
+    .control-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .control-btn.active {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* أزرار التصدير */
+    .export-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .export-btn {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white;
+    }
+
+    .export-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .export-btn.excel { background: linear-gradient(135deg, #21d4fd, #2152ff); }
+    .export-btn.pdf { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .export-btn.csv { background: linear-gradient(135deg, #5ee7df, #b490ca); }
+    .export-btn.print { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+
+    /* جدول الكتب */
+    .table-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: var(--transition-smooth);
+    }
+
+    .dark .table-container {
+        background: var(--card-dark-bg);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .table-container:hover {
+        box-shadow: var(--shadow-2xl);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .books-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    }
+
+    .dark .table-header {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    }
+
+    .table-header th {
+        padding: 1.25rem 1.5rem;
+        text-align: right;
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: #4a5568;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .dark .table-header th {
+        color: #cbd5e0;
+        border-bottom-color: #4a5568;
+    }
+
+    .table-body tr {
+        transition: var(--transition-smooth);
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .dark .table-body tr {
+        border-bottom-color: #4a5568;
+    }
+
+    .table-body tr:last-child {
+        border-bottom: none;
+    }
+
+    .table-body tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    .dark .table-body tr:hover {
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .table-body td {
+        padding: 1.25rem 1.5rem;
+        color: #2d3748;
+        font-size: 0.875rem;
+    }
+
+    .dark .table-body td {
+        color: #f7fafc;
+    }
+
+    /* خلايا الجدول الخاصة */
+    .book-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .book-cover {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .book-info h4 {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .dark .book-info h4 {
+        color: #f7fafc;
+    }
+
+    .book-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.75rem;
+        color: #718096;
+    }
+
+    /* الوسوم */
+    .status-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .badge-free {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+        color: white;
+    }
+
+    .badge-featured {
+        background: linear-gradient(135deg, #fa709a, #fee140);
+        color: white;
+    }
+
+    /* أزرار الإجراءات */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        font-size: 0.875rem;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px) scale(1.1);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .action-btn.view {
+        background: rgba(66, 153, 225, 0.1);
+        color: #4299e1;
+    }
+
+    .action-btn.edit {
+        background: rgba(72, 187, 120, 0.1);
+        color: #48bb78;
+    }
+
+    .action-btn.delete {
+        background: rgba(245, 101, 101, 0.1);
+        color: #f56565;
+    }
+
+    /* حالة فارغة */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+
+    .dark .empty-state h3 {
+        color: #f7fafc;
+    }
+
+    .empty-state p {
+        color: #718096;
+        margin-bottom: 1.5rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* الترقيم */
+    .pagination-container {
+        padding: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .dark .pagination-container {
+        border-top-color: #4a5568;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        background: white;
+        color: #4a5568;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .dark .pagination-btn {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #cbd5e0;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .page-number {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+    }
+
+    .page-number:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+
+    .page-number.active {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* نصائح سريعة */
+    .tips-container {
+        margin-top: 2rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 24px;
+        padding: 2rem;
+        color: white;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .tips-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tips-header i {
+        font-size: 1.5rem;
+    }
+
+    .tips-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .tips-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .tip-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .tip-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .tip-content h4 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .tip-content p {
+        font-size: 0.875rem;
+        opacity: 0.9;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: var(--shadow-2xl);
+        animation: slideUp 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dark .modal {
+        background: var(--card-dark-bg);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .dark .modal-header h3 {
+        color: #f7fafc;
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: none;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+    }
+
+    .modal-close:hover {
+        transform: rotate(90deg);
+        background: rgba(102, 126, 234, 0.2);
+    }
+
+    .modal-body {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .modal-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.2));
+        color: #f56565;
+    }
+
+    .modal-message {
+        font-size: 1.125rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .dark .modal-message {
+        color: #f7fafc;
+    }
+
+    .modal-description {
+        font-size: 0.875rem;
+        color: #718096;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .modal-btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        min-width: 120px;
+    }
+
+    .modal-btn.cancel {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+
+    .modal-btn.confirm {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .header-text h1 {
+            font-size: 2rem;
+        }
+        
+        .toggle-options {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .control-buttons {
+            justify-content: center;
+        }
+        
+        .export-buttons {
+            justify-content: center;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-    <div class="container mx-auto px-4 py-8">
+    <!-- خلفية GSAP المتحركة -->
+    <div id="animated-background">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- زر Dark Mode -->
+    <button id="darkModeToggle" class="dark-mode-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="main-container">
         <!-- رأس الصفحة -->
-        <div class="mb-8 animate-on-scroll">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">إدارة الكتب</h1>
-                    <p class="text-lg text-gray-600">إضافة وتعديل وحذف الكتب في المكتبة</p>
+        <header class="page-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-books"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>إدارة الكتب</h1>
+                        <p>مركز التحكم الشامل لمكتبة الكتب الرقمية</p>
+                    </div>
                 </div>
-                <div class="mt-4 md:mt-0">
-                    <p class="text-sm text-gray-600 bg-white px-4 py-2 rounded-lg shadow">
-                        <i class="fas fa-books ml-2"></i>
-                        إجمالي الكتب: <span class="font-bold">{{ books_count }}</span>
-                    </p>
-                </div>
+                
+                <button class="btn btn-primary" id="addBookBtn">
+                    <i class="fas fa-plus"></i>
+                    إضافة كتاب جديد
+                </button>
             </div>
             
             <!-- بطاقات الإحصائيات -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-book text-blue-600"></i>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3 id="totalBooks">0</h3>
+                            <p>إجمالي الكتب</p>
                         </div>
-                        <div>
-                            <p class="text-gray-600">جميع الكتب</p>
-                            <h3 class="text-2xl font-bold text-gray-800">{{ books_count }}</h3>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-bookmark text-green-600"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-600">كتب مجانية</p>
-                            <h3 class="text-2xl font-bold text-gray-800">
-                                {{ page_obj.paginator.count|default:books_count|add:"-10" }}
-                            </h3>
+                        <div class="stat-icon">
+                            <i class="fas fa-layer-group"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-star text-purple-600"></i>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3 id="freeBooks">0</h3>
+                            <p>كتب مجانية</p>
                         </div>
-                        <div>
-                            <p class="text-gray-600">كتب مميزة</p>
-                            <h3 class="text-2xl font-bold text-gray-800">
-                                {{ page_obj.paginator.count|default:books_count|add:"-5" }}
-                            </h3>
+                        <div class="stat-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3 id="featuredBooks">0</h3>
+                            <p>كتب مميزة</p>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-crown"></i>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
         
-        <div class="flex flex-col lg:flex-row gap-8">
-            <!-- الشريط الجانبي للإضافة -->
-            <div class="lg:w-1/3">
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">إضافة كتاب جديد</h3>
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- لوحة النموذج -->
+            <aside class="form-panel">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2 id="formTitle">إضافة كتاب جديد</h2>
+                        <p>املأ التفاصيل أدناه لإضافة كتاب جديد</p>
+                    </div>
                     
-                    <form method="POST" enctype="multipart/form-data" id="add-book-form">
+                    <form id="bookForm" class="space-y-4">
                         {% csrf_token %}
                         
-                        <div class="space-y-4">
-                            <!-- حقل العنوان -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">
-                                    <i class="fas fa-heading ml-2"></i> عنوان الكتاب
-                                </label>
-                                {{ form.title }}
-                                {% if form.title.errors %}
-                                <p class="text-red-500 text-sm mt-1">{{ form.title.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- حقل المؤلف -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">
-                                    <i class="fas fa-user-pen ml-2"></i> المؤلف
-                                </label>
-                                {{ form.author }}
-                                {% if form.author.errors %}
-                                <p class="text-red-500 text-sm mt-1">{{ form.author.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- حقل التصنيف -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">
-                                    <i class="fas fa-tags ml-2"></i> التصنيف
-                                </label>
-                                {{ form.category }}
-                                {% if form.category.errors %}
-                                <p class="text-red-500 text-sm mt-1">{{ form.category.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- حقل الوصف -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">
-                                    <i class="fas fa-align-left ml-2"></i> الوصف
-                                </label>
-                                {{ form.description }}
-                                {% if form.description.errors %}
-                                <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- الحقول في صفين -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- سنة النشر -->
-                                <div>
-                                    <label class="block text-gray-700 mb-2">
-                                        <i class="fas fa-calendar ml-2"></i> السنة
-                                    </label>
-                                    {{ form.published_year }}
-                                </div>
-                                
-                                <!-- عدد الصفحات -->
-                                <div>
-                                    <label class="block text-gray-700 mb-2">
-                                        <i class="fas fa-file ml-2"></i> الصفحات
-                                    </label>
-                                    {{ form.pages }}
-                                </div>
-                            </div>
-                            
-                            <!-- الحقول في صفين -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- اللغة -->
-                                <div>
-                                    <label class="block text-gray-700 mb-2">
-                                        <i class="fas fa-language ml-2"></i> اللغة
-                                    </label>
-                                    {{ form.language }}
-                                </div>
-                                
-                                <!-- التنسيق -->
-                                <div>
-                                    <label class="block text-gray-700 mb-2">
-                                        <i class="fas fa-file-alt ml-2"></i> التنسيق
-                                    </label>
-                                    {{ form.file_format }}
-                                </div>
-                            </div>
-                            
-                            <!-- صورة الغلاف -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">
-                                    <i class="fas fa-image ml-2"></i> صورة الغلاف
-                                </label>
-                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary-500 transition duration-300">
-                                    <div class="mb-2">
-                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400"></i>
-                                    </div>
-                                    <p class="text-gray-600 mb-2">اسحب وأفلت الصورة هنا أو انقر للاختيار</p>
-                                    {{ form.cover_image }}
-                                    <p class="text-xs text-gray-500">PNG, JPG, GIF حتى 5MB</p>
-                                </div>
-                            </div>
-                            
-                            <!-- خيارات إضافية -->
-                            <div class="space-y-3">
-                                <div class="flex items-center">
-                                    {{ form.is_free }}
-                                    <label for="{{ form.is_free.id_for_label }}" class="mr-2 text-gray-700 cursor-pointer">
-                                        كتاب مجاني
-                                    </label>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    {{ form.is_featured }}
-                                    <label for="{{ form.is_featured.id_for_label }}" class="mr-2 text-gray-700 cursor-pointer">
-                                        كتاب مميز
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <!-- أزرار الإرسال -->
-                            <div class="pt-4">
-                                <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:-translate-y-1">
-                                    <i class="fas fa-plus ml-2"></i> إضافة الكتاب
-                                </button>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-heading"></i>
+                                عنوان الكتاب
+                            </label>
+                            <input type="text" 
+                                name="title" 
+                                class="form-control" 
+                                placeholder="أدخل عنوان الكتاب" 
+                                required>
                         </div>
-                    </form>
-                </div>
-                
-                <!-- نصائح سريعة -->
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold mb-4">نصائح سريعة</h3>
-                    <ul class="space-y-3">
-                        <li class="flex items-start">
-                            <i class="fas fa-lightbulb ml-2 mt-1"></i>
-                            <span>أضف وصفاً مفصلاً لجذب القراء</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-lightbulb ml-2 mt-1"></i>
-                            <span>اختر صورة غلاف جذابة وعالية الجودة</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-lightbulb ml-2 mt-1"></i>
-                            <span>ضع الكتب المجانية والمميزة في المقدمة</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-lightbulb ml-2 mt-1"></i>
-                            <span>تأكد من دقة المعلومات قبل النشر</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- قائمة الكتب -->
-            <div class="lg:w-2/3">
-                <!-- شريط البحث والتصفية -->
-                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-                    <form method="GET" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- حقل البحث -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">بحث</label>
-                                <div class="relative">
-                                    <input type="text" name="search" value="{{ search_query }}" 
-                                           placeholder="ابحث عن كتاب..."
-                                           class="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <button type="submit" class="absolute left-3 top-3 text-gray-400">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-pen"></i>
+                                المؤلف
+                            </label>
+                            <input type="text" 
+                                name="author" 
+                                class="form-control" 
+                                placeholder="أدخل اسم المؤلف" 
+                                required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i>
+                                التصنيف
+                            </label>
+                            <select name="category" class="form-control" required>
+                                <option value="">اختر التصنيف</option>
+                                <option value="ادب">أدب</option>
+                                <option value="علوم">علوم</option>
+                                <option value="تاريخ">تاريخ</option>
+                                <option value="فلسفة">فلسفة</option>
+                                <option value="تكنولوجيا">تكنولوجيا</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                الوصف
+                            </label>
+                            <textarea name="description" 
+                                    class="form-control textarea-control" 
+                                    placeholder="أدخل وصفاً للكتاب" 
+                                    rows="4"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    سنة النشر
+                                </label>
+                                <input type="number" 
+                                    name="year" 
+                                    class="form-control" 
+                                    placeholder="سنة النشر" 
+                                    min="1900" 
+                                    max="2024">
                             </div>
                             
-                            <!-- تصفية حسب التصنيف -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">التصنيف</label>
-                                <select name="category" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">جميع التصنيفات</option>
-                                    {% for category in categories %}
-                                    <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"i" %}selected{% endif %}>
-                                        {{ category.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            
-                            <!-- تصفية حسب الحالة -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">الحالة</label>
-                                <select name="status" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">جميع الحالات</option>
-                                    <option value="free" {% if status_filter == "free" %}selected{% endif %}>مجاني</option>
-                                    <option value="paid" {% if status_filter == "paid" %}selected{% endif %}>مدفوع</option>
-                                    <option value="featured" {% if status_filter == "featured" %}selected{% endif %}>مميز</option>
-                                </select>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-file"></i>
+                                    عدد الصفحات
+                                </label>
+                                <input type="number" 
+                                    name="pages" 
+                                    class="form-control" 
+                                    placeholder="عدد الصفحات" 
+                                    min="1">
                             </div>
                         </div>
                         
-                        <div class="flex justify-between items-center">
-                            <div class="text-sm text-gray-600">
-                                عرض {{ page_obj.start_index }} - {{ page_obj.end_index }} من {{ page_obj.paginator.count }}
-                            </div>
-                            <div class="flex space-x-2">
-                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg">
-                                    <i class="fas fa-filter ml-2"></i> تطبيق الفلاتر
-                                </button>
-                                <a href="{% url 'dashboard_books' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg">
-                                    <i class="fas fa-redo ml-2"></i> إعادة تعيين
-                                </a>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-image"></i>
+                                صورة الغلاف
+                            </label>
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="upload-text">
+                                    <h4>اسحب وأفلت الصورة هنا</h4>
+                                    <p>أو انقر للتصفح</p>
+                                    <p class="upload-hint">PNG, JPG, GIF - حتى 5MB</p>
+                                </div>
+                                <input type="file" 
+                                    name="cover" 
+                                    accept="image/*" 
+                                    style="display: none;">
                             </div>
                         </div>
+                        
+                        <div class="toggle-options">
+                            <div class="toggle-option">
+                                <input type="checkbox" 
+                                    id="isFree" 
+                                    name="isFree" 
+                                    class="toggle-input">
+                                <label for="isFree" class="toggle-label">
+                                    <i class="fas fa-gift"></i>
+                                    <span>كتاب مجاني</span>
+                                </label>
+                            </div>
+                            
+                            <div class="toggle-option">
+                                <input type="checkbox" 
+                                    id="isFeatured" 
+                                    name="isFeatured" 
+                                    class="toggle-input">
+                                <label for="isFeatured" class="toggle-label">
+                                    <i class="fas fa-star"></i>
+                                    <span>كتاب مميز</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                إضافة الكتاب
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancelEdit" style="display: none;">
+                                <i class="fas fa-times"></i>
+                                إلغاء
+                            </button>
+                        </div>
                     </form>
+                </div>
+            </aside>
+            
+            <!-- القسم الرئيسي -->
+            <section class="content-section">
+                <!-- لوحة التحكم -->
+                <div class="control-panel">
+                    <!-- شريط البحث -->
+                    <div class="search-container">
+                        <input type="text" 
+                            class="search-input" 
+                            placeholder="ابحث عن كتاب، مؤلف، أو تصنيف..." 
+                            id="searchInput">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    
+                    <!-- أزرار التحكم -->
+                    <div class="control-buttons">
+                        <button class="control-btn" id="filterBtn">
+                            <i class="fas fa-filter"></i>
+                            تصفية
+                        </button>
+                        <button class="control-btn" id="sortBtn">
+                            <i class="fas fa-sort-amount-down"></i>
+                            ترتيب
+                        </button>
+                        <button class="control-btn" id="viewBtn">
+                            <i class="fas fa-th"></i>
+                            عرض شبكي
+                        </button>
+                        <button class="control-btn" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            تحديث
+                        </button>
+                    </div>
+                    
+                    <!-- أزرار التصدير -->
+                    <div class="export-buttons">
+                        <button class="export-btn excel">
+                            <i class="fas fa-file-excel"></i>
+                            Excel
+                        </button>
+                        <button class="export-btn pdf">
+                            <i class="fas fa-file-pdf"></i>
+                            PDF
+                        </button>
+                        <button class="export-btn csv">
+                            <i class="fas fa-file-csv"></i>
+                            CSV
+                        </button>
+                        <button class="export-btn print">
+                            <i class="fas fa-print"></i>
+                            طباعة
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- جدول الكتب -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">الكتاب</th>
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">المؤلف</th>
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">التصنيف</th>
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">الحالة</th>
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">التاريخ</th>
-                                    <th class="py-4 px-6 text-right text-gray-700 font-semibold">الإجراءات</th>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table class="books-table">
+                            <thead class="table-header">
+                                <tr>
+                                    <th>الكتاب</th>
+                                    <th>المؤلف</th>
+                                    <th>التصنيف</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% for book in page_obj %}
-                                <tr class="border-t border-gray-100 hover:bg-gray-50 transition duration-200">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center">
-                                            <div class="w-10 h-10 bg-blue-100 rounded flex items-center justify-center ml-3">
-                                                {% if book.cover_image %}
-                                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover rounded">
-                                                {% else %}
-                                                <i class="fas fa-book text-blue-600"></i>
-                                                {% endif %}
-                                            </div>
-                                            <div>
-                                                <p class="font-medium text-gray-800">{{ book.title|truncatechars:25 }}</p>
-                                                <p class="text-sm text-gray-500">{{ book.pages }} صفحة</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">{{ book.author|truncatechars:20 }}</td>
-                                    <td class="py-4 px-6">
-                                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                                            {{ book.category.name }}
-                                        </span>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex space-x-2 space-x-reverse">
-                                            {% if book.is_free %}
-                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">مجاني</span>
-                                            {% endif %}
-                                            {% if book.is_featured %}
-                                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">مميز</span>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <span class="text-gray-600">{{ book.created_at|date:"Y/m/d" }}</span>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex space-x-2 space-x-reverse">
-                                            <a href="{% url 'book_detail' book.slug %}" 
-                                               class="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
-                                               title="عرض">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="#" 
-                                               class="text-green-600 hover:text-green-800 p-2 rounded-lg hover:bg-green-50"
-                                               title="تعديل">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="delete-book-btn text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
-                                                    data-book-id="{{ book.id }}"
-                                                    data-book-title="{{ book.title }}"
-                                                    title="حذف">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="py-8 text-center text-gray-500">
-                                        <div class="flex flex-col items-center">
-                                            <i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
-                                            <p class="text-lg">لا توجد كتب</p>
-                                            <p class="text-sm mt-2">ابدأ بإضافة كتاب جديد</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
+                            <tbody class="table-body" id="booksTableBody">
+                                <!-- سيتم تعبئة البيانات من خلال JavaScript -->
                             </tbody>
                         </table>
                     </div>
                     
                     <!-- الترقيم -->
-                    {% if page_obj.paginator.num_pages > 1 %}
-                    <div class="border-t border-gray-100 px-6 py-4">
-                        <div class="flex justify-between items-center">
-                            <div class="text-sm text-gray-600">
-                                الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+                    <div class="pagination-container">
+                        <button class="pagination-btn" id="prevPage">
+                            <i class="fas fa-chevron-right"></i>
+                            السابق
+                        </button>
+                        
+                        <div class="page-numbers" id="pageNumbers">
+                            <!-- سيتم إنشاء أرقام الصفحات من خلال JavaScript -->
+                        </div>
+                        
+                        <button class="pagination-btn" id="nextPage">
+                            التالي
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- نصائح سريعة -->
+                <div class="tips-container">
+                    <div class="tips-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>نصائح للإدارة الفعالة</h3>
+                    </div>
+                    <div class="tips-list">
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-search"></i>
                             </div>
-                            <div class="flex space-x-2">
-                                {% if page_obj.has_previous %}
-                                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                                   class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                                {% endif %}
-                                
-                                {% for num in page_obj.paginator.page_range %}
-                                    {% if page_obj.number == num %}
-                                    <span class="px-3 py-2 bg-primary-600 text-white rounded-lg">{{ num }}</span>
-                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                                       class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">{{ num }}</a>
-                                    {% endif %}
-                                {% endfor %}
-                                
-                                {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                                   class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                                {% endif %}
+                            <div class="tip-content">
+                                <h4>استخدم البحث الذكي</h4>
+                                <p>استخدم مربع البحث للعثور على الكتب بسرعة باستخدام الكلمات المفتاحية</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h4>تصنيف دقيق</h4>
+                                <p>التصنيف الدقيق يساعد المستخدمين في العثور على ما يبحثون عنه بسهولة</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h4>تتبع الإحصائيات</h4>
+                                <p>راقب تطور المكتبة من خلال الإحصائيات التفاعلية في أعلى الصفحة</p>
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
-                
-                <!-- تصدير البيانات -->
-                <div class="mt-8 bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">تصدير البيانات</h3>
-                    <div class="flex flex-wrap gap-4">
-                        <button class="export-btn bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-file-excel ml-2"></i> Excel
-                        </button>
-                        <button class="export-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-file-pdf ml-2"></i> PDF
-                        </button>
-                        <button class="export-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-file-csv ml-2"></i> CSV
-                        </button>
-                        <button class="export-btn bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
-                            <i class="fas fa-print ml-2"></i> طباعة
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
-</div>
 
-<!-- نافذة تأكيد الحذف -->
-<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">تأكيد الحذف</h3>
-                <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-xl">
+    <!-- Modal تأكيد الحذف -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>تأكيد الحذف</h3>
+                <button class="modal-close" id="closeModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
-            <div class="mb-6">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <p class="text-gray-600 text-center mb-4" id="delete-message">
-                    هل أنت متأكد من رغبتك في حذف الكتاب؟
+                <p class="modal-message" id="modalMessage">
+                    هل أنت متأكد من رغبتك في حذف هذا الكتاب؟
                 </p>
-                <p class="text-sm text-gray-500 text-center">
+                <p class="modal-description">
                     هذا الإجراء لا يمكن التراجع عنه. سيتم حذف الكتاب وجميع البيانات المرتبطة به.
                 </p>
             </div>
-            
-            <div class="flex justify-end space-x-4 space-x-reverse">
-                <button id="cancel-delete" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg">
-                    إلغاء
-                </button>
-                <button id="confirm-delete" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg">
-                    <i class="fas fa-trash-alt ml-2"></i> حذف
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelDelete">إلغاء</button>
+                <button class="modal-btn confirm" id="confirmDelete">
+                    <i class="fas fa-trash"></i>
+                    حذف
                 </button>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Modal النجاح -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>تمت العملية بنجاح</h3>
+                <button class="modal-close" id="closeSuccessModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon" style="background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.2)); color: #48bb78;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <p class="modal-message" id="successMessage">
+                    تم إضافة الكتاب بنجاح!
+                </p>
+                <p class="modal-description" id="successDescription">
+                    يمكنك الآن رؤية الكتاب في قائمة الكتب.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn confirm" id="closeSuccessBtn">
+                    <i class="fas fa-check"></i>
+                    حسناً
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
 {% block extra_js %}
-<script>
-    // تأثيرات GSAP لإدارة الكتب
-    document.addEventListener('DOMContentLoaded', function() {
-        // تأثيرات على حقول النموذج
-        const formInputs = document.querySelectorAll('#add-book-form input, #add-book-form select, #add-book-form textarea');
-        formInputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                gsap.to(this, {
-                    borderColor: '#3b82f6',
-                    boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
-                    duration: 0.3
-                });
-            });
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // تهيئة GSAP
+            gsap.registerPlugin();
             
-            input.addEventListener('blur', function() {
-                gsap.to(this, {
-                    borderColor: '#d1d5db',
-                    boxShadow: 'none',
-                    duration: 0.3
-                });
-            });
-        });
-        
-        // تأثيرات على زر الإضافة
-        const submitBtn = document.querySelector('#add-book-form button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    y: -2,
-                    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
-                    duration: 0.3
-                });
-            });
-            
-            submitBtn.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    y: 0,
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                    duration: 0.3
-                });
-            });
-        }
-        
-        // تأثيرات على الصفوف في الجدول
-        const tableRows = document.querySelectorAll('tbody tr');
-        tableRows.forEach((row, index) => {
-            gsap.from(row, {
-                opacity: 0,
-                x: -20,
-                duration: 0.5,
-                delay: index * 0.05,
-                scrollTrigger: {
-                    trigger: row,
-                    start: "top 90%",
-                    toggleActions: "play none none none"
+            // بيانات الكتب المزيفة
+            const books = [
+                {
+                    id: 1,
+                    title: "العادات الذرية",
+                    author: "جيمس كلير",
+                    category: "تطوير الذات",
+                    description: "كتاب رائع عن بناء العادات الصغيرة",
+                    year: 2018,
+                    pages: 320,
+                    isFree: true,
+                    isFeatured: true,
+                    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop",
+                    date: "2023-10-15"
+                },
+                {
+                    id: 2,
+                    title: "قوة التفكير الإيجابي",
+                    author: "نورمان فينسنت بيل",
+                    category: "تطوير الذات",
+                    description: "كيف تفكر بشكل إيجابي وتغير حياتك",
+                    year: 1952,
+                    pages: 256,
+                    isFree: false,
+                    isFeatured: true,
+                    cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=400&fit=crop",
+                    date: "2023-09-22"
+                },
+                {
+                    id: 3,
+                    title: "الأب الغني والأب الفقير",
+                    author: "روبرت كيوساكي",
+                    category: "مال وأعمال",
+                    description: "تعلم كيفية بناء الثروة والحرية المالية",
+                    year: 1997,
+                    pages: 336,
+                    isFree: true,
+                    isFeatured: false,
+                    cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=400&fit=crop",
+                    date: "2023-08-30"
+                },
+                {
+                    id: 4,
+                    title: "التفكير السريع والبطيء",
+                    author: "دانيال كانيمان",
+                    category: "علم النفس",
+                    description: "كيف يعمل العقل ويؤثر في قراراتنا",
+                    year: 2011,
+                    pages: 512,
+                    isFree: false,
+                    isFeatured: false,
+                    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop",
+                    date: "2023-07-18"
+                },
+                {
+                    id: 5,
+                    title: "الذكاء العاطفي",
+                    author: "دانيال جولمان",
+                    category: "علم النفس",
+                    description: "لماذا الذكاء العاطفي أهم من الذكاء التقليدي",
+                    year: 1995,
+                    pages: 352,
+                    isFree: true,
+                    isFeatured: true,
+                    cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&h=400&fit=crop",
+                    date: "2023-06-12"
+                },
+                {
+                    id: 6,
+                    title: "البؤساء",
+                    author: "فيكتور هوغو",
+                    category: "أدب عالمي",
+                    description: "رواية كلاسيكية عن العدالة والمحبة",
+                    year: 1862,
+                    pages: 1463,
+                    isFree: true,
+                    isFeatured: true,
+                    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop",
+                    date: "2023-05-05"
                 }
-            });
+            ];
             
-            row.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    backgroundColor: '#f9fafb',
-                    duration: 0.2
-                });
-            });
+            let currentBookId = null;
+            let currentPage = 1;
+            const booksPerPage = 5;
             
-            row.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    backgroundColor: '#ffffff',
-                    duration: 0.2
-                });
-            });
-        });
-        
-        // تأثيرات على أزرار التصدير
-        const exportBtns = document.querySelectorAll('.export-btn');
-        exportBtns.forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    scale: 1.05,
-                    duration: 0.2
-                });
-            });
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const htmlElement = document.documentElement;
             
-            btn.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    scale: 1,
-                    duration: 0.2
-                });
-            });
-        });
-        
-        // حذف الكتاب
-        const deleteBtns = document.querySelectorAll('.delete-book-btn');
-        const deleteModal = document.getElementById('delete-modal');
-        const closeModal = document.getElementById('close-modal');
-        const cancelDelete = document.getElementById('cancel-delete');
-        const confirmDelete = document.getElementById('confirm-delete');
-        const deleteMessage = document.getElementById('delete-message');
-        
-        let currentBookId = null;
-        let currentBookTitle = null;
-        
-        deleteBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                currentBookId = this.getAttribute('data-book-id');
-                currentBookTitle = this.getAttribute('data-book-title');
-                
-                // تحديث رسالة التأكيد
-                deleteMessage.textContent = `هل أنت متأكد من رغبتك في حذف الكتاب "${currentBookTitle}"؟`;
-                
-                // إظهار النافذة المنبثقة
-                deleteModal.classList.remove('hidden');
-                gsap.fromTo(deleteModal,
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.3 }
-                );
-                
-                const modalContent = deleteModal.querySelector('.bg-white');
-                gsap.fromTo(modalContent,
-                    { scale: 0.8, opacity: 0 },
-                    { scale: 1, opacity: 1, duration: 0.4 }
-                );
-            });
-        });
-        
-        // إغلاق النافذة المنبثقة
-        function closeModalHandler() {
-            const modalContent = deleteModal.querySelector('.bg-white');
-            gsap.to(modalContent, {
-                scale: 0.8,
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => {
-                    deleteModal.classList.add('hidden');
+            darkModeToggle.addEventListener('click', function() {
+                htmlElement.classList.toggle('dark');
+                const icon = this.querySelector('i');
+                if (htmlElement.classList.contains('dark')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                    localStorage.setItem('darkMode', 'false');
                 }
+                
+                // تأثير GSAP
+                gsap.to(this, {
+                    rotation: 360,
+                    duration: 0.5,
+                    ease: "back.out(1.2)"
+                });
             });
             
-            gsap.to(deleteModal, {
-                opacity: 0,
-                duration: 0.3
-            });
-        }
-        
-        if (closeModal) closeModal.addEventListener('click', closeModalHandler);
-        if (cancelDelete) cancelDelete.addEventListener('click', closeModalHandler);
-        
-        // تأكيد الحذف
-        if (confirmDelete) {
-            confirmDelete.addEventListener('click', function() {
-                if (!currentBookId) return;
+            // التحقق من تفضيل Dark Mode
+            if (localStorage.getItem('darkMode') === 'true') {
+                htmlElement.classList.add('dark');
+                darkModeToggle.querySelector('i').classList.remove('fa-moon');
+                darkModeToggle.querySelector('i').classList.add('fa-sun');
+            }
+            
+            // تحديث الإحصائيات
+            function updateStatistics() {
+                const totalBooks = books.length;
+                const freeBooks = books.filter(book => book.isFree).length;
+                const featuredBooks = books.filter(book => book.isFeatured).length;
                 
-                // إرسال طلب AJAX للحذف
-                fetch(`/dashboard/books/${currentBookId}/delete/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // إغلاق النافذة
-                        closeModalHandler();
-                        
-                        // عرض رسالة النجاح
-                        const successDiv = document.createElement('div');
-                        successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
-                        successDiv.innerHTML = `
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 ml-3"></i>
-                                <div>
-                                    <p class="font-bold">نجاح</p>
-                                    <p class="text-sm">${data.message}</p>
+                // تأثير عدادات GSAP
+                gsap.to("#totalBooks", {
+                    innerHTML: totalBooks,
+                    duration: 1.5,
+                    snap: { innerHTML: 1 },
+                    ease: "power2.out"
+                });
+                
+                gsap.to("#freeBooks", {
+                    innerHTML: freeBooks,
+                    duration: 1.5,
+                    snap: { innerHTML: 1 },
+                    ease: "power2.out"
+                });
+                
+                gsap.to("#featuredBooks", {
+                    innerHTML: featuredBooks,
+                    duration: 1.5,
+                    snap: { innerHTML: 1 },
+                    ease: "power2.out"
+                });
+                
+                // تأثيرات على بطاقات الإحصائيات
+                gsap.to(".stat-card", {
+                    y: -5,
+                    duration: 0.3,
+                    stagger: 0.1,
+                    repeat: 1,
+                    yoyo: true,
+                    ease: "power2.inOut"
+                });
+            }
+            
+            // عرض الكتب في الجدول
+            function renderBooks() {
+                const tableBody = document.getElementById('booksTableBody');
+                const startIndex = (currentPage - 1) * booksPerPage;
+                const endIndex = startIndex + booksPerPage;
+                const currentBooks = books.slice(startIndex, endIndex);
+                
+                tableBody.innerHTML = '';
+                
+                if (currentBooks.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="fas fa-book-open"></i>
+                                    </div>
+                                    <h3>لا توجد كتب</h3>
+                                    <p>ابدأ بإضافة كتاب جديد إلى المكتبة</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                currentBooks.forEach((book, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover">
+                                    <img src="${book.cover}" alt="${book.title}">
+                                </div>
+                                <div class="book-info">
+                                    <h4>${book.title}</h4>
+                                    <div class="book-meta">
+                                        <span>${book.pages} صفحة</span>
+                                        ${book.year ? `<span>${book.year}</span>` : ''}
+                                    </div>
                                 </div>
                             </div>
-                        `;
-                        
-                        document.body.appendChild(successDiv);
-                        
-                        // تأثير ظهور رسالة النجاح
-                        gsap.from(successDiv, {
-                            opacity: 0,
-                            y: -20,
+                        </td>
+                        <td>${book.author}</td>
+                        <td>${book.category}</td>
+                        <td>
+                            <div class="status-badges">
+                                ${book.isFree ? '<span class="status-badge badge-free">مجاني</span>' : ''}
+                                ${book.isFeatured ? '<span class="status-badge badge-featured">مميز</span>' : ''}
+                            </div>
+                        </td>
+                        <td>${book.date}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view" onclick="viewBook(${book.id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn edit" onclick="editBook(${book.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deleteBook(${book.id}, '${book.title}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    // تأثير GSAP عند إضافة الصف
+                    gsap.from(row, {
+                        opacity: 0,
+                        x: -30,
+                        duration: 0.5,
+                        delay: index * 0.1,
+                        ease: "power2.out"
+                    });
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                // تحديث الترقيم
+                updatePagination();
+                
+                // تأثيرات تفاعلية على الصفوف
+                const rows = document.querySelectorAll('.table-body tr');
+                rows.forEach(row => {
+                    row.addEventListener('mouseenter', function() {
+                        gsap.to(this, {
+                            backgroundColor: 'rgba(102, 126, 234, 0.05)',
                             duration: 0.3
                         });
-                        
-                        // إزالة الصف من الجدول
-                        const deletedRow = document.querySelector(`.delete-book-btn[data-book-id="${currentBookId}"]`).closest('tr');
-                        gsap.to(deletedRow, {
-                            opacity: 0,
-                            x: -20,
-                            duration: 0.3,
-                            onComplete: () => {
-                                deletedRow.remove();
-                            }
+                    });
+                    
+                    row.addEventListener('mouseleave', function() {
+                        gsap.to(this, {
+                            backgroundColor: 'transparent',
+                            duration: 0.3
                         });
-                        
-                        // إزالة رسالة النجاح بعد 3 ثواني
-                        setTimeout(() => {
-                            gsap.to(successDiv, {
-                                opacity: 0,
-                                y: -20,
-                                duration: 0.3,
-                                onComplete: () => {
-                                    successDiv.remove();
-                                }
-                            });
-                        }, 3000);
-                        
-                        // تحديث عدد الكتب
-                        const bookCountElements = document.querySelectorAll('.bg-white.rounded-2xl.shadow-lg.p-6 h3');
-                        if (bookCountElements.length > 0) {
-                            const currentCount = parseInt(bookCountElements[0].textContent);
-                            gsap.to(bookCountElements[0], {
-                                textContent: currentCount - 1,
-                                duration: 0.5,
-                                snap: { textContent: 1 }
-                            });
-                        }
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('حدث خطأ أثناء حذف الكتاب');
+                    });
                 });
-            });
-        }
-        
-        // إغلاق النافذة عند النقر خارجها
-        window.addEventListener('click', function(e) {
-            if (e.target === deleteModal) {
-                closeModalHandler();
             }
-        });
-        
-        // تأثيرات على زر التصفية
-        const filterBtn = document.querySelector('button[type="submit"]');
-        if (filterBtn) {
-            filterBtn.addEventListener('click', function() {
-                gsap.fromTo(this,
-                    { scale: 1 },
-                    { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
-                );
-            });
-        }
-        
-        // تأثيرات على أزرار الإجراءات في الجدول
-        const actionBtns = document.querySelectorAll('tbody a, tbody button');
-        actionBtns.forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                gsap.to(this, {
+            
+            // تحديث الترقيم
+            function updatePagination() {
+                const totalPages = Math.ceil(books.length / booksPerPage);
+                const pageNumbers = document.getElementById('pageNumbers');
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                
+                pageNumbers.innerHTML = '';
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('span');
+                    pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        currentPage = i;
+                        renderBooks();
+                    });
+                    
+                    pageNumbers.appendChild(pageBtn);
+                }
+                
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+                
+                // تأثيرات GSAP على أزرار الصفحات
+                gsap.to('.page-number.active', {
                     scale: 1.1,
-                    duration: 0.2
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1
+                });
+            }
+            
+            // إضافة كتاب جديد
+            document.getElementById('bookForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const newBook = {
+                    id: books.length + 1,
+                    title: formData.get('title'),
+                    author: formData.get('author'),
+                    category: formData.get('category'),
+                    description: formData.get('description'),
+                    year: parseInt(formData.get('year')) || null,
+                    pages: parseInt(formData.get('pages')) || 0,
+                    isFree: document.getElementById('isFree').checked,
+                    isFeatured: document.getElementById('isFeatured').checked,
+                    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop",
+                    date: new Date().toISOString().split('T')[0].replace(/-/g, '/')
+                };
+                
+                books.unshift(newBook);
+                
+                // إعادة تعيين النموذج
+                this.reset();
+                document.getElementById('cancelEdit').style.display = 'none';
+                document.getElementById('formTitle').textContent = 'إضافة كتاب جديد';
+                document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> إضافة الكتاب';
+                
+                // تحديث الواجهة
+                updateStatistics();
+                renderBooks();
+                
+                // عرض رسالة النجاح
+                document.getElementById('successMessage').textContent = 'تم إضافة الكتاب بنجاح!';
+                document.getElementById('successModal').classList.add('active');
+                
+                // تأثير GSAP على رسالة النجاح
+                gsap.from('#successModal .modal', {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 0.4,
+                    ease: "back.out(1.2)"
+                });
+                
+                // تأثير على زر الإضافة
+                gsap.to('#addBookBtn', {
+                    y: -10,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
                 });
             });
             
-            btn.addEventListener('mouseleave', function() {
+            // تعديل كتاب
+            window.editBook = function(id) {
+                const book = books.find(b => b.id === id);
+                if (!book) return;
+                
+                // تعبئة النموذج
+                document.querySelector('input[name="title"]').value = book.title;
+                document.querySelector('input[name="author"]').value = book.author;
+                document.querySelector('select[name="category"]').value = book.category;
+                document.querySelector('textarea[name="description"]').value = book.description;
+                document.querySelector('input[name="year"]').value = book.year || '';
+                document.querySelector('input[name="pages"]').value = book.pages || '';
+                document.getElementById('isFree').checked = book.isFree;
+                document.getElementById('isFeatured').checked = book.isFeatured;
+                
+                // تغيير النموذج لوضع التعديل
+                currentBookId = id;
+                document.getElementById('formTitle').textContent = 'تعديل الكتاب';
+                document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ التعديلات';
+                document.getElementById('cancelEdit').style.display = 'flex';
+                
+                // تمرير إلى أعلى الصفحة
+                document.querySelector('.form-panel').scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // تأثير GSAP على النموذج
+                gsap.to('.form-container', {
+                    y: -10,
+                    duration: 0.3,
+                    yoyo: true,
+                    repeat: 2,
+                    ease: "power2.inOut"
+                });
+            };
+            
+            // إلغاء التعديل
+            document.getElementById('cancelEdit').addEventListener('click', function() {
+                document.getElementById('bookForm').reset();
+                this.style.display = 'none';
+                document.getElementById('formTitle').textContent = 'إضافة كتاب جديد';
+                document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> إضافة الكتاب';
+                currentBookId = null;
+            });
+            
+            // حذف كتاب
+            window.deleteBook = function(id, title) {
+                currentBookId = id;
+                document.getElementById('modalMessage').textContent = `هل أنت متأكد من رغبتك في حذف الكتاب "${title}"؟`;
+                document.getElementById('deleteModal').classList.add('active');
+                
+                // تأثير GSAP على الـ Modal
+                gsap.from('#deleteModal .modal', {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 0.4,
+                    ease: "back.out(1.2)"
+                });
+            };
+            
+            // تأكيد الحذف
+            document.getElementById('confirmDelete').addEventListener('click', function() {
+                if (currentBookId) {
+                    const index = books.findIndex(b => b.id === currentBookId);
+                    if (index !== -1) {
+                        // تأثير GSAP قبل الحذف
+                        const row = document.querySelector(`button[onclick="deleteBook(${currentBookId},"]`).closest('tr');
+                        gsap.to(row, {
+                            opacity: 0,
+                            x: 100,
+                            duration: 0.3,
+                            ease: "power2.in",
+                            onComplete: () => {
+                                books.splice(index, 1);
+                                updateStatistics();
+                                renderBooks();
+                            }
+                        });
+                    }
+                }
+                
+                // إغلاق الـ Modal
+                document.getElementById('deleteModal').classList.remove('active');
+                currentBookId = null;
+                
+                // تأثير على زر التحديث
+                gsap.to('#refreshBtn', {
+                    rotation: 360,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+            });
+            
+            // إغلاق Modals
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('deleteModal').classList.remove('active');
+                currentBookId = null;
+            });
+            
+            document.getElementById('cancelDelete').addEventListener('click', function() {
+                document.getElementById('deleteModal').classList.remove('active');
+                currentBookId = null;
+            });
+            
+            document.getElementById('closeSuccessModal').addEventListener('click', function() {
+                document.getElementById('successModal').classList.remove('active');
+            });
+            
+            document.getElementById('closeSuccessBtn').addEventListener('click', function() {
+                document.getElementById('successModal').classList.remove('active');
+            });
+            
+            // البحث
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                // في التطبيق الحقيقي، ستتم فلترة البيانات هنا
+                renderBooks();
+                
+                // تأثير GSAP على شريط البحث
+                if (searchTerm.length > 0) {
+                    gsap.to('#searchInput', {
+                        borderColor: '#667eea',
+                        duration: 0.3
+                    });
+                } else {
+                    gsap.to('#searchInput', {
+                        borderColor: '#e2e8f0',
+                        duration: 0.3
+                    });
+                }
+            });
+            
+            // أزرار التحكم
+            document.getElementById('filterBtn').addEventListener('click', function() {
+                this.classList.toggle('active');
+                // تأثير GSAP
                 gsap.to(this, {
-                    scale: 1,
-                    duration: 0.2
+                    scale: 1.1,
+                    duration: 0.2,
+                    yoyo: true,
+                    repeat: 1
+                });
+            });
+            
+            document.getElementById('sortBtn').addEventListener('click', function() {
+                this.classList.toggle('active');
+                // تأثير GSAP
+                gsap.to(this, {
+                    rotation: 180,
+                    duration: 0.3,
+                    ease: "back.out(1.2)"
+                });
+            });
+            
+            document.getElementById('viewBtn').addEventListener('click', function() {
+                this.classList.toggle('active');
+                // تأثير GSAP
+                gsap.to(this, {
+                    y: -5,
+                    duration: 0.2,
+                    yoyo: true,
+                    repeat: 2
+                });
+            });
+            
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                // تأثير GSAP
+                gsap.to(this, {
+                    rotation: 360,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+                
+                // محاكاة تحديث البيانات
+                setTimeout(() => {
+                    updateStatistics();
+                    renderBooks();
+                }, 500);
+            });
+            
+            // أزرار التصدير
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.textContent.trim();
+                    // تأثير GSAP
+                    gsap.to(this, {
+                        scale: 1.1,
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 1
+                    });
+                    
+                    // محاكاة التصدير
+                    setTimeout(() => {
+                        alert(`جاري تصدير البيانات بصيغة ${type}...`);
+                    }, 300);
+                });
+            });
+            
+            // منطقة رفع الملفات
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = uploadArea.querySelector('input[type="file"]');
+            
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const fileName = e.target.files[0].name;
+                    uploadArea.innerHTML = `
+                        <div class="upload-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="upload-text">
+                            <h4>تم رفع الملف</h4>
+                            <p>${fileName}</p>
+                        </div>
+                    `;
+                    
+                    // تأثير GSAP
+                    gsap.from(uploadArea, {
+                        scale: 0.9,
+                        duration: 0.3,
+                        ease: "back.out(1.2)"
+                    });
+                }
+            });
+            
+            // السحب والإفلات
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#667eea';
+                this.style.background = 'rgba(102, 126, 234, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '';
+                this.style.background = '';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '';
+                this.style.background = '';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('image/')) {
+                        fileInput.files = e.dataTransfer.files;
+                        const event = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(event);
+                    }
+                }
+            });
+            
+            // تهيئة الصفحة
+            updateStatistics();
+            renderBooks();
+            
+            // تأثيرات دخول الصفحة
+            gsap.from('.logo-icon', {
+                rotation: 360,
+                duration: 1,
+                ease: "back.out(1.2)"
+            });
+            
+            gsap.from('.header-text h1', {
+                y: -30,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.3
+            });
+            
+            gsap.from('.stat-card', {
+                y: 30,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                delay: 0.5
+            });
+            
+            gsap.from('.form-container', {
+                x: -30,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.8
+            });
+            
+            gsap.from('.control-panel', {
+                y: 30,
+                opacity: 0,
+                duration: 0.8,
+                delay: 1
+            });
+            
+            // تأثيرات الخلفية الدائمة
+            const floatingElements = document.querySelectorAll('.floating-element');
+            floatingElements.forEach((el, index) => {
+                gsap.to(el, {
+                    duration: 20 + (index * 5),
+                    x: "random(-100, 100)",
+                    y: "random(-50, 50)",
+                    rotation: "random(-180, 180)",
+                    ease: "sine.inOut",
+                    repeat: -1,
+                    yoyo: true
+                });
+            });
+            
+            // تأثيرات تفاعلية على الأزرار
+            const buttons = document.querySelectorAll('button:not(.modal-btn)');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        scale: 1.05,
+                        duration: 0.2,
+                        ease: "power2.out"
+                    });
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        scale: 1,
+                        duration: 0.2,
+                        ease: "power2.out"
+                    });
+                });
+            });
+            
+            // تأثيرات على حقول الإدخال
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    gsap.to(this, {
+                        scale: 1.02,
+                        borderColor: '#667eea',
+                        boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
+                        duration: 0.3
+                    });
+                });
+                
+                input.addEventListener('blur', function() {
+                    gsap.to(this, {
+                        scale: 1,
+                        borderColor: '#e2e8f0',
+                        boxShadow: 'none',
+                        duration: 0.3
+                    });
                 });
             });
         });
         
-        // تأثيرات على بطاقات الإحصائيات
-        const statCards = document.querySelectorAll('.bg-white.rounded-2xl.shadow-lg.p-6');
-        statCards.forEach((card, index) => {
-            gsap.from(card, {
-                opacity: 0,
-                y: 20,
-                duration: 0.6,
-                delay: index * 0.1
-            });
-        });
-    });
-</script>
-{% endblock %}
+        // وظائف عامة
+        function viewBook(id) {
+            alert(`عرض تفاصيل الكتاب رقم ${id}`);
+        }
+    </script>
 {% endblock %}

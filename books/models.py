@@ -90,7 +90,8 @@ class ReadingHistory(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, verbose_name="الكتاب")
     last_read = models.DateTimeField(auto_now=True, verbose_name="آخر قراءة")
     progress = models.IntegerField(default=0, verbose_name="التقدم %")
-    
+    reading_duration_minutes = models.IntegerField(default=0, verbose_name="مدة القراءة (دقيقة)")  # أضف هذا
+
     class Meta:
         verbose_name = "سجل القراءة"
         verbose_name_plural = "سجلات القراءة"

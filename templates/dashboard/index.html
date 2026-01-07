@@ -156,7 +156,7 @@
                     </div>
                     <div class="mt-4 flex items-center">
                         <i class="fas fa-comment ml-1"></i>
-                        <span class="text-sm">متوسط 4.8 ⭐</span>
+                        <span class="text-sm">متوسط {{ avg_rating|default:"4.8" }} ⭐</span>
                     </div>
                 </div>
                 
@@ -356,6 +356,7 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
@@ -435,11 +436,32 @@
                 });
                 
                 // طلب AJAX للحصول على أحدث الإحصائيات
-                fetch('/dashboard/statistics/')
-                    .then(response => response.json())
+                fetch('{% url "get_statistics" %}')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        // تحديث الإحصائيات
-                        console.log('تم تحديث الإحصائيات:', data);
+                        if (data.success) {
+                            // تحديث الإحصائيات في الصفحة
+                            document.querySelectorAll('.bg-gradient-to-r')[0].querySelector('h3').textContent = data.stats.total_books;
+                            document.querySelectorAll('.bg-gradient-to-r')[1].querySelector('h3').textContent = data.stats.total_users;
+                            document.querySelectorAll('.bg-gradient-to-r')[2].querySelector('h3').textContent = data.stats.total_reviews;
+                            document.querySelectorAll('.bg-gradient-to-r')[3].querySelector('h3').textContent = data.stats.today_visitors;
+                            
+                            // تحديث الزوار اليوم
+                            const visitorElements = document.querySelectorAll('span:contains("زائر اليوم")');
+                            visitorElements.forEach(el => {
+                                el.textContent = data.stats.today_visitors + ' زائر اليوم';
+                            });
+                            
+                            // إظهار رسالة نجاح
+                            showNotification('تم تحديث الإحصائيات بنجاح', 'success');
+                        } else {
+                            showNotification('حدث خطأ أثناء تحديث الإحصائيات', 'error');
+                        }
                         
                         // إعادة تعيين الدوران
                         setTimeout(() => {
@@ -451,6 +473,15 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
+                        showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+                        
+                        // إعادة تعيين الدوران
+                        setTimeout(() => {
+                            gsap.to(this.querySelector('i'), {
+                                rotation: 0,
+                                duration: 0
+                            });
+                        }, 1000);
                     });
             });
         }
@@ -464,6 +495,20 @@
             const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
             const booksData = [65, 59, 80, 81, 56, 55];
             const usersData = [28, 48, 40, 19, 86, 27];
+            
+            // استخدام البيانات الحقيقية إذا كانت متوفرة
+            {% if monthly_stats %}
+                const monthlyStats = {{ monthly_stats|safe }};
+                const realBooksData = monthlyStats.map(stat => stat.books);
+                const realUsersData = monthlyStats.map(stat => stat.users);
+                
+                if (realBooksData.length === 6) {
+                    booksData = realBooksData;
+                }
+                if (realUsersData.length === 6) {
+                    usersData = realUsersData;
+                }
+            {% endif %}
             
             // وظيفة رسم الرسم البياني
             function drawChart(dataType) {
@@ -484,12 +529,18 @@
                     bar.style.height = '0px';
                     bar.style.backgroundColor = color;
                     
-                    const label = document.createElement('span');
-                    label.className = 'text-gray-600 text-sm';
-                    label.textContent = months[index];
+                    const valueLabel = document.createElement('div');
+                    valueLabel.className = 'text-sm font-medium mb-1';
+                    valueLabel.textContent = value;
+                    valueLabel.style.color = color;
                     
+                    const monthLabel = document.createElement('span');
+                    monthLabel.className = 'text-gray-600 text-sm';
+                    monthLabel.textContent = months[index];
+                    
+                    barContainer.appendChild(valueLabel);
                     barContainer.appendChild(bar);
-                    barContainer.appendChild(label);
+                    barContainer.appendChild(monthLabel);
                     chartContainer.appendChild(barContainer);
                     
                     // تأثير GSAP لرسم الأعمدة
@@ -560,7 +611,61 @@
                 }
             });
         });
+        
+        // وظيفة لعرض الإشعارات
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} ml-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // إظهار الإشعار
+            setTimeout(() => {
+                gsap.to(notification, {
+                    x: 0,
+                    duration: 0.3
+                });
+            }, 10);
+            
+            // إخفاء الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                gsap.to(notification, {
+                    x: '100%',
+                    duration: 0.3,
+                    onComplete: () => {
+                        notification.remove();
+                    }
+                });
+            }, 3000);
+        }
+        
+        // إضافة تأثيرات للصور في بطاقات الكتب
+        const bookImages = document.querySelectorAll('.book-card img');
+        bookImages.forEach(img => {
+            img.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.05,
+                    duration: 0.3
+                });
+            });
+            
+            img.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3
+                });
+            });
+        });
     });
 </script>
-{% endblock %}
 {% endblock %}
