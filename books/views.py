@@ -203,6 +203,8 @@ def dashboard(request):
     # إحصائيات عامة للمستخدم
     bookmarks_count = Bookmark.objects.filter(user=user).count()
     
+
+
     # حساب وقت القراءة الكلي
     total_reading_time = ReadingHistory.objects.filter(
         user=user
@@ -229,9 +231,10 @@ def dashboard(request):
     
     # الكتب المقروءة مؤخراً (آخر 6 كتب للعرض)
     recent_books = ReadingHistory.objects.filter(
-        user=user
+        user=user,
+        last_read__isnull=False
     ).select_related('book').order_by('-last_read')[:6]
-    
+        
     context = {
         'bookmarks_count': bookmarks_count,
         'total_reading_time': total_reading_time / 60 if total_reading_time > 0 else 0,  # تحويل إلى ساعات

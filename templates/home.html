@@ -1,5 +1,3 @@
-[file name]: home.html
-[file content begin]
 {% extends 'base.html' %}
 {% load static %}
 
@@ -527,6 +525,9 @@
                     <i class="fas fa-book-open ml-2"></i> عرض الكتب
                 </a>
             </div>
+
+
+
         </div>
     </div>
 </section>
@@ -556,7 +557,7 @@
             <div class="featured-carousel overflow-x-hidden">
                 <div class="featured-carousel-track flex gap-6 transition-transform duration-500">
                     {% for book in featured_books %}
-                    <div class="featured-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3">
+                    <div class="featured-slide flex-shrink-0 w-full md:w-1/2 lg:w-1/4">
                         <div class="hover-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg h-full">
                             <!-- Book Cover -->
                             <div class="book-cover h-48 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center">
@@ -627,7 +628,128 @@
             </div>
         </div>
     </div>
+</section> 
+
+{% comment %} 
+<!-- Featured Books Section -->
+<section id="featured-books" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+            <div class="mb-6 md:mb-0">
+                <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-2">الكتب المميزة</h2>
+                <p class="text-gray-600 dark:text-gray-300">أفضل الكتب التي يوصي بها قراؤنا</p>
+            </div>
+        </div>
+
+        <!-- Carousel -->
+        <div class="relative overflow-hidden">
+            <div class="flex gap-6">
+
+                {% for book in featured_books %}
+                <!-- Card -->
+                <div class="w-full sm:w-1/2 lg:w-1/4 flex">
+                    <div class="bg-white dark:bg-gray-700 rounded-2xl shadow-lg flex flex-col w-full overflow-hidden group">
+
+                        <!-- Book Cover -->
+                        <div class="h-40 flex items-center justify-center bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                            {% if book.cover_image %}
+                            <img 
+                                src="{{ book.cover_image.url }}" 
+                                alt="{{ book.title }}"
+                                class="h-32 w-auto object-contain transition-transform duration-300 group-hover:scale-110"
+                            >
+                            {% else %}
+                            <i class="fas fa-book-open text-5xl text-gray-300 dark:text-gray-600"></i>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-5 flex flex-col flex-grow">
+
+                            <!-- Title + Free -->
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-white line-clamp-2">
+                                    {{ book.title }}
+                                </h3>
+
+                                {% if book.is_free %}
+                                <span class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-0.5 rounded-full text-xs">
+                                    مجاني
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                بواسطة {{ book.author }}
+                            </p>
+
+                            <!-- Rating -->
+                            <div class="flex items-center mb-4">
+                                <div class="flex text-yellow-400 ml-2 text-sm">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= book.average_rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ book.average_rating|floatformat:1 }}
+                                </span>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="mt-auto flex justify-between items-center">
+                                <a href="{% url 'book_detail' book.slug %}"
+                                   class="bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                                    <i class="fas fa-eye ml-1"></i> قراءة
+                                </a>
+
+                                <div class="flex space-x-3 space-x-reverse text-gray-500">
+                                    <button class="hover:text-yellow-500 transition">
+                                        <i class="far fa-bookmark"></i>
+                                    </button>
+                                    <button class="hover:text-blue-500 transition">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="w-full text-center py-16">
+                    <i class="fas fa-book-open text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">لا توجد كتب مميزة حالياً</p>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
 </section>
+
+ {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- Mobile App Section -->
 <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800">

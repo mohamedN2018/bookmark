@@ -5,667 +5,709 @@
 {% block title %}لوحة التحكم - مكتبة الكتب{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-    <div class="container mx-auto px-4 py-8">
-        <!-- رأس الصفحة -->
-        <div class="mb-8 animate-on-scroll">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">لوحة التحكم</h1>
-                    <p class="text-lg text-gray-600">مرحباً {{ user.username }}! إليك نظرة عامة على نشاطك.</p>
-                </div>
-                <div class="mt-4 md:mt-0 flex space-x-4 space-x-reverse">
-                    <div class="bg-white rounded-xl shadow-lg p-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center ml-3">
-                                <i class="fas fa-calendar-day text-primary-600"></i>
+
+    <!-- JSON للـ JS -->
+    {{ monthly_stats|json_script:"monthly-stats-data" }}
+
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <!-- رأس الصفحة -->
+            <div class="mb-8 animate-on-scroll">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">لوحة التحكم</h1>
+                        <p class="text-lg text-gray-600">مرحباً {{ user.username }}! إليك نظرة عامة على نشاطك.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-4 space-x-reverse">
+                        <div class="bg-white rounded-xl shadow-lg p-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center ml-3">
+                                    <i class="fas fa-calendar-day text-primary-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">اليوم</p>
+                                    <p class="font-bold text-gray-800">{% now "j F Y" %}</p>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- بطاقات الإحصائيات -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- بطاقة الكتب المحفوظة -->
+                    <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex justify-between items-start">
                             <div>
-                                <p class="text-sm text-gray-600">اليوم</p>
-                                <p class="font-bold text-gray-800">{% now "j F Y" %}</p>
+                                <p class="text-gray-600 mb-2">الكتب المحفوظة</p>
+                                <h3 class="text-3xl font-bold text-gray-800">{{ bookmarks_count }}</h3>
+                                <p class="text-green-600 text-sm mt-2">
+                                    <i class="fas fa-bookmark ml-1"></i>
+                                    كتب في قائمة المفضلة
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-bookmark text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- بطاقة ساعات القراءة -->
+                    <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-600 mb-2">ساعات القراءة</p>
+                                <h3 class="text-3xl font-bold text-gray-800">{{ total_reading_time|floatformat:0 }}</h3>
+                                <p class="text-green-600 text-sm mt-2">
+                                    <i class="fas fa-clock ml-1"></i>
+                                    إجمالي وقت القراءة
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-clock text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- بطاقة التقييمات -->
+                    <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-600 mb-2">التقييمات</p>
+                                <h3 class="text-3xl font-bold text-gray-800">{{ reviews_count }}</h3>
+                                <p class="text-green-600 text-sm mt-2">
+                                    <i class="fas fa-star ml-1"></i>
+                                    تقييمات ومراجعات
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-star text-purple-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- بطاقة الكتب المقروءة -->
+                    <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-600 mb-2">الكتب المقروءة</p>
+                                <h3 class="text-3xl font-bold text-gray-800">{{ reading_history|length }}</h3>
+                                <p class="text-green-600 text-sm mt-2">
+                                    <i class="fas fa-book-open ml-1"></i>
+                                    كتب قرأتها مؤخراً
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-book-open text-green-600 text-xl"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- بطاقات الإحصائيات -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- بطاقة الكتب المحفوظة -->
-                <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-600 mb-2">الكتب المحفوظة</p>
-                            <h3 class="text-3xl font-bold text-gray-800">{{ bookmarks_count }}</h3>
-                            <p class="text-green-600 text-sm mt-2">
-                                <i class="fas fa-bookmark ml-1"></i>
-                                كتب في قائمة المفضلة
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-bookmark text-yellow-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- بطاقة ساعات القراءة -->
-                <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-600 mb-2">ساعات القراءة</p>
-                            <h3 class="text-3xl font-bold text-gray-800">{{ total_reading_time|floatformat:0 }}</h3>
-                            <p class="text-green-600 text-sm mt-2">
-                                <i class="fas fa-clock ml-1"></i>
-                                إجمالي وقت القراءة
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-clock text-blue-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- بطاقة التقييمات -->
-                <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-600 mb-2">التقييمات</p>
-                            <h3 class="text-3xl font-bold text-gray-800">{{ reviews_count }}</h3>
-                            <p class="text-green-600 text-sm mt-2">
-                                <i class="fas fa-star ml-1"></i>
-                                تقييمات ومراجعات
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-star text-purple-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- بطاقة الكتب المقروءة -->
-                <div class="dashboard-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-600 mb-2">الكتب المقروءة</p>
-                            <h3 class="text-3xl font-bold text-gray-800">{{ reading_history|length }}</h3>
-                            <p class="text-green-600 text-sm mt-2">
-                                <i class="fas fa-book-open ml-1"></i>
-                                كتب قرأتها مؤخراً
-                            </p>
-                        </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-book-open text-green-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- إذا كان المستخدم موظفاً، أضف إحصائيات إدارية -->
-        {% if user.is_staff %}
-        <div class="mb-8 animate-on-scroll">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">الإحصائيات الإدارية</h2>
-                <button id="refresh-stats" class="text-primary-600 hover:text-primary-800">
-                    <i class="fas fa-sync-alt ml-2"></i> تحديث
-                </button>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-blue-100 mb-2">إجمالي الكتب</p>
-                            <h3 class="text-3xl font-bold">{{ total_books }}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-books text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <i class="fas fa-arrow-up ml-1"></i>
-                        <span class="text-sm">زيادة هذا الشهر</span>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-green-100 mb-2">إجمالي المستخدمين</p>
-                            <h3 class="text-3xl font-bold">{{ total_users }}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <i class="fas fa-user-plus ml-1"></i>
-                        <span class="text-sm">{{ today_visitors }} زائر اليوم</span>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-purple-100 mb-2">إجمالي التقييمات</p>
-                            <h3 class="text-3xl font-bold">{{ total_reviews }}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-star text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <i class="fas fa-comment ml-1"></i>
-                        <span class="text-sm">متوسط {{ avg_rating|default:"4.8" }} ⭐</span>
-                    </div>
-                </div>
-                
-                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-2xl shadow-lg p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-yellow-100 mb-2">نشاط اليوم</p>
-                            <h3 class="text-3xl font-bold">{{ today_visitors }}</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-line text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <i class="fas fa-fire ml-1"></i>
-                        <span class="text-sm">مستخدم نشط</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- رسم بياني للإحصائيات -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <!-- إذا كان المستخدم موظفاً، أضف إحصائيات إدارية -->
+            {% if user.is_staff %}
+            <div class="mb-8 animate-on-scroll">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">إحصائيات الشهور الستة الماضية</h3>
-                    <div class="flex space-x-2">
-                        <button class="stat-btn active bg-primary-100 text-primary-600 px-4 py-2 rounded-lg" data-type="books">
-                            الكتب
-                        </button>
-                        <button class="stat-btn bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg" data-type="users">
-                            المستخدمون
-                        </button>
+                    <h2 class="text-2xl font-bold text-gray-800">الإحصائيات الإدارية</h2>
+                    <button id="refresh-stats" class="text-primary-600 hover:text-primary-800">
+                        <i class="fas fa-sync-alt ml-2"></i> تحديث
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-blue-100 mb-2">إجمالي الكتب</p>
+                                <h3 class="text-3xl font-bold">{{ total_books }}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-books text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center">
+                            <i class="fas fa-arrow-up ml-1"></i>
+                            <span class="text-sm">زيادة هذا الشهر</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl shadow-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-green-100 mb-2">إجمالي المستخدمين</p>
+                                <h3 class="text-3xl font-bold">{{ total_users }}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center">
+                            <i class="fas fa-user-plus ml-1"></i>
+                            <span class="text-sm">{{ today_visitors }} زائر اليوم</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl shadow-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-purple-100 mb-2">إجمالي التقييمات</p>
+                                <h3 class="text-3xl font-bold">{{ total_reviews }}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-star text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center">
+                            <i class="fas fa-comment ml-1"></i>
+                            <span class="text-sm">متوسط {{ avg_rating|default:"4.8" }} ⭐</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-2xl shadow-lg p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-yellow-100 mb-2">نشاط اليوم</p>
+                                <h3 class="text-3xl font-bold">{{ today_visitors }}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-line text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center">
+                            <i class="fas fa-fire ml-1"></i>
+                            <span class="text-sm">مستخدم نشط</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="h-64 flex items-end space-x-4 space-x-reverse justify-center" id="statistics-chart">
-                    <!-- سيتم ملؤها بالرسم البياني -->
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- قسم الكتب المقروءة مؤخراً -->
-        <div class="mb-8 animate-on-scroll">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">الكتب المقروءة مؤخراً</h2>
-                <a href="{% url 'book_list' %}" class="text-primary-600 hover:text-primary-800 font-medium">
-                    عرض الكل <i class="fas fa-arrow-left"></i>
-                </a>
-            </div>
-            
-            {% if recent_books %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for history in recent_books %}
-                <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="h-48 bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center relative">
-                        {% if history.book.cover_image %}
-                        <img src="{{ history.book.cover_image.url }}" alt="{{ history.book.title }}" class="w-full h-full object-cover">
-                        {% else %}
-                        <i class="fas fa-book-open text-6xl text-blue-300"></i>
-                        {% endif %}
-                        <div class="absolute top-4 left-4 bg-white bg-opacity-90 px-3 py-1 rounded-full">
-                            <span class="text-sm font-medium">{{ history.progress }}%</span>
+                <!-- رسم بياني للإحصائيات -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            إحصائيات الشهور الستة الماضية
+                        </h3>
+
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button
+                                class="stat-btn active bg-primary-100 text-primary-600 px-4 py-2 rounded-lg font-medium transition"
+                                data-type="books">
+                                الكتب
+                            </button>
+
+                            <button
+                                class="stat-btn bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium transition"
+                                data-type="users">
+                                المستخدمون
+                            </button>
                         </div>
                     </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-3">
-                            <h3 class="text-xl font-bold text-gray-800">{{ history.book.title|truncatechars:30 }}</h3>
-                            <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                                {{ history.book.category.name }}
-                            </span>
-                        </div>
-                        <p class="text-gray-600 mb-4">{{ history.book.author }}</p>
-                        
-                        <!-- شريط التقدم -->
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                <span>التقدم</span>
-                                <span>{{ history.progress }}%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-primary-600 h-2 rounded-full" style="width: {{ history.progress }}%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-500 text-sm">
-                                <i class="far fa-clock ml-1"></i>
-                                {{ history.last_read|timesince }}
-                            </span>
-                            <a href="{% url 'book_detail' history.book.slug %}" class="text-primary-600 hover:text-primary-800 font-medium">
-                                أكمل القراءة <i class="fas fa-arrow-left"></i>
-                            </a>
-                        </div>
+
+                    <!-- Container الرسم البياني -->
+                    <div
+                        id="statistics-chart"
+                        class="h-64 flex items-end justify-center gap-4 border-t pt-6">
+                        <!-- الأعمدة سيتم توليدها بالـ JS -->
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-book-open text-3xl text-gray-400"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-3">لا توجد كتب مقروءة بعد</h3>
-                <p class="text-gray-600 mb-6">ابدأ رحلة القراءة واستكشف كتبنا المميزة</p>
-                <a href="{% url 'book_list' %}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 w-1/2 rounded-lg inline-block">
-                    <i class="fas fa-book-open ml-2"></i> استعرض الكتب
-                </a>
             </div>
             {% endif %}
-        </div>
-        
-        <!-- قسم الإجراءات السريعة -->
-        <div class="animate-on-scroll">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">الإجراءات السريعة</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <a href="{% url 'book_list' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-blue-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-search text-blue-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">استكشاف الكتب</h3>
-                            <p class="text-sm text-gray-600">اكتشف كتب جديدة</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm">تصفح مكتبتنا الواسعة من الكتب في مختلف التصنيفات</p>
-                </a>
+            <!-- قسم الكتب المقروءة مؤخراً -->
+            <div class="mb-8 animate-on-scroll">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">الكتب المقروءة مؤخراً ( {{ recent_books|length }} )</h2>
+                    <a href="{% url 'book_list' %}" class="text-primary-600 hover:text-primary-800 font-medium">
+                        عرض الكل <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
                 
-                <a href="{% url 'profile' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-green-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-user-edit text-green-600 text-xl"></i>
+                {% if recent_books %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for history in recent_books %}
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="h-48 bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center relative">
+                            {% if history.book.cover_image %}
+                            <img src="{{ history.book.cover_image.url }}" alt="{{ history.book.title }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <i class="fas fa-book-open text-6xl text-blue-300"></i>
+                            {% endif %}
+                            <div class="absolute top-4 left-4 bg-white bg-opacity-90 px-3 py-1 rounded-full">
+                                <span class="text-sm font-medium">{{ history.progress }}%</span>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">تعديل الملف</h3>
-                            <p class="text-sm text-gray-600">تحديث معلوماتك</p>
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-xl font-bold text-gray-800">{{ history.book.title|truncatechars:30 }}</h3>
+                                <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                                    {{ history.book.category.name }}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 mb-4">{{ history.book.author }}</p>
+                            
+                            <!-- شريط التقدم -->
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>التقدم</span>
+                                    <span>{{ history.progress }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-primary-600 h-2 rounded-full" style="width: {{ history.progress }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 text-sm">
+                                    <i class="far fa-clock ml-1"></i>
+                                    {{ history.last_read|timesince }}
+                                </span>
+                                <a href="{% url 'book_detail' history.book.slug %}" class="text-primary-600 hover:text-primary-800 font-medium">
+                                    أكمل القراءة <i class="fas fa-arrow-left"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-gray-600 text-sm">قم بتحديث بياناتك الشخصية وإعدادات الحساب</p>
-                </a>
-                
-                {% if user.is_staff %}
-                <a href="{% url 'dashboard_books' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-purple-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-book-medical text-purple-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">إدارة الكتب</h3>
-                            <p class="text-sm text-gray-600">إضافة وتحرير الكتب</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm">أضف كتب جديدة أو عدّل على الكتب الموجودة</p>
-                </a>
-                
-                <a href="{% url 'dashboard_users' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-yellow-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-users-cog text-yellow-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">إدارة المستخدمين</h3>
-                            <p class="text-sm text-gray-600">عرض وإدارة الحسابات</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm">راقب نشاط المستخدمين وادفع حساباتهم</p>
-                </a>
+                    {% endfor %}
+                </div>
                 {% else %}
-                <a href="#" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-yellow-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-trophy text-yellow-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">الإنجازات</h3>
-                            <p class="text-sm text-gray-600">تابع تقدمك</p>
-                        </div>
+                <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-book-open text-3xl text-gray-400"></i>
                     </div>
-                    <p class="text-gray-600 text-sm">احصل على شارات إنجاز بناءً على نشاط قراءتك</p>
-                </a>
-                
-                <a href="#" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-red-500">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center ml-4">
-                            <i class="fas fa-bell text-red-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">الإشعارات</h3>
-                            <p class="text-sm text-gray-600">الكتب والتحديثات الجديدة</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 text-sm">ابقَ على اطلاع بآخر الإضافات والتحديثات</p>
-                </a>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">لا توجد كتب مقروءة بعد</h3>
+                    <p class="text-gray-600 mb-6">ابدأ رحلة القراءة واستكشف كتبنا المميزة</p>
+                    <a href="{% url 'book_list' %}" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 w-1/2 rounded-lg inline-block">
+                        <i class="fas fa-book-open ml-2"></i> استعرض الكتب
+                    </a>
+                </div>
                 {% endif %}
+            </div>
+            
+            <!-- قسم الإجراءات السريعة -->
+            <div class="animate-on-scroll">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">الإجراءات السريعة</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <a href="{% url 'book_list' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-blue-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-search text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">استكشاف الكتب</h3>
+                                <p class="text-sm text-gray-600">اكتشف كتب جديدة</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">تصفح مكتبتنا الواسعة من الكتب في مختلف التصنيفات</p>
+                    </a>
+                    
+                    <a href="{% url 'profile' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-green-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-user-edit text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">تعديل الملف</h3>
+                                <p class="text-sm text-gray-600">تحديث معلوماتك</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">قم بتحديث بياناتك الشخصية وإعدادات الحساب</p>
+                    </a>
+                    
+                    {% if user.is_staff %}
+                    <a href="{% url 'dashboard_books' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-purple-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-book-medical text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">إدارة الكتب</h3>
+                                <p class="text-sm text-gray-600">إضافة وتحرير الكتب</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">أضف كتب جديدة أو عدّل على الكتب الموجودة</p>
+                    </a>
+                    
+                    <a href="{% url 'dashboard_users' %}" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-yellow-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-users-cog text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">إدارة المستخدمين</h3>
+                                <p class="text-sm text-gray-600">عرض وإدارة الحسابات</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">راقب نشاط المستخدمين وادفع حساباتهم</p>
+                    </a>
+                    {% else %}
+                    <a href="#" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-yellow-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-trophy text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">الإنجازات</h3>
+                                <p class="text-sm text-gray-600">تابع تقدمك</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">احصل على شارات إنجاز بناءً على نشاط قراءتك</p>
+                    </a>
+                    
+                    <a href="#" class="action-card bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300 border-l-4 border-red-500">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center ml-4">
+                                <i class="fas fa-bell text-red-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">الإشعارات</h3>
+                                <p class="text-sm text-gray-600">الكتب والتحديثات الجديدة</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm">ابقَ على اطلاع بآخر الإضافات والتحديثات</p>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    // تأثيرات GSAP للوحة التحكم
-    document.addEventListener('DOMContentLoaded', function() {
-        // تأثيرات على بطاقات الإحصائيات
-        const dashboardCards = document.querySelectorAll('.dashboard-card');
-        dashboardCards.forEach((card, index) => {
-            gsap.from(card, {
-                opacity: 0,
-                y: 30,
-                duration: 0.6,
-                delay: index * 0.1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
-        });
-        
-        // تأثيرات على بطاقات الإجراءات
-        const actionCards = document.querySelectorAll('.action-card');
-        actionCards.forEach((card, index) => {
-            card.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    y: -5,
-                    duration: 0.3
+    <script>
+        // تأثيرات GSAP للوحة التحكم
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأثيرات على بطاقات الإحصائيات
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            dashboardCards.forEach((card, index) => {
+                gsap.from(card, {
+                    opacity: 1,
+                    y: 30,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
                 });
             });
             
-            card.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    y: 0,
-                    duration: 0.3
-                });
-            });
-            
-            gsap.from(card, {
-                opacity: 0,
-                x: -20,
-                duration: 0.6,
-                delay: 0.2 + (index * 0.1),
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
-        });
-        
-        // تأثيرات على بطاقات الكتب
-        const bookCards = document.querySelectorAll('.book-card');
-        bookCards.forEach((card, index) => {
-            gsap.from(card, {
-                opacity: 0,
-                y: 30,
-                duration: 0.6,
-                delay: index * 0.1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
-        });
-        
-        // تحديث الإحصائيات
-        const refreshBtn = document.getElementById('refresh-stats');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', function() {
-                // تأثير دوران على الزر
-                gsap.to(this.querySelector('i'), {
-                    rotation: 360,
-                    duration: 1,
-                    ease: "power2.out"
-                });
-                
-                // طلب AJAX للحصول على أحدث الإحصائيات
-                fetch('{% url "get_statistics" %}')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            // تحديث الإحصائيات في الصفحة
-                            document.querySelectorAll('.bg-gradient-to-r')[0].querySelector('h3').textContent = data.stats.total_books;
-                            document.querySelectorAll('.bg-gradient-to-r')[1].querySelector('h3').textContent = data.stats.total_users;
-                            document.querySelectorAll('.bg-gradient-to-r')[2].querySelector('h3').textContent = data.stats.total_reviews;
-                            document.querySelectorAll('.bg-gradient-to-r')[3].querySelector('h3').textContent = data.stats.today_visitors;
-                            
-                            // تحديث الزوار اليوم
-                            const visitorElements = document.querySelectorAll('span:contains("زائر اليوم")');
-                            visitorElements.forEach(el => {
-                                el.textContent = data.stats.today_visitors + ' زائر اليوم';
-                            });
-                            
-                            // إظهار رسالة نجاح
-                            showNotification('تم تحديث الإحصائيات بنجاح', 'success');
-                        } else {
-                            showNotification('حدث خطأ أثناء تحديث الإحصائيات', 'error');
-                        }
-                        
-                        // إعادة تعيين الدوران
-                        setTimeout(() => {
-                            gsap.to(this.querySelector('i'), {
-                                rotation: 0,
-                                duration: 0
-                            });
-                        }, 1000);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showNotification('حدث خطأ في الاتصال بالخادم', 'error');
-                        
-                        // إعادة تعيين الدوران
-                        setTimeout(() => {
-                            gsap.to(this.querySelector('i'), {
-                                rotation: 0,
-                                duration: 0
-                            });
-                        }, 1000);
+            // تأثيرات على بطاقات الإجراءات
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach((card, index) => {
+                card.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        y: -5,
+                        duration: 0.3
                     });
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        y: 0,
+                        duration: 0.3
+                    });
+                });
+                
+                gsap.from(card, {
+                    opacity: 1,
+                    x: -20,
+                    duration: 0.6,
+                    delay: 0.2 + (index * 0.1),
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
+                });
             });
-        }
-        
-        // رسم بياني للإحصائيات
-        const statBtns = document.querySelectorAll('.stat-btn');
-        const chartContainer = document.getElementById('statistics-chart');
-        
-        if (statBtns.length > 0 && chartContainer) {
-            // بيانات افتراضية للرسم البياني
-            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
-            const booksData = [65, 59, 80, 81, 56, 55];
-            const usersData = [28, 48, 40, 19, 86, 27];
             
-            // استخدام البيانات الحقيقية إذا كانت متوفرة
-            {% if monthly_stats %}
-                const monthlyStats = {{ monthly_stats|safe }};
-                const realBooksData = monthlyStats.map(stat => stat.books);
-                const realUsersData = monthlyStats.map(stat => stat.users);
-                
-                if (realBooksData.length === 6) {
-                    booksData = realBooksData;
-                }
-                if (realUsersData.length === 6) {
-                    usersData = realUsersData;
-                }
-            {% endif %}
+            // تأثيرات على بطاقات الكتب
+            const bookCards = document.querySelectorAll('.book-card');
+            bookCards.forEach((card, index) => {
+                gsap.from(card, {
+                    opacity: 1,
+                    y: 30,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
+                });
+            });
             
-            // وظيفة رسم الرسم البياني
-            function drawChart(dataType) {
-                chartContainer.innerHTML = '';
-                const data = dataType === 'books' ? booksData : usersData;
-                const color = dataType === 'books' ? '#3b82f6' : '#10b981';
-                
-                const maxValue = Math.max(...data);
-                
-                data.forEach((value, index) => {
-                    const barHeight = (value / maxValue) * 180;
-                    
-                    const barContainer = document.createElement('div');
-                    barContainer.className = 'flex flex-col items-center';
-                    
-                    const bar = document.createElement('div');
-                    bar.className = `w-10 rounded-t-lg mb-2 transition-all duration-500`;
-                    bar.style.height = '0px';
-                    bar.style.backgroundColor = color;
-                    
-                    const valueLabel = document.createElement('div');
-                    valueLabel.className = 'text-sm font-medium mb-1';
-                    valueLabel.textContent = value;
-                    valueLabel.style.color = color;
-                    
-                    const monthLabel = document.createElement('span');
-                    monthLabel.className = 'text-gray-600 text-sm';
-                    monthLabel.textContent = months[index];
-                    
-                    barContainer.appendChild(valueLabel);
-                    barContainer.appendChild(bar);
-                    barContainer.appendChild(monthLabel);
-                    chartContainer.appendChild(barContainer);
-                    
-                    // تأثير GSAP لرسم الأعمدة
-                    gsap.to(bar, {
-                        height: `${barHeight}px`,
+            // تحديث الإحصائيات
+            const refreshBtn = document.getElementById('refresh-stats');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    // تأثير دوران على الزر
+                    gsap.to(this.querySelector('i'), {
+                        rotation: 360,
                         duration: 1,
-                        delay: index * 0.1,
                         ease: "power2.out"
+                    });
+                    
+                    // طلب AJAX للحصول على أحدث الإحصائيات
+                    fetch('{% url "get_statistics" %}')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // تحديث الإحصائيات في الصفحة
+                                document.querySelectorAll('.bg-gradient-to-r')[0].querySelector('h3').textContent = data.stats.total_books;
+                                document.querySelectorAll('.bg-gradient-to-r')[1].querySelector('h3').textContent = data.stats.total_users;
+                                document.querySelectorAll('.bg-gradient-to-r')[2].querySelector('h3').textContent = data.stats.total_reviews;
+                                document.querySelectorAll('.bg-gradient-to-r')[3].querySelector('h3').textContent = data.stats.today_visitors;
+                                
+                                // تحديث الزوار اليوم
+                                const visitorElements = document.querySelectorAll('span:contains("زائر اليوم")');
+                                visitorElements.forEach(el => {
+                                    el.textContent = data.stats.today_visitors + ' زائر اليوم';
+                                });
+                                
+                                // إظهار رسالة نجاح
+                                showNotification('تم تحديث الإحصائيات بنجاح', 'success');
+                            } else {
+                                showNotification('حدث خطأ أثناء تحديث الإحصائيات', 'error');
+                            }
+                            
+                            // إعادة تعيين الدوران
+                            setTimeout(() => {
+                                gsap.to(this.querySelector('i'), {
+                                    rotation: 0,
+                                    duration: 0
+                                });
+                            }, 1000);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showNotification('حدث خطأ في الاتصال بالخادم', 'error');
+                            
+                            // إعادة تعيين الدوران
+                            setTimeout(() => {
+                                gsap.to(this.querySelector('i'), {
+                                    rotation: 0,
+                                    duration: 0
+                                });
+                            }, 1000);
+                        });
+                });
+            }
+            
+            // رسم بياني للإحصائيات
+            const statBtns = document.querySelectorAll('.stat-btn');
+            const chartContainer = document.getElementById('statistics-chart');
+            
+            if (statBtns.length > 0 && chartContainer) {
+                // بيانات افتراضية للرسم البياني
+                const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
+                const booksData = [65, 59, 80, 81, 56, 55];
+                const usersData = [28, 48, 40, 19, 86, 27];
+                
+                // استخدام البيانات الحقيقية إذا كانت متوفرة
+                {% if monthly_stats %}
+                    const monthlyStats = {{ monthly_stats|safe }};
+                    const realBooksData = monthlyStats.map(stat => stat.books);
+                    const realUsersData = monthlyStats.map(stat => stat.users);
+                    
+                    if (realBooksData.length === 6) {
+                        booksData = realBooksData;
+                    }
+                    if (realUsersData.length === 6) {
+                        usersData = realUsersData;
+                    }
+                {% endif %}
+                
+                // وظيفة رسم الرسم البياني
+                function drawChart(dataType) {
+                    chartContainer.innerHTML = '';
+                    const data = dataType === 'books' ? booksData : usersData;
+                    const color = dataType === 'books' ? '#3b82f6' : '#10b981';
+                    
+                    const maxValue = Math.max(...data);
+                    
+                    data.forEach((value, index) => {
+                        const barHeight = (value / maxValue) * 180;
+                        
+                        const barContainer = document.createElement('div');
+                        barContainer.className = 'flex flex-col items-center';
+                        
+                        const bar = document.createElement('div');
+                        bar.className = `w-10 rounded-t-lg mb-2 transition-all duration-500`;
+                        bar.style.height = '0px';
+                        bar.style.backgroundColor = color;
+                        
+                        const valueLabel = document.createElement('div');
+                        valueLabel.className = 'text-sm font-medium mb-1';
+                        valueLabel.textContent = value;
+                        valueLabel.style.color = color;
+                        
+                        const monthLabel = document.createElement('span');
+                        monthLabel.className = 'text-gray-600 text-sm';
+                        monthLabel.textContent = months[index];
+                        
+                        barContainer.appendChild(valueLabel);
+                        barContainer.appendChild(bar);
+                        barContainer.appendChild(monthLabel);
+                        chartContainer.appendChild(barContainer);
+                        
+                        // تأثير GSAP لرسم الأعمدة
+                        gsap.to(bar, {
+                            height: `${barHeight}px`,
+                            duration: 1,
+                            delay: index * 0.1,
+                            ease: "power2.out"
+                        });
+                    });
+                }
+                
+                // رسم الرسم البياني الابتدائي
+                drawChart('books');
+                
+                // إضافة أحداث للأزرار
+                statBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const dataType = this.getAttribute('data-type');
+                        
+                        // تحديث الأزرار النشطة
+                        statBtns.forEach(b => {
+                            b.classList.remove('active', 'bg-primary-100', 'text-primary-600');
+                            b.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                        });
+                        
+                        this.classList.add('active', 'bg-primary-100', 'text-primary-600');
+                        this.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                        
+                        // إعادة رسم الرسم البياني
+                        drawChart(dataType);
+                        
+                        // تأثير على الزر
+                        gsap.fromTo(this,
+                            { scale: 1 },
+                            { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
+                        );
                     });
                 });
             }
             
-            // رسم الرسم البياني الابتدائي
-            drawChart('books');
-            
-            // إضافة أحداث للأزرار
-            statBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const dataType = this.getAttribute('data-type');
-                    
-                    // تحديث الأزرار النشطة
-                    statBtns.forEach(b => {
-                        b.classList.remove('active', 'bg-primary-100', 'text-primary-600');
-                        b.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-                    });
-                    
-                    this.classList.add('active', 'bg-primary-100', 'text-primary-600');
-                    this.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
-                    
-                    // إعادة رسم الرسم البياني
-                    drawChart(dataType);
-                    
-                    // تأثير على الزر
-                    gsap.fromTo(this,
-                        { scale: 1 },
-                        { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
-                    );
+            // تأثيرات على شريط التقدم
+            const progressBars = document.querySelectorAll('.bg-primary-600');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                
+                gsap.to(bar, {
+                    width: width,
+                    duration: 1.5,
+                    delay: 0.5,
+                    ease: "power2.out"
                 });
             });
-        }
-        
-        // تأثيرات على شريط التقدم
-        const progressBars = document.querySelectorAll('.bg-primary-600');
-        progressBars.forEach(bar => {
-            const width = bar.style.width;
-            bar.style.width = '0%';
             
-            gsap.to(bar, {
-                width: width,
-                duration: 1.5,
-                delay: 0.5,
-                ease: "power2.out"
-            });
-        });
-        
-        // تأثيرات على البطاقات المتدرجة
-        const gradientCards = document.querySelectorAll('.bg-gradient-to-r');
-        gradientCards.forEach((card, index) => {
-            gsap.from(card, {
-                opacity: 0,
-                x: -30,
-                duration: 0.6,
-                delay: index * 0.1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
-        });
-        
-        // وظيفة لعرض الإشعارات
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full ${
-                type === 'success' ? 'bg-green-500 text-white' : 
-                type === 'error' ? 'bg-red-500 text-white' : 
-                'bg-blue-500 text-white'
-            }`;
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} ml-2"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // إظهار الإشعار
-            setTimeout(() => {
-                gsap.to(notification, {
-                    x: 0,
-                    duration: 0.3
-                });
-            }, 10);
-            
-            // إخفاء الإشعار بعد 3 ثواني
-            setTimeout(() => {
-                gsap.to(notification, {
-                    x: '100%',
-                    duration: 0.3,
-                    onComplete: () => {
-                        notification.remove();
+            // تأثيرات على البطاقات المتدرجة
+            const gradientCards = document.querySelectorAll('.bg-gradient-to-r');
+            gradientCards.forEach((card, index) => {
+                gsap.from(card, {
+                    opacity: 1,
+                    x: -30,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
                     }
                 });
-            }, 3000);
-        }
-        
-        // إضافة تأثيرات للصور في بطاقات الكتب
-        const bookImages = document.querySelectorAll('.book-card img');
-        bookImages.forEach(img => {
-            img.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    scale: 1.05,
-                    duration: 0.3
-                });
             });
             
-            img.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    scale: 1,
-                    duration: 0.3
+            // وظيفة لعرض الإشعارات
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full ${
+                    type === 'success' ? 'bg-green-500 text-white' : 
+                    type === 'error' ? 'bg-red-500 text-white' : 
+                    'bg-blue-500 text-white'
+                }`;
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} ml-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // إظهار الإشعار
+                setTimeout(() => {
+                    gsap.to(notification, {
+                        x: 0,
+                        duration: 0.3
+                    });
+                }, 10);
+                
+                // إخفاء الإشعار بعد 3 ثواني
+                setTimeout(() => {
+                    gsap.to(notification, {
+                        x: '100%',
+                        duration: 0.3,
+                        onComplete: () => {
+                            notification.remove();
+                        }
+                    });
+                }, 3000);
+            }
+        
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const statsScript = document.getElementById("monthly-stats-data");
+            if (!statsScript) {
+                console.error("monthly_stats غير موجودة");
+                return;
+            }
+
+            const data = JSON.parse(statsScript.textContent || "[]");
+            const chart = document.getElementById("statistics-chart");
+            const buttons = document.querySelectorAll(".stat-btn");
+
+            function renderChart(type) {
+                chart.innerHTML = "";
+                const maxValue = Math.max(...data.map(item => item[type])) || 1;
+
+                data.forEach(item => {
+                    const barHeight = (item[type] / maxValue) * 100;
+
+                    const bar = document.createElement("div");
+                    bar.className = "flex flex-col items-center w-10";
+
+                    bar.innerHTML = `
+                        <div class="w-full bg-primary-500 rounded-t-lg transition-all duration-500"
+                            style="height:${barHeight}%"></div>
+                        <span class="text-xs text-gray-600 mt-2">
+                            ${item.month}/${item.year}
+                        </span>
+                    `;
+                    chart.appendChild(bar);
+                });
+            }
+
+            renderChart("books");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    buttons.forEach(b => b.classList.remove("active", "bg-primary-100", "text-primary-600"));
+                    btn.classList.add("active", "bg-primary-100", "text-primary-600");
+
+                    renderChart(btn.dataset.type);
                 });
             });
         });
-    });
-</script>
+    </script>
 {% endblock %}
