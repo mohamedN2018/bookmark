@@ -296,15 +296,8 @@
         </div>
         <!-- Categories Grid with Icons -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-
-
-
-
-
-
-
             {% for category in categories|slice:":16" %}
-            <!-- Category 1: الأدب -->
+            <!-- Category -->
             <a href="{% url 'books_by_category' category.slug %}" class="category-card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 hover-card">
                 <div class="flex items-center">
                     <div class="category-icon bg-gradient-to-br from-blue-500 to-blue-600 text-white">
@@ -312,30 +305,24 @@
                     </div>
                     <div class="flex-grow mr-4">
                         <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">{{ category.name }}</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">{{ count_book_cat }} كتاب</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">{{ category.books_count }} كتاب</p>
                     </div>
                     <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
                 </div>
             </a>
             {% endfor %}
-
-
-
-
-
-
-
         </div>
         
         <!-- View All Categories -->
         <div class="text-center">
-            <a href="#" class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium hover:underline">
+            <a href="{% url 'categories_list' %}" class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium hover:underline">
                 <i class="fas fa-list-alt ml-2"></i>
                 <span>عرض جميع التصنيفات</span>
             </a>
         </div>
     </div>
 </section>
+
 
 <!-- Popular Authors Section -->
 <section class="py-20 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
@@ -351,105 +338,58 @@
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Author 1 -->
+            {% for author_data in featured_authors %}
             <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
                 <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author1" alt="Author" class="w-full h-full object-cover">
+                    <img src="{{ author_data.avatar_url }}" alt="{{ author_data.author.name }}" class="w-full h-full object-cover">
                 </div>
-                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">د. أحمد محمد</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">متخصص في العلوم والتكنولوجيا</p>
+                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">{{ author_data.author.name }}</h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    {{ author_data.author.specialization|default:"كاتب ومؤلف" }}
+                </p>
                 <div class="flex items-center justify-center mb-4">
                     <div class="flex text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= author_data.avg_rating %}
+                                <i class="fas fa-star"></i>
+                            {% elif forloop.counter|add:"-0.5" <= author_data.avg_rating %}
+                                <i class="fas fa-star-half-alt"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٧</span>
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">{{ author_data.avg_rating|floatformat:1 }}</span>
                 </div>
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">٢٥ كتاب • ١٢٤٥ قارئ</p>
-                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">
+                    {{ author_data.books_count }} كتاب • {{ author_data.readers_count }} قارئ
+                </p>
+                <a href="{% url 'author_books' author_data.author.id %}" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
                     <i class="fas fa-book-open ml-2"></i> عرض الكتب
                 </a>
             </div>
-            
-            <!-- Author 2 -->
-            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
-                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author2" alt="Author" class="w-full h-full object-cover">
-                </div>
-                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">سارة عبد الله</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">كاتبة روائية وكاتبة قصة قصيرة</p>
-                <div class="flex items-center justify-center mb-4">
-                    <div class="flex text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">٥.٠</span>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">١٨ كتاب • ٢١٤٥ قارئ</p>
-                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
-                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
+            {% empty %}
+            <div class="col-span-4 text-center py-12">
+                <p class="text-gray-600 dark:text-gray-400 text-lg">لا يوجد مؤلفون مميزون حالياً</p>
+                <a href="{% url 'admin:index' %}" class="inline-block mt-4 bg-blue-600 text-white hover:bg-blue-700 py-2 px-6 rounded-lg transition-colors">
+                    إضافة مؤلفين من لوحة الإدارة
                 </a>
             </div>
-            
-            <!-- Author 3 -->
-            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
-                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author3" alt="Author" class="w-full h-full object-cover">
-                </div>
-                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">يوسف الخليفة</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">خبير في الأعمال والاقتصاد</p>
-                <div class="flex items-center justify-center mb-4">
-                    <div class="flex text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                    </div>
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٠</span>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">١٤ كتاب • ٨٧٦ قارئ</p>
-                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
-                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
-                </a>
-            </div>
-            
-            <!-- Author 4 -->
-            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl p-6 text-center">
-                <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-lg">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=author4" alt="Author" class="w-full h-full object-cover">
-                </div>
-                <h3 class="font-bold text-gray-800 dark:text-white text-xl mb-1">فاطمة علي</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">متخصصة في تطوير الذات</p>
-                <div class="flex items-center justify-center mb-4">
-                    <div class="flex text-yellow-400">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">٤.٥</span>
-                </div>
-                <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">٢٢ كتاب • ١٩٨٧ قارئ</p>
-                <a href="#" class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 py-2 px-4 rounded-lg transition-colors text-sm font-medium">
-                    <i class="fas fa-book-open ml-2"></i> عرض الكتب
-                </a>
-            </div>
-
-
-
+            {% endfor %}
         </div>
+        
+        {% if featured_authors %}
+        <div class="text-center mt-12">
+            <a href="{% url 'all_authors' %}" class="inline-flex items-center justify-center gap-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white py-3 px-8 rounded-xl font-medium transition-all hover:shadow-lg">
+                <span>عرض جميع المؤلفين</span>
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        {% endif %}
     </div>
 </section>
 
-<!-- Featured Books Section -->
+{% comment %} <!-- Featured Books Section -->
 <section id="featured-books" class="py-20 bg-gray-50 dark:bg-gray-800">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12">
@@ -469,7 +409,7 @@
             </div>
         </div>
         
-        <!-- Featured Books Carousel -->
+      <!-- Featured Books Carousel -->
         <div class="relative">
             <div class="featured-carousel overflow-x-hidden">
                 <div class="featured-carousel-track flex gap-6 transition-transform duration-500">
@@ -544,10 +484,11 @@
                 </div>
             </div>
         </div>
-    </div>
-</section> 
 
-{% comment %} 
+    </div>
+</section>  {% endcomment %}
+
+
 <!-- Featured Books Section -->
 <section id="featured-books" class="py-20 bg-gray-50 dark:bg-gray-800">
     <div class="container mx-auto px-4">
@@ -650,22 +591,6 @@
 
     </div>
 </section>
-
- {% endcomment %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <!-- Mobile App Section -->

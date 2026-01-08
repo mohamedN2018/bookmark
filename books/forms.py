@@ -31,10 +31,42 @@ class ReviewForm(forms.ModelForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = '__all__'
+        fields = [
+            'title',
+            'author',
+            'author_name',
+            'category',
+            'description',
+            'cover_image',
+            'pdf_file',
+            'published_year',
+            'pages',
+            'language',
+            'price',
+            'is_free',
+            'is_featured',
+        ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
+            'title': forms.TextInput(attrs={'placeholder': 'أدخل عنوان الكتاب'}),
+            'published_year': forms.NumberInput(attrs={'min': '1900', 'max': '2024'}),
+            'pages': forms.NumberInput(attrs={'min': '1'}),
+            'price': forms.NumberInput(attrs={'step': '0.01'}),
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        is_free = cleaned_data.get('is_free')
+        price = cleaned_data.get('price')
+        
+        if is_free and price and float(price) > 0:
+            raise forms.ValidationError('الكتب المجانية يجب أن يكون سعرها 0 ريال')
+        
+        if not is_free and price and float(price) <= 0:
+            raise forms.ValidationError('الكتب المدفوعة يجب أن يكون سعرها أكبر من 0 ريال')
+        
+        return cleaned_data
+
 
 
 

@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}كتب {{ author.name }} - مكتبتنا{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <!-- Author Info -->
+    <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center gap-4 mb-6">
+                <a href="{% url 'author_detail' author.id %}" class="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>العودة إلى صفحة المؤلف</span>
+                </a>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg">
+                    {% if author.avatar %}
+                    <img src="{{ author.avatar.url }}" alt="{{ author.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ author.id }}" alt="{{ author.name }}" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+                
+                <div class="flex-1 text-center md:text-right">
+                    <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">كتب {{ author.name }}</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        {% if author.specialization %}
+                        {{ author.specialization }}
+                        {% endif %}
+                    </p>
+                    
+                    <div class="inline-flex items-center gap-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ books_count }}</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">كتاب</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                                {{ author.average_rating|floatformat:1 }}
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">تقييم</div>
+                        </div>
+                        
+                        <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                                    {{ author.get_total_readers }}
+                                </div>
+
+                            <div class="text-sm text-gray-500 dark:text-gray-400">قارئ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Books -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">جميع كتب المؤلف</h2>
+                
+                <div class="flex items-center gap-4">
+                    <select class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">ترتيب حسب</option>
+                        <option value="newest">الأحدث</option>
+                        <option value="oldest">الأقدم</option>
+                        <option value="rating">التقييم</option>
+                        <option value="popular">الأكثر شعبية</option>
+                    </select>
+                    
+                    <select class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">جميع الفئات</option>
+                        <option value="free">مجاني فقط</option>
+                        <option value="featured">مميز فقط</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Stats Bar -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 mb-8">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
+                            <i class="fas fa-book text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">عرض</div>
+                            <div class="font-bold text-gray-800 dark:text-white">{{ page_obj.object_list|length }} من {{ books_count }} كتاب</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-6">
+                        <div class="text-center">
+                            <div class="font-bold text-gray-800 dark:text-white">
+                                {% with total_pages=page_obj.object_list|slice:":10" %}
+                                    {% with sum=0 %}
+                                        {% for book in total_pages %}
+                                            {% with sum=sum|add:book.pages %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                        {{ sum }}
+                                    {% endwith %}
+                                {% endwith %}
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">صفحة تقريباً</div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="font-bold text-gray-800 dark:text-white">
+                                {% with years=page_obj.object_list|slice:":10" %}
+                                    {% if years %}
+                                 {{ years.0.published_year }} - {{ last_year.published_year }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">سنوات النشر</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Books Grid -->
+        {% if page_obj %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+            {% for book in page_obj %}
+            <div class="hover-card bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
+                <a href="{% url 'book_detail' book.slug %}">
+                    <div class="relative">
+                        <div class="h-56 overflow-hidden">
+                            {% if book.cover_image %}
+                            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                            {% else %}
+                            <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                                <i class="fas fa-book text-5xl text-gray-400 dark:text-gray-600"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="absolute top-0 right-0 flex flex-col gap-2 p-3">
+                            {% if book.is_featured %}
+                            <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+                                <i class="fas fa-star"></i>
+                                <span>مميز</span>
+                            </span>
+                            {% endif %}
+                            
+                            {% if book.is_free %}
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                مجاني
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if book.category %}
+                        <div class="absolute bottom-4 right-4">
+                            <span class="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                                {{ book.category.name }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="p-5">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2">
+                            {{ book.title }}
+                        </h3>
+                        
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <i class="fas fa-calendar-alt ml-2"></i>
+                            <span>{{ book.published_year }}</span>
+                            <span class="mx-3">•</span>
+                            <i class="fas fa-file-alt ml-2"></i>
+                            <span>{{ book.pages }} صفحة</span>
+                            <span class="mx-3">•</span>
+                            <i class="fas fa-language ml-2"></i>
+                            <span>{{ book.language }}</span>
+                        </div>
+                        
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-5 line-clamp-2">
+                            {{ book.description|truncatechars:100 }}
+                        </p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    {% with avg_rating=book.average_rating %}
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= avg_rating %}
+                                            <i class="fas fa-star text-sm"></i>
+                                        {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                                            <i class="fas fa-star-half-alt text-sm"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-sm"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 mr-2">
+                                    ({{ book.reviews.count }})
+                                </span>
+                            </div>
+                            
+                            <div class="text-gray-800 dark:text-gray-200 font-bold">
+                                {% if book.is_free %}
+                                <span class="text-green-600 dark:text-green-400">مجاني</span>
+                                {% else %}
+                                {{ book.price }} <span class="text-sm font-normal">ريال</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-eye"></i>
+                                    <span>{{ book.views }} مشاهدة</span>
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-download"></i>
+                                    <span>{{ book.downloads }} تحميل</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Empty State -->
+        {% else %}
+        <div class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl">
+            <div class="w-24 h-24 mx-auto mb-6 text-gray-300 dark:text-gray-600">
+                <i class="fas fa-book-open text-6xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-3">لا توجد كتب</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">لم يضف المؤلف أي كتب بعد</p>
+            <a href="{% url 'author_detail' author.id %}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors">
+                <i class="fas fa-arrow-right"></i>
+                <span>العودة إلى صفحة المؤلف</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="flex justify-center">
+            <nav class="inline-flex rounded-lg shadow-sm bg-white dark:bg-gray-800 p-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg mx-1">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg mx-1">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" 
+                       class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg mx-1">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg mx-1">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card {
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.dark .stat-card {
+    background: linear-gradient(145deg, #1f2937, #111827);
+}
+</style>
+{% endblock %}

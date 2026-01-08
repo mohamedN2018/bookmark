@@ -27,10 +27,43 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('books_by_category', kwargs={'slug': self.slug})
 
+
+
+class Author(models.Model):
+    name = models.CharField(max_length=200, verbose_name="اسم المؤلف")
+    bio = models.TextField(verbose_name="السيرة الذاتية", blank=True, null=True)
+    avatar = models.ImageField(upload_to='authors/avatars/', verbose_name="الصورة الشخصية", blank=True, null=True)
+    specialization = models.CharField(max_length=200, verbose_name="التخصص", blank=True, null=True)
+    website = models.URLField(verbose_name="الموقع الإلكتروني", blank=True, null=True)
+    email = models.EmailField(verbose_name="البريد الإلكتروني", blank=True, null=True)
+    is_featured = models.BooleanField(default=False, verbose_name="مميز")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "مؤلف"
+        verbose_name_plural = "المؤلفون"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+        
+    def get_books_count(self):
+        return self.books.count()
+
+    def get_total_readers(self):
+        return ReadingHistory.objects.filter(book__author=self).values('user').distinct().count()
+
+    def average_rating(self):
+        from django.db.models import Avg
+        avg = self.books.aggregate(avg_rating=Avg('reviews__rating'))['avg_rating']
+        return avg if avg else 0
+
 class Book(models.Model):
     title = models.CharField(max_length=200, verbose_name="عنوان الكتاب")
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
-    author = models.CharField(max_length=100, verbose_name="المؤلف")
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books', verbose_name="المؤلف", null=True, blank=True)  # ← تغيير من CharField إلى ForeignKey
+    author_name = models.CharField(max_length=100, verbose_name="اسم المؤلف (إذا لم يكن مسجلاً)", blank=True, null=True)  # ← إضافة حقل احتياطي
     description = models.TextField(verbose_name="الوصف")
     cover_image = models.ImageField(upload_to='book_covers/', verbose_name="صورة الغلاف", blank=True, null=True)
     pdf_file = models.FileField(upload_to='books/pdfs/', blank=True, null=True, verbose_name="ملف PDF")

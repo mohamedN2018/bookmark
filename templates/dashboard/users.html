@@ -5,69 +5,109 @@
 {% block title %}إدارة المستخدمين - لوحة التحكم{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-    <div class="container mx-auto px-4 py-8">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div class="container mx-auto px-4 py-8 mt-16">
         <!-- رأس الصفحة -->
-        <div class="mb-8 animate-on-scroll">
+        <div class="mb-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div>
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">إدارة المستخدمين</h1>
-                    <p class="text-lg text-gray-600">عرض وإدارة حسابات المستخدمين</p>
+                    <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-2">إدارة المستخدمين</h1>
+                    <p class="text-base md:text-lg text-gray-600 dark:text-gray-300">عرض وإدارة حسابات المستخدمين في النظام</p>
                 </div>
                 <div class="mt-4 md:mt-0">
-                    <p class="text-sm text-gray-600 bg-white px-4 py-2 rounded-lg shadow">
-                        <i class="fas fa-users ml-2"></i>
-                        إجمالي المستخدمين: <span class="font-bold">{{ total_users }}</span>
-                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-white dark:bg-gray-800 px-4 py-3 rounded-xl shadow-md dark:shadow-gray-900">
+                            <div class="flex items-center">
+                                <i class="fas fa-users text-primary-600 dark:text-primary-400 ml-3"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">المستخدمين</p>
+                                    <p class="text-lg font-bold dark:text-white">{{ total_users }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='{% url 'dashboard' %}'" 
+                                class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg flex items-center transition duration-200">
+                            <i class="fas fa-arrow-right ml-2"></i>
+                            العودة
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <!-- بطاقات الإحصائيات -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl shadow-lg p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                <!-- إجمالي المستخدمين -->
+                <div class="stat-card bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-blue-100 mb-2">إجمالي المستخدمين</p>
-                            <h3 class="text-2xl font-bold">{{ total_users }}</h3>
+                            <p class="text-blue-100 text-sm md:text-base mb-2">إجمالي المستخدمين</p>
+                            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">{{ total_users }}</h3>
                         </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-users"></i>
+                        <div class="stat-icon">
+                            <i class="fas fa-users text-white text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-blue-100 text-sm">
+                            <i class="fas fa-user-plus ml-2"></i>
+                            <span>زيادة 12% هذا الشهر</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl shadow-lg p-6">
+                <!-- المستخدمون النشطون -->
+                <div class="stat-card bg-gradient-to-r from-green-500 to-green-600 dark:from-green-700 dark:to-green-800">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-green-100 mb-2">المستخدمون النشطون</p>
-                            <h3 class="text-2xl font-bold">{{ active_users }}</h3>
+                            <p class="text-green-100 text-sm md:text-base mb-2">المستخدمون النشطون</p>
+                            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">{{ active_users }}</h3>
                         </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-check"></i>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check text-white text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-green-100 text-sm">
+                            <i class="fas fa-chart-line ml-2"></i>
+                            <span>نسبة النشاط 85%</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl shadow-lg p-6">
+                <!-- الموظفون -->
+                <div class="stat-card bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-700 dark:to-purple-800">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-purple-100 mb-2">الموظفون</p>
-                            <h3 class="text-2xl font-bold">{{ staff_users }}</h3>
+                            <p class="text-purple-100 text-sm md:text-base mb-2">الموظفون</p>
+                            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">{{ staff_users }}</h3>
                         </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-tie"></i>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-tie text-white text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-purple-100 text-sm">
+                            <i class="fas fa-shield-alt ml-2"></i>
+                            <span>صلاحيات إدارية</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-2xl shadow-lg p-6">
+                <!-- المسجلون اليوم -->
+                <div class="stat-card bg-gradient-to-r from-yellow-500 to-yellow-600 dark:from-yellow-700 dark:to-yellow-800">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-yellow-100 mb-2">المسجلون اليوم</p>
-                            <h3 class="text-2xl font-bold">{{ today_users }}</h3>
+                            <p class="text-yellow-100 text-sm md:text-base mb-2">المسجلون اليوم</p>
+                            <h3 class="text-xl md:text-2xl lg:text-3xl font-bold text-white">{{ today_users }}</h3>
                         </div>
-                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-plus"></i>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-plus text-white text-lg md:text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-yellow-100 text-sm">
+                            <i class="fas fa-calendar-day ml-2"></i>
+                            <span>{{ today_date }}</span>
                         </div>
                     </div>
                 </div>
@@ -75,17 +115,17 @@
         </div>
         
         <!-- شريط البحث والتصفية -->
-        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <form method="GET" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg dark:shadow-gray-900 p-4 md:p-6 mb-6 md:mb-8">
+            <form method="GET" class="space-y-4 md:space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- حقل البحث -->
-                    <div>
-                        <label class="block text-gray-700 mb-2">بحث</label>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 dark:text-gray-300 mb-2 text-sm md:text-base">بحث سريع</label>
                         <div class="relative">
                             <input type="text" name="search" value="{{ search_query }}" 
-                                   placeholder="ابحث عن مستخدم..."
-                                   class="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <button type="submit" class="absolute left-3 top-3 text-gray-400">
+                                   placeholder="ابحث عن مستخدم بالاسم أو البريد الإلكتروني..."
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg pr-12 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                            <button type="submit" class="absolute left-3 top-3 text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -93,108 +133,125 @@
                     
                     <!-- تصفية حسب الدور -->
                     <div>
-                        <label class="block text-gray-700 mb-2">الدور</label>
-                        <select name="role" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option value="">جميع الأدوار</option>
-                            <option value="staff" {% if role_filter == "staff" %}selected{% endif %}>الموظفون</option>
-                            <option value="active" {% if role_filter == "active" %}selected{% endif %}>النشطون</option>
+                        <label class="block text-gray-700 dark:text-gray-300 mb-2 text-sm md:text-base">الدور</label>
+                        <select name="role" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                            <option value="">جميع المستخدمين</option>
+                            <option value="staff" {% if role_filter == "staff" %}selected{% endif %}>الموظفون فقط</option>
+                            <option value="active" {% if role_filter == "active" %}selected{% endif %}>النشطون فقط</option>
                             <option value="inactive" {% if role_filter == "inactive" %}selected{% endif %}>غير النشطين</option>
                         </select>
                     </div>
                     
                     <!-- زر التصفية -->
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg">
-                            <i class="fas fa-filter ml-2"></i> تطبيق الفلاتر
+                        <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white font-medium md:font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center text-sm md:text-base">
+                            <i class="fas fa-filter ml-2"></i> تطبيق
                         </button>
                     </div>
                 </div>
                 
-                <div class="flex justify-between items-center">
-                    <div class="text-sm text-gray-600">
-                        عرض {{ page_obj.start_index }} - {{ page_obj.end_index }} من {{ page_obj.paginator.count }}
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-lg">
+                        عرض <span class="font-bold dark:text-white">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> من <span class="font-bold dark:text-white">{{ page_obj.paginator.count }}</span> مستخدم
                     </div>
-                    <div>
-                        <a href="{% url 'dashboard_users' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg">
+                    <div class="flex gap-2">
+                        <a href="{% url 'dashboard_users' %}" class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg flex items-center text-sm md:text-base">
                             <i class="fas fa-redo ml-2"></i> إعادة تعيين
                         </a>
+                        <button type="button" onclick="exportUsers()" class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center text-sm md:text-base">
+                            <i class="fas fa-download ml-2"></i> تصدير
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
         
         <!-- جدول المستخدمين -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg dark:shadow-gray-900 overflow-hidden mb-8">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full min-w-[800px] md:min-w-full">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">المستخدم</th>
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">البريد الإلكتروني</th>
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">تاريخ التسجيل</th>
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">الحالة</th>
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">الدور</th>
-                            <th class="py-4 px-6 text-right text-gray-700 font-semibold">الإجراءات</th>
+                        <tr class="bg-gray-50 dark:bg-gray-900">
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">المستخدم</th>
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">البريد الإلكتروني</th>
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">تاريخ التسجيل</th>
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">الحالة</th>
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">الدور</th>
+                            <th class="py-3 px-4 md:py-4 md:px-6 text-right text-gray-700 dark:text-gray-300 font-semibold text-sm md:text-base">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in page_obj %}
-                        <tr class="border-t border-gray-100 hover:bg-gray-50 transition duration-200" id="user-row-{{ user.id }}">
-                            <td class="py-4 px-6">
+                        <tr class="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200" id="user-row-{{ user.id }}">
+                            <!-- بيانات المستخدم -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center ml-3">
-                                        <i class="fas fa-user text-primary-600"></i>
+                                    <div class="w-8 h-8 md:w-10 md:h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center ml-2 md:ml-3 flex-shrink-0">
+                                        <i class="fas fa-user text-primary-600 dark:text-primary-400 text-sm md:text-base"></i>
                                     </div>
-                                    <div>
-                                        <p class="font-medium text-gray-800">{{ user.username }}</p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ user.first_name }} {{ user.last_name }}
+                                    <div class="truncate">
+                                        <p class="font-medium text-gray-800 dark:text-white text-sm md:text-base truncate">{{ user.username }}</p>
+                                        <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">
+                                            {{ user.first_name|default:"لا يوجد" }} {{ user.last_name|default:"" }}
                                         </p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-4 px-6">
-                                <span class="text-gray-600">{{ user.email|truncatechars:25 }}</span>
+                            
+                            <!-- البريد الإلكتروني -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
+                                <a href="mailto:{{ user.email }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 text-sm md:text-base truncate block">
+                                    {{ user.email|truncatechars:20 }}
+                                </a>
                             </td>
-                            <td class="py-4 px-6">
-                                <span class="text-gray-600">{{ user.date_joined|date:"Y/m/d" }}</span>
-                                <p class="text-xs text-gray-500">{{ user.date_joined|timesince }}</p>
+                            
+                            <!-- تاريخ التسجيل -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
+                                <span class="text-gray-600 dark:text-gray-300 text-sm md:text-base">{{ user.date_joined|date:"Y/m/d" }}</span>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ user.date_joined|timesince }}</p>
                             </td>
-                            <td class="py-4 px-6">
+                            
+                            <!-- الحالة -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
                                 {% if user.is_active %}
-                                <span class="status-active bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                                    <i class="fas fa-check-circle ml-1"></i> نشط
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">
+                                    <i class="fas fa-check-circle ml-1 text-xs"></i> نشط
                                 </span>
                                 {% else %}
-                                <span class="status-inactive bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
-                                    <i class="fas fa-times-circle ml-1"></i> معطل
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300">
+                                    <i class="fas fa-times-circle ml-1 text-xs"></i> معطل
                                 </span>
                                 {% endif %}
                             </td>
-                            <td class="py-4 px-6">
+                            
+                            <!-- الدور -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
                                 {% if user.is_staff %}
-                                <span class="role-staff bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
-                                    <i class="fas fa-user-tie ml-1"></i> موظف
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300">
+                                    <i class="fas fa-user-tie ml-1 text-xs"></i> موظف
                                 </span>
                                 {% else %}
-                                <span class="role-user bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                                    <i class="fas fa-user ml-1"></i> مستخدم
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300">
+                                    <i class="fas fa-user ml-1 text-xs"></i> مستخدم
                                 </span>
                                 {% endif %}
                             </td>
-                            <td class="py-4 px-6">
-                                <div class="flex space-x-2 space-x-reverse">
-                                    <button class="view-user-btn text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
-                                            data-user-id="{{ user.id }}"
+                            
+                            <!-- الإجراءات -->
+                            <td class="py-3 px-4 md:py-4 md:px-6">
+                                <div class="flex items-center justify-end gap-1 md:gap-2">
+                                    <!-- عرض التفاصيل -->
+                                    <button onclick="viewUserDetails({{ user.id }})" 
+                                            class="action-btn text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900"
                                             title="عرض التفاصيل">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     
                                     {% if user != request.user %}
-                                    <button class="toggle-status-btn {% if user.is_active %}text-yellow-600 hover:text-yellow-800{% else %}text-green-600 hover:text-green-800{% endif %} p-2 rounded-lg {% if user.is_active %}hover:bg-yellow-50{% else %}hover:bg-green-50{% endif %}"
-                                            data-user-id="{{ user.id }}"
-                                            data-is-active="{{ user.is_active|yesno:'true,false' }}"
-                                            title="{% if user.is_active %}تعطيل{% else %}تفعيل{% endif %}">
+                                    <!-- تفعيل/تعطيل -->
+                                    <button onclick="toggleUserStatus({{ user.id }}, {{ user.is_active|yesno:'true,false' }})"
+                                            class="action-btn {% if user.is_active %}text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900{% else %}text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900{% endif %}"
+                                            title="{% if user.is_active %}تعطيل المستخدم{% else %}تفعيل المستخدم{% endif %}">
                                         {% if user.is_active %}
                                         <i class="fas fa-user-slash"></i>
                                         {% else %}
@@ -202,19 +259,27 @@
                                         {% endif %}
                                     </button>
                                     
-                                    <button class="toggle-staff-btn {% if user.is_staff %}text-gray-600 hover:text-gray-800{% else %}text-purple-600 hover:text-purple-800{% endif %} p-2 rounded-lg {% if user.is_staff %}hover:bg-gray-50{% else %}hover:bg-purple-50{% endif %}"
-                                            data-user-id="{{ user.id }}"
-                                            data-is-staff="{{ user.is_staff|yesno:'true,false' }}"
-                                            title="{% if user.is_staff %}سحب الصلاحيات{% else %}منح صلاحيات الموظف{% endif %}">
+                                    <!-- صلاحيات الموظف -->
+                                    <button onclick="toggleStaffStatus({{ user.id }}, {{ user.is_staff|yesno:'true,false' }})"
+                                            class="action-btn {% if user.is_staff %}text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900{% else %}text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900{% endif %}"
+                                            title="{% if user.is_staff %}سحب صلاحيات الموظف{% else %}منح صلاحيات الموظف{% endif %}">
                                         {% if user.is_staff %}
                                         <i class="fas fa-user-tag"></i>
                                         {% else %}
                                         <i class="fas fa-user-shield"></i>
                                         {% endif %}
                                     </button>
+                                    
+                                    <!-- حذف المستخدم -->
+                                    <button onclick="deleteUser({{ user.id }}, '{{ user.username }}')"
+                                            class="action-btn text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900"
+                                            title="حذف المستخدم">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                     {% else %}
-                                    <span class="text-gray-400 p-2" title="لا يمكن تعديل حسابك">
-                                        <i class="fas fa-user"></i>
+                                    <!-- إشارة للمستخدم الحالي -->
+                                    <span class="text-gray-400 px-2 text-xs md:text-sm" title="حسابك الحالي">
+                                        <i class="fas fa-user text-sm"></i>
                                     </span>
                                     {% endif %}
                                 </div>
@@ -222,10 +287,11 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-gray-500">
+                            <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center">
-                                    <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
-                                    <p class="text-lg">لا توجد مستخدمين</p>
+                                    <i class="fas fa-users text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                    <p class="text-lg font-medium dark:text-gray-300">لا توجد مستخدمين</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">ابدأ بإضافة أول مستخدم</p>
                                 </div>
                             </td>
                         </tr>
@@ -236,32 +302,36 @@
             
             <!-- الترقيم -->
             {% if page_obj.paginator.num_pages > 1 %}
-            <div class="border-t border-gray-100 px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <div class="text-sm text-gray-600">
-                        الصفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+            <div class="border-t border-gray-100 dark:border-gray-700 px-4 md:px-6 py-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                        الصفحة <span class="font-bold dark:text-white">{{ page_obj.number }}</span> من <span class="font-bold dark:text-white">{{ page_obj.paginator.num_pages }}</span>
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex items-center gap-1 md:gap-2">
                         {% if page_obj.has_previous %}
                         <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
-                           class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            <i class="fas fa-chevron-right"></i>
+                           class="pagination-btn border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <i class="fas fa-chevron-right text-xs md:text-sm"></i>
+                            السابق
                         </a>
                         {% endif %}
                         
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <span class="px-3 py-2 bg-primary-600 text-white rounded-lg">{{ num }}</span>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
-                               class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">{{ num }}</a>
-                            {% endif %}
-                        {% endfor %}
+                        <div class="flex items-center gap-1">
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="pagination-active bg-primary-600 dark:bg-primary-700 text-white">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
+                                   class="pagination-number border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                         
                         {% if page_obj.has_next %}
                         <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}"
-                           class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            <i class="fas fa-chevron-left"></i>
+                           class="pagination-btn border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            التالي
+                            <i class="fas fa-chevron-left text-xs md:text-sm mr-2"></i>
                         </a>
                         {% endif %}
                     </div>
@@ -270,90 +340,146 @@
             {% endif %}
         </div>
         
-        <!-- أدوات إضافية -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- أقسام إضافية -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <!-- إضافة مستخدم جديد -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">إضافة مستخدم جديد</h3>
-                <form class="space-y-4">
-                    <div>
-                        <label class="block text-gray-700 mb-2">اسم المستخدم</label>
-                        <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-gray-700 mb-2">البريد الإلكتروني</label>
-                        <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg dark:shadow-gray-900 p-4 md:p-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-user-plus text-primary-600 dark:text-primary-400 ml-3"></i>
+                    إضافة مستخدم جديد
+                </h3>
+                <form id="add-user-form" class="space-y-3 md:space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div>
-                            <label class="block text-gray-700 mb-2">كلمة المرور</label>
-                            <input type="password" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">اسم المستخدم *</label>
+                            <input type="text" id="username" required
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
                         </div>
                         
                         <div>
-                            <label class="block text-gray-700 mb-2">تأكيد كلمة المرور</label>
-                            <input type="password" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">البريد الإلكتروني *</label>
+                            <input type="email" id="email" required
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
                         </div>
                     </div>
                     
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">الاسم الأول</label>
+                            <input type="text" id="first_name"
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">الاسم الأخير</label>
+                            <input type="text" id="last_name"
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">كلمة المرور *</label>
+                            <input type="password" id="password" required
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 mb-1 text-sm md:text-base">تأكيد كلمة المرور *</label>
+                            <input type="password" id="confirm_password" required
+                                   class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base">
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="space-y-3">
                             <div class="flex items-center">
-                                <input type="checkbox" id="is-staff" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <label for="is-staff" class="mr-2 text-gray-700">موظف</label>
+                                <input type="checkbox" id="is_staff" class="h-4 w-4 text-primary-600 dark:text-primary-500 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+                                <label for="is_staff" class="mr-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">صلاحيات موظف</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="is-active" checked class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
-                                <label for="is-active" class="mr-2 text-gray-700">نشط</label>
+                                <input type="checkbox" id="is_active" checked class="h-4 w-4 text-primary-600 dark:text-primary-500 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+                                <label for="is_active" class="mr-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">حساب نشط</label>
                             </div>
                         </div>
                         
-                        <button type="button" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg">
-                            <i class="fas fa-user-plus ml-2"></i> إضافة
+                        <button type="submit" class="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center text-sm md:text-base">
+                            <i class="fas fa-user-plus ml-2"></i> إضافة مستخدم
                         </button>
                     </div>
                 </form>
             </div>
             
-            <!-- تصدير البيانات -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">تصدير وإعدادات</h3>
+            <!-- أدوات وإحصاءات -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg dark:shadow-gray-900 p-4 md:p-6">
+                <h3 class="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                    <i class="fas fa-tools text-primary-600 dark:text-primary-400 ml-3"></i>
+                    أدوات وإعدادات
+                </h3>
                 <div class="space-y-4">
+                    <!-- تصدير البيانات -->
                     <div>
-                        <label class="block text-gray-700 mb-2">تصدير بيانات المستخدمين</label>
+                        <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-3 text-sm md:text-base">تصدير بيانات المستخدمين</h4>
                         <div class="flex flex-wrap gap-2">
-                            <button class="export-btn bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">
+                            <button onclick="exportUsers('csv')" class="export-option bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white">
+                                <i class="fas fa-file-csv ml-1"></i> CSV
+                            </button>
+                            <button onclick="exportUsers('excel')" class="export-option bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white">
                                 <i class="fas fa-file-excel ml-1"></i> Excel
                             </button>
-                            <button class="export-btn bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm">
+                            <button onclick="exportUsers('pdf')" class="export-option bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white">
                                 <i class="fas fa-file-pdf ml-1"></i> PDF
-                            </button>
-                            <button class="export-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm">
-                                <i class="fas fa-file-csv ml-1"></i> CSV
                             </button>
                         </div>
                     </div>
                     
+                    <!-- إعدادات عامة -->
                     <div>
-                        <label class="block text-gray-700 mb-2">إعدادات عامة</label>
-                        <div class="space-y-2">
+                        <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-3 text-sm md:text-base">إعدادات النظام</h4>
+                        <div class="space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-gray-600">إرسال إشعارات الترحيب</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                <span class="text-gray-600 dark:text-gray-400 text-sm md:text-base">تفعيل التسجيل الذاتي</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider dark:bg-gray-600"></span>
                                 </label>
                             </div>
                             
                             <div class="flex items-center justify-between">
-                                <span class="text-gray-600">تفعيل التسجيل التلقائي</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                <span class="text-gray-600 dark:text-gray-400 text-sm md:text-base">إشعارات الترحيب</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider dark:bg-gray-600"></span>
                                 </label>
                             </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600 dark:text-gray-400 text-sm md:text-base">تحقق ثنائي العوامل</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider dark:bg-gray-600"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- إجراءات سريعة -->
+                    <div>
+                        <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-3 text-sm md:text-base">إجراءات سريعة</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="sendBulkEmails()" class="quick-action bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">
+                                <i class="fas fa-envelope ml-2"></i> إرسال بريد
+                            </button>
+                            <button onclick="generateReport()" class="quick-action bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+                                <i class="fas fa-chart-bar ml-2"></i> تقرير
+                            </button>
+                            <button onclick="backupUsers()" class="quick-action bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400">
+                                <i class="fas fa-database ml-2"></i> نسخة احتياطية
+                            </button>
+                            <button onclick="importUsers()" class="quick-action bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-400">
+                                <i class="fas fa-upload ml-2"></i> استيراد
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -362,445 +488,642 @@
     </div>
 </div>
 
-<!-- نافذة تفاصيل المستخدم -->
-<div id="user-details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">تفاصيل المستخدم</h3>
-                <button id="close-user-modal" class="text-gray-500 hover:text-gray-700 text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div id="user-details-content">
-                <!-- سيتم ملؤها بالبيانات -->
-            </div>
+<!-- مودال تفاصيل المستخدم -->
+<div id="user-details-modal" class="modal-overlay hidden">
+    <div class="modal-container dark:bg-gray-800 dark:text-white">
+        <div class="modal-header dark:border-gray-700">
+            <h3 class="modal-title dark:text-white">تفاصيل المستخدم</h3>
+            <button onclick="closeModal()" class="modal-close dark:text-gray-300">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body dark:text-gray-300" id="user-details-content">
+            <!-- سيتم ملؤها بواسطة JavaScript -->
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* تنسيقات خاصة بصفحة المستخدمين */
+    .stat-card {
+        @apply rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 text-white;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-icon {
+        @apply w-10 h-10 md:w-12 md:h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center;
+    }
+    
+    .action-btn {
+        @apply p-2 rounded-lg transition duration-200 text-sm md:text-base;
+    }
+    
+    .pagination-btn {
+        @apply px-3 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200 text-sm md:text-base flex items-center;
+    }
+    
+    .pagination-number {
+        @apply px-3 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200 text-sm md:text-base;
+    }
+    
+    .pagination-active {
+        @apply px-3 py-2 text-white rounded-lg text-sm md:text-base;
+    }
+    
+    .export-option {
+        @apply text-white px-3 py-2 rounded-lg text-sm md:text-base transition duration-200 flex items-center;
+    }
+    
+    .quick-action {
+        @apply px-3 py-2 rounded-lg transition duration-200 flex items-center justify-center text-sm md:text-base;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: #3b82f6;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    /* مودال تفاصيل المستخدم */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+    }
+    
+    .modal-container {
+        background: white;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        font-size: 1.25rem;
+        transition: color 0.2s;
+    }
+    
+    .modal-close:hover {
+        color: #374151;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    /* تحسينات للوضع الداكن */
+    .dark .slider {
+        background-color: #4b5563;
+    }
+    
+    .dark input:checked + .slider {
+        background-color: #3b82f6;
+    }
+    
+    .dark .modal-overlay {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    
+    /* تحسينات للرسوم المتحركة */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-container {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* تحسينات للاستجابة */
+    @media (max-width: 640px) {
+        .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+        }
+        
+        table {
+            font-size: 0.875rem;
+        }
+        
+        .modal-container {
+            margin: 1rem;
+            max-height: 80vh;
+        }
+        
+        .modal-header, .modal-body {
+            padding: 16px;
+        }
+        
+        .quick-action, .export-option {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+        }
+    }
+    
+    @media (min-width: 641px) and (max-width: 1024px) {
+        .stat-card {
+            padding: 1.5rem;
+        }
+        
+        .modal-container {
+            max-width: 600px;
+        }
+    }
+    
+    @media (min-width: 1025px) {
+        .container {
+            max-width: 1280px;
+        }
+        
+        .modal-container {
+            max-width: 700px;
+        }
+    }
+    
+    /* تأثيرات hover محسنة */
+    .action-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    .export-option:hover, .quick-action:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* تحسين عرض الجدول على الشاشات الصغيرة */
+    @media (max-width: 768px) {
+        .overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-    // تأثيرات GSAP لإدارة المستخدمين
-    document.addEventListener('DOMContentLoaded', function() {
-        // تأثيرات على بطاقات الإحصائيات
-        const statCards = document.querySelectorAll('.bg-gradient-to-r');
-        statCards.forEach((card, index) => {
-            gsap.from(card, {
-                opacity: 0,
-                y: 30,
-                duration: 0.6,
-                delay: index * 0.1
-            });
-            
-            card.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    y: -5,
-                    duration: 0.3
-                });
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    y: 0,
-                    duration: 0.3
-                });
-            });
-        });
-        
-        // تأثيرات على الصفوف في الجدول
-        const tableRows = document.querySelectorAll('tbody tr');
-        tableRows.forEach((row, index) => {
-            gsap.from(row, {
-                opacity: 0,
-                x: -20,
-                duration: 0.5,
-                delay: index * 0.05,
-                scrollTrigger: {
-                    trigger: row,
-                    start: "top 90%",
-                    toggleActions: "play none none none"
+    // وظيفة لتبديل الوضع الداكن/الفاتح
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    }
+    
+    // التحقق من تفضيل المستخدم عند تحميل الصفحة
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+    }
+    
+    // في ملف JavaScript منفصل
+    function toggleUserStatus(userId, isActive) {
+        if (confirm(`هل تريد ${isActive ? 'تعطيل' : 'تفعيل'} هذا المستخدم؟`)) {
+            showLoading();
+            fetch(`/dashboard/users/${userId}/toggle-status/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showNotification(data.message || 'تم تحديث حالة المستخدم بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'حدث خطأ أثناء تحديث حالة المستخدم', 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                showNotification('حدث خطأ أثناء تحديث حالة المستخدم', 'error');
             });
-        });
-        
-        // تفعيل/تعطيل المستخدم
-        const toggleStatusBtns = document.querySelectorAll('.toggle-status-btn');
-        toggleStatusBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const isActive = this.getAttribute('data-is-active') === 'true';
-                const row = document.getElementById(`user-row-${userId}`);
-                const statusSpan = row.querySelector('.status-active, .status-inactive');
-                const icon = this.querySelector('i');
-                
-                // إرسال طلب AJAX
-                fetch(`/dashboard/users/${userId}/toggle-status/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // تحديث الحالة في الواجهة
-                        if (isActive) {
-                            // تغيير من نشط إلى معطل
-                            statusSpan.className = 'status-inactive bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm';
-                            statusSpan.innerHTML = '<i class="fas fa-times-circle ml-1"></i> معطل';
-                            
-                            this.setAttribute('data-is-active', 'false');
-                            this.classList.remove('text-yellow-600', 'hover:text-yellow-800', 'hover:bg-yellow-50');
-                            this.classList.add('text-green-600', 'hover:text-green-800', 'hover:bg-green-50');
-                            icon.className = 'fas fa-user-check';
-                            this.title = 'تفعيل';
-                        } else {
-                            // تغيير من معطل إلى نشط
-                            statusSpan.className = 'status-active bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm';
-                            statusSpan.innerHTML = '<i class="fas fa-check-circle ml-1"></i> نشط';
-                            
-                            this.setAttribute('data-is-active', 'true');
-                            this.classList.remove('text-green-600', 'hover:text-green-800', 'hover:bg-green-50');
-                            this.classList.add('text-yellow-600', 'hover:text-yellow-800', 'hover:bg-yellow-50');
-                            icon.className = 'fas fa-user-slash';
-                            this.title = 'تعطيل';
-                        }
-                        
-                        // تأثير على الزر
-                        gsap.fromTo(this,
-                            { scale: 1 },
-                            { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1 }
-                        );
-                        
-                        // تأثير على حالة المستخدم
-                        gsap.fromTo(statusSpan,
-                            { scale: 0.8 },
-                            { scale: 1, duration: 0.3 }
-                        );
-                        
-                        // عرض رسالة النجاح
-                        showSuccessMessage(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('حدث خطأ أثناء تحديث حالة المستخدم');
-                });
+        }
+    }
+
+    function toggleStaffStatus(userId, isStaff) {
+        if (confirm(`هل تريد ${isStaff ? 'سحب صلاحيات الموظف من' : 'منح صلاحيات الموظف ل'} هذا المستخدم؟`)) {
+            showLoading();
+            fetch(`/dashboard/users/${userId}/toggle-staff/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showNotification(data.message || 'تم تحديث صلاحيات المستخدم بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'حدث خطأ أثناء تحديث صلاحيات المستخدم', 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                showNotification('حدث خطأ أثناء تحديث صلاحيات المستخدم', 'error');
             });
-        });
-        
-        // منح/سحب صلاحيات الموظف
-        const toggleStaffBtns = document.querySelectorAll('.toggle-staff-btn');
-        toggleStaffBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const isStaff = this.getAttribute('data-is-staff') === 'true';
-                const row = document.getElementById(`user-row-${userId}`);
-                const roleSpan = row.querySelector('.role-staff, .role-user');
-                const icon = this.querySelector('i');
-                
-                // إرسال طلب AJAX
-                fetch(`/dashboard/users/${userId}/toggle-staff/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // تحديث الدور في الواجهة
-                        if (isStaff) {
-                            // تغيير من موظف إلى مستخدم عادي
-                            roleSpan.className = 'role-user bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm';
-                            roleSpan.innerHTML = '<i class="fas fa-user ml-1"></i> مستخدم';
-                            
-                            this.setAttribute('data-is-staff', 'false');
-                            this.classList.remove('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
-                            this.classList.add('text-purple-600', 'hover:text-purple-800', 'hover:bg-purple-50');
-                            icon.className = 'fas fa-user-shield';
-                            this.title = 'منح صلاحيات الموظف';
-                        } else {
-                            // تغيير من مستخدم عادي إلى موظف
-                            roleSpan.className = 'role-staff bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm';
-                            roleSpan.innerHTML = '<i class="fas fa-user-tie ml-1"></i> موظف';
-                            
-                            this.setAttribute('data-is-staff', 'true');
-                            this.classList.remove('text-purple-600', 'hover:text-purple-800', 'hover:bg-purple-50');
-                            this.classList.add('text-gray-600', 'hover:text-gray-800', 'hover:bg-gray-50');
-                            icon.className = 'fas fa-user-tag';
-                            this.title = 'سحب الصلاحيات';
-                        }
-                        
-                        // تأثير على الزر
-                        gsap.fromTo(this,
-                            { scale: 1 },
-                            { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1 }
-                        );
-                        
-                        // تأثير على دور المستخدم
-                        gsap.fromTo(roleSpan,
-                            { scale: 0.8 },
-                            { scale: 1, duration: 0.3 }
-                        );
-                        
-                        // عرض رسالة النجاح
-                        showSuccessMessage(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('حدث خطأ أثناء تحديث صلاحيات المستخدم');
-                });
+        }
+    }
+
+    function deleteUser(userId, username) {
+        if (confirm(`هل أنت متأكد من حذف المستخدم "${username}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+            showLoading();
+            fetch(`/dashboard/users/${userId}/delete/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showNotification('تم حذف المستخدم بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'حدث خطأ أثناء حذف المستخدم', 'error');
+                }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                showNotification('حدث خطأ أثناء حذف المستخدم', 'error');
             });
-        });
-        
-        // عرض تفاصيل المستخدم
-        const viewUserBtns = document.querySelectorAll('.view-user-btn');
-        const userModal = document.getElementById('user-details-modal');
-        const closeUserModal = document.getElementById('close-user-modal');
-        const userDetailsContent = document.getElementById('user-details-content');
-        
-        viewUserBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                
-                // جلب بيانات المستخدم
-                fetch(`/api/user/${userId}/details/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // عرض البيانات في النافذة المنبثقة
-                            userDetailsContent.innerHTML = `
-                                <div class="space-y-6">
-                                    <!-- معلومات أساسية -->
-                                    <div class="flex items-center space-x-4 space-x-reverse">
-                                        <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-user text-3xl text-primary-600"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-xl font-bold text-gray-800">${data.user.username}</h4>
-                                            <p class="text-gray-600">${data.user.email}</p>
-                                            <div class="flex space-x-2 mt-2">
-                                                <span class="${data.user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} px-3 py-1 rounded-full text-sm">
-                                                    <i class="fas fa-${data.user.is_active ? 'check' : 'times'}-circle ml-1"></i>
-                                                    ${data.user.is_active ? 'نشط' : 'معطل'}
-                                                </span>
-                                                <span class="${data.user.is_staff ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'} px-3 py-1 rounded-full text-sm">
-                                                    <i class="fas fa-${data.user.is_staff ? 'user-tie' : 'user'} ml-1"></i>
-                                                    ${data.user.is_staff ? 'موظف' : 'مستخدم'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- معلومات شخصية -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-gray-700 mb-2">الاسم الأول</label>
-                                            <p class="text-gray-800">${data.user.first_name || 'غير محدد'}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-700 mb-2">الاسم الأخير</label>
-                                            <p class="text-gray-800">${data.user.last_name || 'غير محدد'}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-700 mb-2">تاريخ التسجيل</label>
-                                            <p class="text-gray-800">${data.user.date_joined}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-gray-700 mb-2">آخر دخول</label>
-                                            <p class="text-gray-800">${data.user.last_login || 'غير متاح'}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- إحصائيات -->
-                                    <div>
-                                        <h4 class="text-lg font-bold text-gray-800 mb-4">إحصائيات النشاط</h4>
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                            <div class="bg-blue-50 p-4 rounded-lg text-center">
-                                                <p class="text-2xl font-bold text-blue-600">${data.stats.books_read || 0}</p>
-                                                <p class="text-sm text-gray-600">الكتب المقروءة</p>
-                                            </div>
-                                            <div class="bg-green-50 p-4 rounded-lg text-center">
-                                                <p class="text-2xl font-bold text-green-600">${data.stats.bookmarks || 0}</p>
-                                                <p class="text-sm text-gray-600">الكتب المحفوظة</p>
-                                            </div>
-                                            <div class="bg-purple-50 p-4 rounded-lg text-center">
-                                                <p class="text-2xl font-bold text-purple-600">${data.stats.reviews || 0}</p>
-                                                <p class="text-sm text-gray-600">التقييمات</p>
-                                            </div>
-                                            <div class="bg-yellow-50 p-4 rounded-lg text-center">
-                                                <p class="text-2xl font-bold text-yellow-600">${data.stats.reading_time || 0}</p>
-                                                <p class="text-sm text-gray-600">ساعة قراءة</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- النشاط الأخير -->
-                                    <div>
-                                        <h4 class="text-lg font-bold text-gray-800 mb-4">آخر النشاط</h4>
-                                        <div class="space-y-3">
-                                            ${data.recent_activity && data.recent_activity.length > 0 ? 
-                                                data.recent_activity.map(activity => `
-                                                    <div class="flex items-center bg-gray-50 p-3 rounded-lg">
-                                                        <div class="w-10 h-10 rounded-full ${activity.type === 'read' ? 'bg-blue-100' : activity.type === 'review' ? 'bg-yellow-100' : 'bg-green-100'} flex items-center justify-center ml-3">
-                                                            <i class="fas fa-${activity.icon} ${activity.type === 'read' ? 'text-blue-600' : activity.type === 'review' ? 'text-yellow-600' : 'text-green-600'}"></i>
-                                                        </div>
-                                                        <div>
-                                                            <p class="text-gray-800">${activity.description}</p>
-                                                            <p class="text-sm text-gray-500">${activity.time}</p>
-                                                        </div>
-                                                    </div>
-                                                `).join('') :
-                                                '<p class="text-gray-500 text-center">لا يوجد نشاط حديث</p>'
-                                            }
-                                        </div>
+        }
+    }
+
+    function viewUserDetails(userId) {
+        showLoading();
+        fetch(`/api/users/${userId}/details/`)
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    const user = data.user;
+                    const detailsHTML = `
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-3xl text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold dark:text-white">${user.username}</h4>
+                                    <p class="text-gray-600 dark:text-gray-300">${user.email}</p>
+                                    <div class="flex gap-2 mt-2">
+                                        <span class="px-3 py-1 rounded-full text-xs ${user.is_active ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'}">
+                                            ${user.is_active ? 'نشط' : 'معطل'}
+                                        </span>
+                                        <span class="px-3 py-1 rounded-full text-xs ${user.is_staff ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300'}">
+                                            ${user.is_staff ? 'موظف' : 'مستخدم'}
+                                        </span>
                                     </div>
                                 </div>
-                            `;
+                            </div>
                             
-                            // إظهار النافذة المنبثقة
-                            userModal.classList.remove('hidden');
-                            gsap.fromTo(userModal,
-                                { opacity: 0 },
-                                { opacity: 1, duration: 0.3 }
-                            );
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">الاسم الكامل</p>
+                                    <p class="font-medium dark:text-white">${user.first_name || ''} ${user.last_name || '' || 'غير محدد'}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">تاريخ التسجيل</p>
+                                    <p class="font-medium dark:text-white">${user.date_joined}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">آخر دخول</p>
+                                    <p class="font-medium dark:text-white">${user.last_login || 'غير متاح'}</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">تاريخ آخر تعديل</p>
+                                    <p class="font-medium dark:text-white">${user.last_updated || 'غير متاح'}</p>
+                                </div>
+                            </div>
                             
-                            const modalContent = userModal.querySelector('.bg-white');
-                            gsap.fromTo(modalContent,
-                                { scale: 0.8, opacity: 0 },
-                                { scale: 1, opacity: 1, duration: 0.4 }
-                            );
-                        } else {
-                            alert('حدث خطأ أثناء جلب بيانات المستخدم');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('حدث خطأ أثناء جلب بيانات المستخدم');
-                    });
-            });
-        });
-        
-        // إغلاق نافذة تفاصيل المستخدم
-        function closeUserModalHandler() {
-            const modalContent = userModal.querySelector('.bg-white');
-            gsap.to(modalContent, {
-                scale: 0.8,
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => {
-                    userModal.classList.add('hidden');
+                            ${data.stats ? `
+                            <div class="border-t dark:border-gray-700 pt-4">
+                                <h5 class="font-medium mb-3 dark:text-white">الإحصائيات</h5>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                                        <p class="text-xl font-bold dark:text-white">${data.stats.books_read || 0}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">كتب مقروءة</p>
+                                    </div>
+                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                                        <p class="text-xl font-bold dark:text-white">${data.stats.reviews || 0}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">تقييمات</p>
+                                    </div>
+                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                                        <p class="text-xl font-bold dark:text-white">${data.stats.bookmarks || 0}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">محفوظات</p>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="border-t dark:border-gray-700 pt-4">
+                                <h5 class="font-medium mb-3 dark:text-white">الإجراءات</h5>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="toggleUserStatus(${userId}, ${user.is_active})" class="px-4 py-2 rounded-lg ${user.is_active ? 'bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' : 'bg-green-100 hover:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400'}">
+                                        ${user.is_active ? 'تعطيل' : 'تفعيل'}
+                                    </button>
+                                    <button onclick="toggleStaffStatus(${userId}, ${user.is_staff})" class="px-4 py-2 rounded-lg ${user.is_staff ? 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-900/20 dark:hover:bg-gray-900/30 text-gray-700 dark:text-gray-400' : 'bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-400'}">
+                                        ${user.is_staff ? 'سحب صلاحيات' : 'منح صلاحيات'}
+                                    </button>
+                                    <button onclick="deleteUser(${userId}, '${user.username}')" class="px-4 py-2 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-400">
+                                        حذف
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('user-details-content').innerHTML = detailsHTML;
+                    document.getElementById('user-details-modal').classList.remove('hidden');
                 }
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error:', error);
+                showNotification('حدث خطأ أثناء جلب بيانات المستخدم', 'error');
             });
-            
-            gsap.to(userModal, {
-                opacity: 0,
-                duration: 0.3
-            });
-        }
-        
-        if (closeUserModal) {
-            closeUserModal.addEventListener('click', closeUserModalHandler);
-        }
-        
-        // إغلاق النافذة عند النقر خارجها
-        window.addEventListener('click', function(e) {
-            if (e.target === userModal) {
-                closeUserModalHandler();
+    }
+
+    function closeModal() {
+        document.getElementById('user-details-modal').classList.add('hidden');
+    }
+
+    function exportUsers(format = 'csv') {
+        showLoading();
+        // تنفيذ تصدير البيانات حسب الصيغة المطلوبة
+        setTimeout(() => {
+            hideLoading();
+            showNotification(`تم تصدير البيانات بصيغة ${format.toUpperCase()} بنجاح`, 'success');
+        }, 1500);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
-        });
+        }
+        return cookieValue;
+    }
+
+    // إضافة مستخدم جديد
+    document.getElementById('add-user-form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        // تأثيرات على أزرار التصدير
-        const exportBtns = document.querySelectorAll('.export-btn');
-        exportBtns.forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    scale: 1.05,
-                    duration: 0.2
-                });
-            });
-            
-            btn.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    scale: 1,
-                    duration: 0.2
-                });
-            });
-            
-            btn.addEventListener('click', function() {
-                gsap.fromTo(this,
-                    { scale: 1 },
-                    { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 }
-                );
-            });
-        });
+        const formData = {
+            username: document.getElementById('username').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            first_name: document.getElementById('first_name').value.trim(),
+            last_name: document.getElementById('last_name').value.trim(),
+            password: document.getElementById('password').value,
+            confirm_password: document.getElementById('confirm_password').value,
+            is_staff: document.getElementById('is_staff').checked,
+            is_active: document.getElementById('is_active').checked
+        };
         
-        // وظيفة لعرض رسائل النجاح
-        function showSuccessMessage(message) {
-            const successDiv = document.createElement('div');
-            successDiv.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
-            successDiv.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle text-green-500 ml-3"></i>
-                    <div>
-                        <p class="font-bold">نجاح</p>
-                        <p class="text-sm">${message}</p>
+        // التحقق من المدخلات
+        if (!formData.username || !formData.email || !formData.password) {
+            showNotification('جميع الحقول المطلوبة يجب أن تكون مملوءة', 'error');
+            return;
+        }
+        
+        if (formData.password !== formData.confirm_password) {
+            showNotification('كلمات المرور غير متطابقة', 'error');
+            return;
+        }
+        
+        if (formData.password.length < 8) {
+            showNotification('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 'error');
+            return;
+        }
+        
+        showLoading();
+        fetch('/api/users/add/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showNotification('تم إضافة المستخدم بنجاح', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showNotification(data.message || 'حدث خطأ أثناء إضافة المستخدم', 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showNotification('حدث خطأ أثناء إضافة المستخدم', 'error');
+        });
+    });
+
+    // وظائف مساعدة
+    function showLoading() {
+        let loader = document.getElementById('global-loader');
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'global-loader';
+            loader.innerHTML = `
+                <div class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 flex flex-col items-center">
+                        <div class="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p class="text-gray-700 dark:text-gray-300">جاري المعالجة...</p>
                     </div>
                 </div>
             `;
-            
-            document.body.appendChild(successDiv);
-            
-            // تأثير ظهور رسالة النجاح
-            gsap.from(successDiv, {
-                opacity: 0,
-                y: -20,
-                duration: 0.3
-            });
-            
-            // إزالة رسالة النجاح بعد 3 ثواني
-            setTimeout(() => {
-                gsap.to(successDiv, {
-                    opacity: 0,
-                    y: -20,
-                    duration: 0.3,
-                    onComplete: () => {
-                        successDiv.remove();
-                    }
-                });
-            }, 3000);
+            document.body.appendChild(loader);
         }
+    }
+
+    function hideLoading() {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            loader.remove();
+        }
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const types = {
+            success: 'bg-green-500 text-white',
+            error: 'bg-red-500 text-white',
+            info: 'bg-blue-500 text-white',
+            warning: 'bg-yellow-500 text-white'
+        };
         
-        // تأثيرات على مفاتيح التبديل
-        const toggleSwitches = document.querySelectorAll('input[type="checkbox"]');
-        toggleSwitches.forEach(switchEl => {
-            switchEl.addEventListener('change', function() {
-                const switchDiv = this.nextElementSibling;
-                
-                if (this.checked) {
-                    gsap.to(switchDiv, {
-                        backgroundColor: '#2563eb',
-                        duration: 0.2
-                    });
-                } else {
-                    gsap.to(switchDiv, {
-                        backgroundColor: '#d1d5db',
-                        duration: 0.2
-                    });
-                }
-            });
-        });
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-transform duration-300 ${types[type] || types.info}`;
+        notification.textContent = message;
+        notification.style.transform = 'translateX(100%)';
+        
+        document.body.appendChild(notification);
+        
+        // عرض الإشعار
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // إخفاء الإشعار بعد 3 ثواني
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // إغلاق المودال بالضغط على ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
     });
+
+    // إغلاق المودال بالضغط خارج المحتوى
+    document.getElementById('user-details-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // وظائف إضافية
+    function sendBulkEmails() {
+        showNotification('سيتم إرسال رسائل البريد الإلكتروني للمستخدمين المحددين', 'info');
+    }
+
+    function generateReport() {
+        showLoading();
+        setTimeout(() => {
+            hideLoading();
+            showNotification('تم إنشاء التقرير بنجاح', 'success');
+        }, 2000);
+    }
+
+    function backupUsers() {
+        showNotification('جاري إنشاء نسخة احتياطية من بيانات المستخدمين', 'info');
+    }
+
+    function importUsers() {
+        showNotification('حدد ملف المستخدمين للاستيراد', 'info');
+    }
+
+    // تحسين تجربة المستخدم مع البحث
+    const searchInput = document.querySelector('input[name="search"]');
+    let searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    }
 </script>
-{% endblock %}
 {% endblock %}

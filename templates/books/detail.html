@@ -7,7 +7,7 @@
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
     <!-- مسار التنقل -->
-    <div class="bg-white shadow-sm">
+    <div class="bg-white shadow-sm mt-16 pt-16">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center text-sm text-gray-600">
                 <a href="{% url 'home' %}" class="hover:text-blue-600">الرئيسية</a>
@@ -96,7 +96,11 @@
                                 </div>
                                 <div>
                                     <p class="text-gray-600">المؤلف</p>
-                                    <p class="font-medium text-gray-800">{{ book.author }}</p>
+                                    <p class="font-medium text-gray-800">
+                                        {% comment %} <a href="{% url 'author_books' author_data.author.id %}"> {{ book.author }} </a>  {% endcomment %}
+                                        <a href="{% url 'author_books' book.author.id %}">{{ book.author.name }}</a>
+
+                                    </p>
                                 </div>
                             </div>
                             
@@ -106,8 +110,10 @@
                                 </div>
                                 <div>
                                     <p class="text-gray-600">التصنيف</p>
-                                    <p class="font-medium text-gray-800">{{ book.category.name }}</p>
-                                </div>
+                                    <a href="{% url 'book_list' %}?category={{ book.category.slug }}">
+                                        {{ book.category.name }}
+                                    </a>
+                               </div>
                             </div>
                         </div>
                     </div>

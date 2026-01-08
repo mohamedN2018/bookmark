@@ -10,7 +10,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserCreationForm, ReviewForm, BookForm
-from .models import Book, Category, Review, Bookmark, ReadingHistory
+from .models import Book, Category, Review, Bookmark, ReadingHistory, Author
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 import json
@@ -20,14 +20,43 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import os
 import csv
+from django.contrib.auth.decorators import login_required
+
 
 def home(request):
     count_book = Book.objects.count()
-    count_book_cat = Category.objects.count()
+    categories = Category.objects.annotate(
+        books_count=Count('books')
+    )
+    
+    # الحصول على المؤلفين المميزين
+    featured_authors = Author.objects.filter(is_featured=True)[:4]
+    if not featured_authors.exists():
+        featured_authors = Author.objects.annotate(
+            books_count=models.Count('books')
+        ).order_by('-books_count')[:4]
+
+    # إضافة إحصائيات للمؤلفين
+    authors_with_stats = []
+    for author in featured_authors:
+        authors_with_stats.append({
+            'author': author,
+            'books_count': author.get_books_count(),
+            'readers_count': ReadingHistory.objects.filter(
+                book__author=author
+            ).values('user').distinct().count(),
+            'avg_rating': round(
+                Book.objects.filter(author=author)
+                .aggregate(avg=Avg('reviews__rating'))['avg'] or 0,
+                1
+            ),
+            'avatar_url': author.avatar.url if author.avatar else f'https://api.dicebear.com/7.x/avataaars/svg?seed={author.id}',
+        })
+
+
 
     # الكتب المميزة
     featured_books = Book.objects.filter(is_featured=True)[:8]
-    categories = Category.objects.all()
     # أحدث الكتب
     latest_books = Book.objects.all().order_by('-created_at')[:8]
     
@@ -42,59 +71,179 @@ def home(request):
         'top_rated_books': top_rated_books,
         'categories': categories,
         'count_book': count_book,
-        'count_book_cat': count_book_cat,
+        'count_book_cat': categories.count(),
+        'featured_authors': authors_with_stats,  # ← إضافة المؤلفين للسياق
     }
     return render(request, 'home.html', context)
 
+
+def popular_authors(request):
+    """عرض أشهر المؤلفين"""
+    # الحصول على المؤلفين المميزين أولاً
+    featured_authors = Author.objects.filter(is_featured=True)
+    
+    # إذا لم يكن هناك مؤلفون مميزون، اعرض المؤلفين الأكثر كتباً
+    if not featured_authors.exists():
+        featured_authors = Author.objects.annotate(
+            books_count=models.Count('books')
+        ).order_by('-books_count')[:4]
+    
+    # إذا كان عدد المؤلفين أقل من 4، أضف مؤلفين آخرين
+    if featured_authors.count() < 4:
+        additional_authors = Author.objects.exclude(
+            id__in=featured_authors.values_list('id', flat=True)
+        ).annotate(
+            books_count=models.Count('books')
+        ).order_by('-books_count')[:4 - featured_authors.count()]
+        featured_authors = list(featured_authors) + list(additional_authors)
+    
+    # إضافة إحصائيات لكل مؤلف
+    authors_with_stats = []
+    for author in featured_authors[:4]:  # تأكد من عرض 4 مؤلفين فقط
+        authors_with_stats.append({
+            'author': author,
+            'books_count': author.get_books_count(),
+            'readers_count': author.get_total_readers(),
+            'avg_rating': round(author.average_rating(), 1) if author.average_rating() else 0,
+            'avatar_url': author.avatar.url if author.avatar else f'https://api.dicebear.com/7.x/avataaars/svg?seed={author.id}',
+        })
+    
+    context = {
+        'featured_authors': authors_with_stats,
+    }
+    
+    return render(request, 'authors/popular.html', context)
+
+def all_authors(request):
+    """عرض جميع المؤلفين"""
+    authors = Author.objects.annotate(
+        books_count=Count('books')
+    ).order_by('-books_count')
+    
+    # البحث
+    search_query = request.GET.get('q', '')
+    if search_query:
+        authors = authors.filter(
+            Q(name__icontains=search_query) |
+            Q(specialization__icontains=search_query) |
+            Q(bio__icontains=search_query)
+        )
+    
+    # الترقيم
+    paginator = Paginator(authors, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'total_authors': authors.count(),
+    }
+    
+    return render(request, 'authors/list.html', context)
+
+def author_books(request, author_id):
+    author = get_object_or_404(Author, id=author_id)
+    books = Book.objects.filter(author=author).order_by('-created_at')
+
+    paginator = Paginator(books, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'author': author,
+        'page_obj': page_obj,
+        'books_count': books.count(),
+    }
+    
+    return render(request, 'authors/books.html', context)
+
+def author_detail(request, author_id):
+    """تفاصيل المؤلف"""
+    author = get_object_or_404(Author, id=author_id)
+    
+    # إحصائيات المؤلف
+    books = author.books.all()
+    total_pages = books.aggregate(total=Sum('pages'))['total'] or 0
+    total_downloads = books.aggregate(total=Sum('downloads'))['total'] or 0
+    total_views = books.aggregate(total=Sum('views'))['total'] or 0
+    
+    # الكتب المميزة للمؤلف
+    featured_books = books.filter(is_featured=True)[:4]
+    
+    context = {
+        'author': author,
+        'books': books,
+        'featured_books': featured_books,
+        'total_pages': total_pages,
+        'total_downloads': total_downloads,
+        'total_views': total_views,
+        'books_count': books.count(),
+    }
+    
+    return render(request, 'authors/detail.html', context)
+
+
 def book_list(request):
     books = Book.objects.all().order_by('-created_at')
-    featured_books = Book.objects.filter(is_featured=True)[:8]
-
-    # ===== التصفية حسب التصنيف =====
+    
+    # إحصائيات
+    free_books_count = Book.objects.filter(is_free=True).count()
+    featured_books_count = Book.objects.filter(is_featured=True).count()
+    categories_count = Category.objects.count()
+    
+    # التصفية حسب التصنيف
     category_slug = request.GET.get('category')
     current_category = None
     if category_slug:
         current_category = get_object_or_404(Category, slug=category_slug)
         books = books.filter(category=current_category)
     
-    # ===== البحث =====
+    # البحث
     query = request.GET.get('q')
     if query:
         books = books.filter(
             Q(title__icontains=query) |
-            Q(author__icontains=query) |
+            Q(author__name__icontains=query) |
+            Q(author_name__icontains=query) |
             Q(description__icontains=query)
         )
     
-    # ===== التصفية حسب السعر =====
+    # التصفية حسب السعر
     price_filter = request.GET.get('price')
     if price_filter == 'free':
         books = books.filter(is_free=True)
     elif price_filter == 'paid':
         books = books.filter(is_free=False)
     
-    # ===== التصفية حسب اللغة =====
+    # التصفية حسب اللغة
     language = request.GET.get('language')
     if language:
         books = books.filter(language=language)
     
-    # ===== الترقيم =====
+    # الترقيم
     paginator = Paginator(books, 12)
     page_number = request.GET.get('page')
-    books = paginator.get_page(page_number)
+    books_page = paginator.get_page(page_number)
+    
+    # جلب جميع اللغات المتاحة
+    languages = Book.objects.values_list('language', flat=True).distinct()
     
     context = {
-        'books': books,
+        'books': books_page,
         'categories': Category.objects.all(),
-        'languages': Book.objects.values_list('language', flat=True).distinct(),
-        'current_category': current_category,  # <--- أضفنا هذا
+        'languages': languages,
+        'current_category': current_category,
         'current_query': query,
         'current_price': price_filter,
         'current_language': language,
-        'featured_books': featured_books,
+        'free_books_count': free_books_count,
+        'featured_books_count': featured_books_count,
+        'categories_count': categories_count,
     }
     
     return render(request, 'books/list.html', context)
+
 
 def book_detail(request, slug):
     book = get_object_or_404(Book, slug=slug)
@@ -134,6 +283,7 @@ def book_detail(request, slug):
         })
 
     total_reviews = book.reviews.count()
+
 
     context = {
         'book': book,
@@ -491,67 +641,6 @@ def get_statistics(request):
     
     return render(request, 'dashboard/index.html', context)
 
-
-@login_required
-def dashboard_books(request):
-    # التحقق من صلاحيات الموظفين
-    if not request.user.is_staff:
-        messages.error(request, 'ليس لديك صلاحية للوصول إلى هذه الصفحة.')
-        return redirect('dashboard')
-    
-    books = Book.objects.all().order_by('-created_at')
-    categories = Category.objects.all()
-    
-    # البحث والتصفية
-    search_query = request.GET.get('search', '')
-    category_filter = request.GET.get('category', '')
-    status_filter = request.GET.get('status', '')
-    
-    if search_query:
-        books = books.filter(
-            Q(title__icontains=search_query) |
-            Q(author__icontains=search_query) |
-            Q(description__icontains=search_query)
-        )
-    
-    if category_filter:
-        books = books.filter(category_id=category_filter)
-    
-    if status_filter:
-        if status_filter == 'free':
-            books = books.filter(is_free=True)
-        elif status_filter == 'paid':
-            books = books.filter(is_free=False)
-        elif status_filter == 'featured':
-            books = books.filter(is_featured=True)
-    
-    # الترقيم
-    paginator = Paginator(books, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
-        if form.is_valid():
-            book = form.save()
-            messages.success(request, f'تم إضافة الكتاب "{book.title}" بنجاح!')
-            return redirect('dashboard_books')
-        else:
-            messages.error(request, 'حدث خطأ أثناء إضافة الكتاب. يرجى التحقق من البيانات.')
-    else:
-        form = BookForm()
-    
-    context = {
-        'page_obj': page_obj,
-        'form': form,
-        'categories': categories,
-        'search_query': search_query,
-        'category_filter': category_filter,
-        'status_filter': status_filter,
-        'books_count': books.count(),
-    }
-    return render(request, 'dashboard/books.html', context)
-
 @login_required
 def dashboard_users(request):
     # التحقق من صلاحيات الموظفين
@@ -643,6 +732,108 @@ def dashboard_settings(request):
     }
     return render(request, 'dashboard/settings.html', context)
 
+
+@login_required
+def dashboard_books(request):
+    # التحقق من صلاحيات الموظفين
+    if not request.user.is_staff:
+        messages.error(request, 'ليس لديك صلاحية للوصول إلى هذه الصفحة.')
+        return redirect('dashboard')
+    
+    books = Book.objects.all()
+    categories = Category.objects.all()
+    authors = Author.objects.all()
+    
+    # إحصائيات
+    free_books_count = Book.objects.filter(is_free=True).count()
+    featured_books_count = Book.objects.filter(is_featured=True).count()
+    categories_count = Category.objects.count()
+    
+    # البحث والتصفية
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    status_filter = request.GET.get('status', '')
+    sort_by = request.GET.get('sort', '-created_at')
+    
+    if search_query:
+        books = books.filter(
+            Q(title__icontains=search_query) |
+            Q(author__name__icontains=search_query) |
+            Q(author_name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(category__name__icontains=search_query)
+        )
+    
+    if category_filter:
+        books = books.filter(category_id=category_filter)
+    
+    if status_filter == 'free':
+        books = books.filter(is_free=True)
+    elif status_filter == 'paid':
+        books = books.filter(is_free=False)
+    elif status_filter == 'featured':
+        books = books.filter(is_featured=True)
+    
+    # الترتيب
+    if sort_by in ['title', '-title', '-created_at', '-views', '-downloads']:
+        books = books.order_by(sort_by)
+    
+    # الترقيم
+    paginator = Paginator(books, 10)
+    page_number = request.GET.get('page')
+    books_page = paginator.get_page(page_number)
+    
+    # تحرير كتاب
+    editing_book = None
+    edit_id = request.GET.get('edit')
+    if edit_id:
+        try:
+            editing_book = Book.objects.get(id=edit_id)
+        except Book.DoesNotExist:
+            messages.error(request, 'الكتاب المطلوب غير موجود.')
+    
+    # إضافة/تحديث كتاب
+    if request.method == 'POST':
+        book_id = request.POST.get('book_id')
+        
+        if book_id:
+            # تحديث كتاب موجود
+            try:
+                book = Book.objects.get(id=book_id)
+                form = BookForm(request.POST, request.FILES, instance=book)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, f'تم تحديث الكتاب "{book.title}" بنجاح!')
+                    return redirect('dashboard_books')
+            except Book.DoesNotExist:
+                messages.error(request, 'الكتاب المطلوب غير موجود.')
+        else:
+            # إضافة كتاب جديد
+            form = BookForm(request.POST, request.FILES)
+            if form.is_valid():
+                book = form.save()
+                messages.success(request, f'تم إضافة الكتاب "{book.title}" بنجاح!')
+                return redirect('dashboard_books')
+            else:
+                messages.error(request, 'حدث خطأ أثناء إضافة الكتاب. يرجى التحقق من البيانات.')
+    
+    context = {
+        'books': books_page,
+        'categories': categories,
+        'authors': authors,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'status_filter': status_filter,
+        'sort_by': sort_by,
+        'editing_book': editing_book,
+        'free_books_count': free_books_count,
+        'featured_books_count': featured_books_count,
+        'categories_count': categories_count,
+    }
+    
+    return render(request, 'dashboard/manage_books.html', context)
+
+
 @login_required
 @require_POST
 def delete_book(request, book_id):
@@ -650,11 +841,14 @@ def delete_book(request, book_id):
     if not request.user.is_staff:
         return JsonResponse({'success': False, 'message': 'ليس لديك صلاحية لهذا الإجراء.'})
     
-    book = get_object_or_404(Book, id=book_id)
-    book_title = book.title
-    book.delete()
-    
-    return JsonResponse({'success': True, 'message': f'تم حذف الكتاب "{book_title}" بنجاح.'})
+    try:
+        book = Book.objects.get(id=book_id)
+        book_title = book.title
+        book.delete()
+        return JsonResponse({'success': True, 'message': f'تم حذف الكتاب "{book_title}" بنجاح.'})
+    except Book.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'الكتاب المطلوب غير موجود.'})
+
 
 @login_required
 @require_POST

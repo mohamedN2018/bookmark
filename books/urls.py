@@ -27,6 +27,13 @@ urlpatterns = [
     path('dashboard/users/<int:user_id>/toggle-status/', views.toggle_user_status, name='toggle_user_status'),
     path('dashboard/users/<int:user_id>/toggle-staff/', views.toggle_staff_status, name='toggle_staff_status'),
     path('dashboard/statistics/', views.get_statistics, name='get_statistics'),
+    path('delete/<int:book_id>/', views.delete_book, name='delete_book'),
+
+
+    path('authors/', views.all_authors, name='all_authors'),
+    path('author/<int:author_id>/books/', views.author_books, name='author_books'),
+    path('author/<int:author_id>/', views.author_detail, name='author_detail'),
+
 
     # API
     # path('api/search/', views.search_books, name='search_books'),
