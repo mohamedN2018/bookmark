@@ -33,6 +33,7 @@ class Book(models.Model):
     author = models.CharField(max_length=100, verbose_name="المؤلف")
     description = models.TextField(verbose_name="الوصف")
     cover_image = models.ImageField(upload_to='book_covers/', verbose_name="صورة الغلاف", blank=True, null=True)
+    pdf_file = models.FileField(upload_to='books/pdfs/', blank=True, null=True, verbose_name="ملف PDF")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='books', verbose_name="التصنيف")
     published_year = models.IntegerField(verbose_name="سنة النشر")
     pages = models.IntegerField(verbose_name="عدد الصفحات")
@@ -43,7 +44,9 @@ class Book(models.Model):
     is_featured = models.BooleanField(default=False, verbose_name="مميز")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+    downloads = models.IntegerField(default=0, verbose_name="عدد التحميلات")
+    views = models.IntegerField(default=0, verbose_name="عدد المشاهدات")
+
     class Meta:
         verbose_name = "كتاب"
         verbose_name_plural = "الكتب"
@@ -65,6 +68,14 @@ class Book(models.Model):
         if reviews:
             return sum([review.rating for review in reviews]) / len(reviews)
         return 0
+    def increment_views(self):
+        self.views += 1
+        self.save(update_fields=['views'])
+
+    def increment_downloads(self):
+        self.downloads += 1
+        self.save(update_fields=['downloads'])
+
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews', verbose_name="الكتاب")

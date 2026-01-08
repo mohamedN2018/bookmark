@@ -222,7 +222,7 @@
                         <div class="text-white/70">قارئ نشط</div>
                     </div>
                     <div class="text-center md:col-span-1">
-                        <div class="text-3xl md:text-4xl font-bold text-white mb-2" data-counter="150">0</div>
+                        <div class="text-3xl md:text-4xl font-bold text-white mb-2" data-counter="{{ count_book }}">0</div>
                         <div class="text-white/70">كاتب ومؤلف</div>
                     </div>
                 </div>
@@ -294,120 +294,37 @@
                 اختر من بين مجموعة واسعة من التصنيفات التي تناسب جميع اهتمامات القراءة
             </p>
         </div>
-        
         <!-- Categories Grid with Icons -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+
+
+
+
+
+
+
+            {% for category in categories|slice:":16" %}
             <!-- Category 1: الأدب -->
-            <a href="#" class="category-card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 hover-card">
+            <a href="{% url 'books_by_category' category.slug %}" class="category-card bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 hover-card">
                 <div class="flex items-center">
                     <div class="category-icon bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                         <i class="fas fa-pen-nib text-2xl"></i>
                     </div>
                     <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">الأدب والروايات</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">٢٥٤ كتاب</p>
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">{{ category.name }}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">{{ count_book_cat }} كتاب</p>
                     </div>
                     <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
                 </div>
             </a>
-            
-            <!-- Category 2: العلمية -->
-            <a href="#" class="category-card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-green-500 to-green-600 text-white">
-                        <i class="fas fa-flask text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">العلوم والتكنولوجيا</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٨٩ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 3: التاريخ -->
-            <a href="#" class="category-card bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-amber-500 to-amber-600 text-white">
-                        <i class="fas fa-landmark text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">التاريخ والجغرافيا</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٦٧ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 4: تطوير الذات -->
-            <a href="#" class="category-card bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                        <i class="fas fa-brain text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">تطوير الذات</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">٢١٣ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 5: الأعمال -->
-            <a href="#" class="category-card bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-cyan-500 to-cyan-600 text-white">
-                        <i class="fas fa-chart-line text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">الأعمال والاقتصاد</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٤٥ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 6: الدين -->
-            <a href="#" class="category-card bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
-                        <i class="fas fa-mosque text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">العلوم الدينية</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">٣٢١ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 7: الأطفال -->
-            <a href="#" class="category-card bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-pink-500 to-pink-600 text-white">
-                        <i class="fas fa-child text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">كتب الأطفال</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">١٧٨ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
-            
-            <!-- Category 8: اللغات -->
-            <a href="#" class="category-card bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 p-6 hover-card">
-                <div class="flex items-center">
-                    <div class="category-icon bg-gradient-to-br from-violet-500 to-violet-600 text-white">
-                        <i class="fas fa-language text-2xl"></i>
-                    </div>
-                    <div class="flex-grow mr-4">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-1">تعلم اللغات</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">٩٨ كتاب</p>
-                    </div>
-                    <i class="fas fa-arrow-left text-gray-400 dark:text-gray-500"></i>
-                </div>
-            </a>
+            {% endfor %}
+
+
+
+
+
+
+
         </div>
         
         <!-- View All Categories -->

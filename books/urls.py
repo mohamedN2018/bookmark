@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('books/', views.book_list, name='book_list'),
     path('books/<slug:slug>/', views.book_detail, name='book_detail'),
+    path('categories/', views.categories_list, name='categories_list'),
     path('category/<slug:slug>/', views.books_by_category, name='books_by_category'),
     
     # المصادقة

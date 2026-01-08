@@ -6,106 +6,153 @@
 
 {% block extra_css %}
 <style>
-    /* Enhanced Dimensions */
-    .book-card-container {
-        min-height: 400px;
-        max-height: 500px;
+    /* Enhanced Styles Matching categories_list.html */
+    .books-header {
+        background: linear-gradient(135deg, 
+            rgba(59, 130, 246, 0.9) 0%, 
+            rgba(147, 51, 234, 0.9) 50%, 
+            rgba(239, 68, 68, 0.9) 100%);
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        position: relative;
+        overflow: hidden;
     }
     
+    /* موجات متحركة */
+    .wave-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        overflow: hidden;
+    }
+    
+    .wave {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        background-size: 1440px 100px;
+        animation: wave 20s linear infinite;
+    }
+    
+    @keyframes wave {
+        0% { background-position-x: 0; }
+        100% { background-position-x: 1440px; }
+    }
+    
+    /* بطاقات الكتب - نفس تصميم بطاقات الفئات */
+    .book-card {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        border-radius: 20px;
+        background: white;
+    }
+    
+    .dark .book-card {
+        background: #1f2937;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        border-color: #3b82f6;
+    }
+    
+    .book-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        transform: translateX(-100%);
+        transition: transform 0.4s ease;
+    }
+    
+    .book-card:hover::before {
+        transform: translateX(0);
+    }
+    
+    /* تأثيرات الصور */
     .book-image-container {
         height: 220px;
-        min-height: 220px;
-        max-height: 220px;
-    }
-    
-    .book-content-container {
-        height: calc(100% - 220px);
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .book-description {
-        height: 3.6rem;
-        line-height: 1.2;
         overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
     }
     
-    .book-title {
-        height: 2.8rem;
-        line-height: 1.4;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-    
-    .book-meta-info {
-        height: 1.5rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-    
-    .sidebar-filters {
-        min-height: 500px;
-        max-height: calc(100vh - 150px);
-        overflow-y: auto;
-    }
-    
-    /* Enhanced Grid Layout - نفس شكل الكتب في صفحة الكاتيجوري */
-    .books-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .books-grid {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        }
-    }
-    
-    @media (max-width: 640px) {
-        .books-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    /* Enhanced Hover Effects - نفس تأثيرات الكاتيجوري */
-    .book-card-hover {
-        transition: all 0.3s ease;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .dark .book-card-hover {
-        border-color: #374151;
-    }
-    
-    .book-card-hover:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-    
-    .dark .book-card-hover:hover {
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Enhanced Image Effects */
-    .book-image-zoom {
+    .book-image {
         transition: transform 0.5s ease;
         transform-origin: center center;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     
-    .book-card-hover:hover .book-image-zoom {
-        transform: scale(1.05);
+    .book-card:hover .book-image {
+        transform: scale(1.1);
     }
     
-    /* Enhanced Badges */
+    /* تأثيرات الظهور */
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* عدادات الإحصائيات */
+    .stats-counter {
+        font-feature-settings: "tnum";
+        font-variant-numeric: tabular-nums;
+    }
+    
+    /* بطاقة التصفية الرئيسية */
+    .main-filter-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .main-filter-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    
+    .main-filter-card:hover::before {
+        opacity: 1;
+    }
+    
+    /* تحسينات للوضع الداكن */
+    .dark .books-header {
+        background: linear-gradient(135deg, 
+            rgba(30, 41, 59, 0.9) 0%, 
+            rgba(55, 48, 163, 0.9) 50%, 
+            rgba(124, 58, 237, 0.9) 100%);
+    }
+    
+    .dark .book-card {
+        background: #1f2937;
+    }
+    
+    /* Badges */
     .book-badge {
         position: absolute;
         top: 12px;
@@ -128,7 +175,7 @@
         color: white;
     }
     
-    /* Enhanced Rating - نفس تصميم الكاتيجوري */
+    /* Rating */
     .rating-stars {
         position: absolute;
         bottom: 12px;
@@ -144,7 +191,7 @@
         gap: 0.25rem;
     }
     
-    /* Enhanced Pagination - نفس تصميم الكاتيجوري */
+    /* Pagination */
     .pagination-item {
         min-width: 2.5rem;
         height: 2.5rem;
@@ -156,11 +203,13 @@
         font-weight: 500;
     }
     
-    .pagination-item:hover {
-        transform: translateY(-2px);
+    /* Filter Sidebar */
+    .sidebar-filters {
+        min-height: 500px;
+        max-height: calc(100vh - 150px);
+        overflow-y: auto;
     }
     
-    /* Enhanced Filter Sidebar - نفس تصميم الكاتيجوري */
     .filter-section {
         margin-bottom: 1.5rem;
         padding-bottom: 1.5rem;
@@ -194,84 +243,16 @@
         color: white;
     }
     
-    /* Enhanced Active Filters */
-    .active-filter-tag {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin: 0.25rem;
-        animation: slideIn 0.3s ease;
+    /* Search Bar */
+    .search-input {
+        transition: all 0.3s ease;
     }
     
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .search-input:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
-    /* Enhanced Empty State - نفس تصميم الكاتيجوري */
-    .empty-state {
-        height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        background: white;
-        border-radius: 20px;
-    }
-    
-    .dark .empty-state {
-        background: #1f2937;
-    }
-    
-    /* Enhanced View Toggle */
-    .view-toggle-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-    
-    .view-toggle-btn.active {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-    }
-    
-    .dark .view-toggle-btn.active {
-        background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    }
-    
-    /* Enhanced Search Bar - نفس تصميم الكاتيجوري */
-    .search-bar-wrapper {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .search-bar-input {
-        height: 56px;
-        border-radius: 16px;
-        font-size: 1.125rem;
-        padding-right: 4rem;
-        border: 2px solid transparent;
-    }
-    
-    .search-bar-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Enhanced Category Chips - نفس تصميم الكاتيجوري */
+    /* Category Chips */
     .category-chip {
         display: inline-flex;
         align-items: center;
@@ -302,274 +283,185 @@
         color: white;
         border-color: transparent;
     }
-
-    /* Image fallback styles */
-    .book-image-fallback {
-        width: 100%;
-        height: 100%;
+    
+    /* Empty State */
+    .empty-state {
+        height: 400px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+        flex-direction: column;
+        background: white;
+        border-radius: 20px;
     }
     
-    .dark .book-image-fallback {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    .dark .empty-state {
+        background: #1f2937;
     }
-
-    /* List View Styles */
-    .list-view-active {
+    
+    /* Book Content Container */
+    .book-content-container {
+        padding: 1.5rem;
+        flex: 1;
         display: flex;
         flex-direction: column;
+    }
+    
+    .book-title {
+        height: 2.8rem;
+        line-height: 1.4;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .book-description {
+        height: 3.6rem;
+        line-height: 1.2;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+    
+    /* Grid Layout */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
     }
     
-    .list-view-active .book-card-container {
-        max-height: 200px;
-        min-height: 200px;
-        flex-direction: row;
-        margin-bottom: 1rem;
-        aspect-ratio: auto;
-    }
-    
-    .list-view-active .book-image-container {
-        width: 150px;
-        height: 200px;
-        min-height: 200px;
-        max-height: 200px;
-        flex-shrink: 0;
-    }
-    
-    .list-view-active .book-content-container {
-        width: calc(100% - 150px);
-        height: 200px;
-        padding: 1.5rem;
-        justify-content: space-between;
-    }
-    
-    .list-view-active .book-title {
-        height: auto;
-        -webkit-line-clamp: 2;
-        font-size: 1.1rem;
-    }
-    
-    .list-view-active .book-description {
-        height: 3rem;
-        -webkit-line-clamp: 2;
-        line-height: 1.5;
-    }
-    
-    .list-view-active .book-meta-info {
-        height: auto;
-        white-space: normal;
-    }
-    
     @media (max-width: 768px) {
-        .list-view-active .book-card-container {
-            flex-direction: column;
-            max-height: 400px;
-            min-height: 400px;
-        }
-        
-        .list-view-active .book-image-container {
-            width: 100%;
-            height: 220px;
-        }
-        
-        .list-view-active .book-content-container {
-            width: 100%;
-            height: calc(400px - 220px);
+        .books-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         }
     }
-
-    /* Additional Dark Mode Fixes */
-    .dark .search-bar-input {
-        background-color: #1f2937;
-        color: #f9fafb;
-        border-color: #374151;
-    }
     
-    .dark .search-bar-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    }
-
-    .dark select {
-        background-color: #1f2937;
-        color: #f9fafb;
-        border-color: #374151;
-    }
-    
-    .dark select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    }
-
-    /* Fix for images in dark mode */
-    .dark .book-image-container {
-        background-color: #111827;
-    }
-
-    /* Fix for active state in dark mode */
-    .dark .filter-item.active {
-        background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    }
-
-    /* Fix for pagination in dark mode */
-    .dark .pagination-item {
-        color: #d1d5db;
-    }
-
-    .dark .pagination-item:hover {
-        background-color: #374151;
-    }
-
-    /* Statistics counters */
-    .stat-count {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    /* Main Content Wrapper - نفس تصميم الكاتيجوري */
-    .main-content-wrapper {
-        background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
-        min-height: calc(100vh - 80px);
-    }
-    
-    .dark .main-content-wrapper {
-        background: linear-gradient(to bottom, #111827 0%, #1f2937 100%);
-    }
-
-    /* Container styling */
-    .content-container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    /* Book card styling to match category page */
-    .book-card-hover {
-        background: white;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-    
-    .dark .book-card-hover {
-        background: #1f2937;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Button styling to match category page */
-    .action-button {
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    /* Header styling */
-    .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 5rem 0;
-        margin-bottom: 3rem;
-    }
-    
-    .dark .page-header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    @media (max-width: 640px) {
+        .books-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="main-content-wrapper transition-colors duration-300">
-    <!-- Page Header - نفس تصميم هيدر الكاتيجوري -->
-    <div class="page-header text-white relative overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-10 right-10 w-72 h-72 bg-white rounded-full"></div>
-            <div class="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full"></div>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+    <!-- رأس الصفحة -->
+    <div class="books-header relative overflow-hidden">
+        <!-- موجات متحركة -->
+        <div class="wave-container">
+            <div class="wave"></div>
+            <div class="wave" style="animation-delay: -5s; opacity: 0.7;"></div>
+            <div class="wave" style="animation-delay: -10s; opacity: 0.5;"></div>
         </div>
         
-        <div class="relative z-10">
-            <div class="content-container px-4 md:px-6">
-                <div class="max-w-3xl mx-auto text-center">
-                    <div class="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse ml-2"></span>
-                        <span class="font-medium text-sm">
-                            {{ page_obj.paginator.count|default:"0" }} كتاب متاح
-                        </span>
+        <!-- عناصر عائمة -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-20 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/3 right-1/3 w-40 h-40 bg-pink-500/5 rounded-full blur-2xl"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-20 md:py-24 relative">
+            <div class="max-w-6xl mx-auto text-center">
+                <!-- مسار التنقل -->
+                <div class="flex items-center justify-center mb-6">
+                    <a href="{% url 'home' %}" class="text-white/80 hover:text-white transition-colors">
+                        <i class="fas fa-home"></i>
+                    </a>
+                    <i class="fas fa-chevron-left mx-3 text-white/60"></i>
+                    <span class="text-white font-medium">جميع الكتب</span>
+                </div>
+                
+                <!-- العنوان الرئيسي -->
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                    <span class="block">اكتشف الكتب</span>
+                    <span class="text-3xl md:text-4xl font-normal opacity-90">آلاف الكتب في متناول يدك</span>
+                </h1>
+                
+                <!-- الوصف -->
+                <p class="text-xl text-white/90 mb-10 max-w-3xl mx-auto">
+                    استكشف عالم المعرفة من خلال مكتبتنا الشاملة. كل كتاب هنا هو بوابة لعالم جديد من المعرفة والإلهام.
+                </p>
+                
+                <!-- إحصائيات -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <div class="stats-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center transform transition-all duration-300 hover:scale-105">
+                        <div class="text-3xl font-bold text-white mb-2 stats-counter" data-count="{{ page_obj.paginator.count|default:'0' }}">0</div>
+                        <div class="text-white/80">كتاب</div>
                     </div>
-                    
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                        <span class="block mb-2">اكتشف عالم</span>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">
-                            الكتب والمعرفة
-                        </span>
-                    </h1>
-                    
-                    <p class="text-lg md:text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-                        تصفح آلاف الكتب في مختلف المجالات. اقرأ، استمتع، وتعلم معنا في رحلة معرفية لا تنتهي.
-                    </p>
-                    
-                    <!-- Search Bar - نفس تصميم الكاتيجوري -->
-                    <div class="search-bar-wrapper">
-                        <form method="GET" action="{% url 'book_list' %}" class="relative">
-                            <div class="relative">
-                                <input type="text" 
-                                       name="q" 
-                                       value="{{ request.GET.q }}" 
-                                       placeholder="ابحث عن كتاب، مؤلف، أو موضوع..."
-                                       class="search-bar-input w-full p-4 pr-14 text-gray-800 dark:text-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-0">
-                                <button type="submit" 
-                                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
-                                    <i class="fas fa-search text-xl"></i>
-                                </button>
-                            </div>
-                        </form>
+                    <div class="stats-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center transform transition-all duration-300 hover:scale-105">
+                        <div class="text-3xl font-bold text-white mb-2 stats-counter" data-count="{{ categories.count|default:'0' }}">0</div>
+                        <div class="text-white/80">فئة</div>
                     </div>
-                    
-                    <!-- Quick Categories - نفس تصميم الكاتيجوري -->
-                    <div class="flex flex-wrap justify-center gap-2 mt-8">
-                        <a href="{% url 'book_list' %}" 
-                           class="category-chip {% if not current_category %}active{% endif %}">
-                            الكل
-                            <span class="text-xs bg-white/20 px-2 py-1 rounded-full mr-2">
-                                {{ page_obj.paginator.count|default:"0" }}
-                            </span>
+                    <div class="stats-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center transform transition-all duration-300 hover:scale-105">
+                        {% with authors=books.values_list %}
+                        <div class="text-3xl font-bold text-white mb-2 stats-counter" data-count="{{ authors|length|default:'0' }}">0</div>
+                        {% endwith %}
+                        <div class="text-white/80">مؤلف</div>
+                    </div>
+                    <div class="stats-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center transform transition-all duration-300 hover:scale-105">
+                        <div class="text-3xl font-bold text-white mb-2">∞</div>
+                        <div class="text-white/80">معرفة</div>
+                    </div>
+                </div>
+                
+                <!-- شريط البحث -->
+                <div class="max-w-2xl mx-auto mb-8">
+                    <form method="GET" action="{% url 'book_list' %}" class="relative">
+                        <input type="text" 
+                               name="q" 
+                               value="{{ request.GET.q }}"
+                               placeholder="ابحث عن كتاب، مؤلف، أو موضوع..." 
+                               class="search-input w-full px-6 py-4 pr-12 rounded-2xl shadow-lg focus:outline-none bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+                        <button type="submit" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        {% if request.GET.q %}
+                        <a href="{% url 'book_list' %}" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors">
+                            <i class="fas fa-times"></i>
                         </a>
-                        {% for category in categories|slice:":6" %}
-                        <a href="{% url 'book_list' %}?category={{ category.slug }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-                           class="category-chip {% if current_category.slug == category.slug %}active{% endif %}">
-                            {{ category.name }}
-                            <span class="text-xs bg-white/20 px-2 py-1 rounded-full mr-2">
-                                {{ category.book_set.count|default:"0" }}
-                            </span>
-                        </a>
-                        {% endfor %}
-                    </div>
+                        {% endif %}
+                    </form>
+                </div>
+                
+                <!-- الفئات السريعة -->
+                <div class="flex flex-wrap justify-center gap-2">
+                    <a href="{% url 'book_list' %}" 
+                       class="category-chip {% if not current_category %}active{% endif %}">
+                        الكل
+                        <span class="text-xs bg-white/20 px-2 py-1 rounded-full mr-2">
+                            {{ page_obj.paginator.count|default:"0" }}
+                        </span>
+                    </a>
+                    {% for category in categories|slice:":6" %}
+                    <a href="{% url 'book_list' %}?category={{ category.slug }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                       class="category-chip {% if current_category.slug == category.slug %}active{% endif %}">
+                        {{ category.name }}
+                        <span class="text-xs bg-white/20 px-2 py-1 rounded-full mr-2">
+                            {{ category.book_set.count|default:"0" }}
+                        </span>
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="content-container px-4 md:px-6 py-8">
+    <!-- المحتوى الرئيسي -->
+    <div class="container mx-auto px-4 py-8 -mt-12 relative z-10">
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Filter Sidebar - نفس تصميم الكاتيجوري -->
+            <!-- شريط التصفية الجانبي -->
             <div class="lg:w-1/4">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6 sticky top-24 sidebar-filters">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">تصفية النتائج</h3>
-                        {% if current_category or request.GET.price or request.GET.language or request.GET.q %}
-                        <a href="{% url 'book_list' %}" 
-                           class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                            <i class="fas fa-times ml-1"></i> إزالة الكل
-                        </a>
-                        {% endif %}
-                    </div>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sidebar-filters sticky top-6">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+                        <i class="fas fa-filter ml-2 text-blue-500"></i>
+                        تصفية النتائج
+                    </h3>
                     
-                    <!-- Categories Filter -->
+                    <!-- تصفية التصنيفات -->
                     <div class="filter-section">
                         <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center">
                             <i class="fas fa-folder ml-2 text-blue-500"></i>
@@ -597,7 +489,7 @@
                         </div>
                     </div>
                     
-                    <!-- Price Filter -->
+                    <!-- تصفية السعر -->
                     <div class="filter-section">
                         <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center">
                             <i class="fas fa-tag ml-2 text-green-500"></i>
@@ -613,9 +505,6 @@
                                class="filter-item {% if request.GET.price == 'free' %}active{% endif %}">
                                 <i class="fas fa-gift ml-2 text-green-500"></i>
                                 مجاني فقط
-                                <span class="mr-auto text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
-                                    {{ free_books_count|default:"0" }}
-                                </span>
                             </a>
                             <a href="{% url 'book_list' %}?price=paid{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if current_category %}&category={{ current_category.slug }}{% endif %}" 
                                class="filter-item {% if request.GET.price == 'paid' %}active{% endif %}">
@@ -625,7 +514,8 @@
                         </div>
                     </div>
                     
-                    <!-- Language Filter -->
+                    <!-- تصفية اللغة -->
+                    {% if languages %}
                     <div class="filter-section">
                         <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center">
                             <i class="fas fa-language ml-2 text-purple-500"></i>
@@ -646,30 +536,14 @@
                             {% endfor %}
                         </div>
                     </div>
-                    
-                    <!-- Sort Options -->
-                    <div class="filter-section">
-                        <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-4 flex items-center">
-                            <i class="fas fa-sort-amount-down ml-2 text-yellow-500"></i>
-                            الترتيب
-                        </h4>
-                        <select class="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                            <option value="newest">الأحدث أولاً</option>
-                            <option value="popular">الأكثر شعبية</option>
-                            <option value="rating">الأعلى تقييماً</option>
-                            <option value="price_low">الأقل سعراً</option>
-                            <option value="price_high">الأعلى سعراً</option>
-                        </select>
-                    </div>
+                    {% endif %}
                 </div>
-                
-  
             </div>
             
-            <!-- Main Books Content -->
+            <!-- محتوى الكتب -->
             <div class="lg:w-3/4">
-                <!-- Results Header - نفس تصميم الكاتيجوري -->
-                <div class="mb-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+                <!-- رأس النتائج -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">
@@ -682,33 +556,33 @@
                                 {% endif %}
                             </h2>
                             <p class="text-gray-600 dark:text-gray-400">
-                                عرض <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.start_index|default:"1" }}</span> 
-                                - <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.end_index|default:"1" }}</span> 
-                                من <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.paginator.count|default:"1" }}</span> كتاب
+                                عرض <span class="font-bold text-blue-600 dark:text-blue-400">{{ books.start_index|default:"1" }}</span> 
+                                - <span class="font-bold text-blue-600 dark:text-blue-400">{{ books.end_index|default:"1" }}</span> 
+                                من <span class="font-bold text-blue-600 dark:text-blue-400">{{ books.paginator.count|default:"1" }}</span> كتاب
                             </p>
                         </div>
                         
                         <div class="flex items-center gap-3">
-                            <!-- View Toggle -->
+                            <!-- تباديل العرض -->
                             <div class="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-                                <button id="grid-view-btn" class="view-toggle-btn grid-view active bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                <button id="grid-view-btn" class="p-2 px-3 bg-blue-500 text-white">
                                     <i class="fas fa-th-large"></i>
                                 </button>
-                                <button id="list-view-btn" class="view-toggle-btn list-view text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <button id="list-view-btn" class="p-2 px-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
                                     <i class="fas fa-list"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Active Filters -->
+                    <!-- الفلاتر النشطة -->
                     {% if current_category or request.GET.price or request.GET.language %}
                     <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-gray-700 dark:text-gray-300">الفلاتر النشطة:</span>
                             
                             {% if current_category %}
-                            <span class="active-filter-tag bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
                                 {{ current_category.name }}
                                 <a href="{% url 'book_list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}{% if request.GET.price %}&price={{ request.GET.price }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}" 
                                    class="mr-2 hover:text-blue-900 dark:hover:text-blue-100">
@@ -718,7 +592,7 @@
                             {% endif %}
                             
                             {% if request.GET.price %}
-                            <span class="active-filter-tag bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
                                 {% if request.GET.price == 'free' %}مجاني{% else %}مدفوع{% endif %}
                                 <a href="{% url 'book_list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}{% if current_category %}&category={{ current_category.slug }}{% endif %}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}" 
                                    class="mr-2 hover:text-green-900 dark:hover:text-green-100">
@@ -728,7 +602,7 @@
                             {% endif %}
                             
                             {% if request.GET.language %}
-                            <span class="active-filter-tag bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+                            <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm">
                                 {{ request.GET.language }}
                                 <a href="{% url 'book_list' %}{% if request.GET.q %}?q={{ request.GET.q }}{% endif %}{% if current_category %}&category={{ current_category.slug }}{% endif %}{% if request.GET.price %}&price={{ request.GET.price }}{% endif %}" 
                                    class="mr-2 hover:text-purple-900 dark:hover:text-purple-100">
@@ -736,34 +610,29 @@
                                 </a>
                             </span>
                             {% endif %}
-                            
-                            <a href="{% url 'book_list' %}" 
-                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium flex items-center">
-                                <i class="fas fa-times ml-1"></i> إزالة الكل
-                            </a>
                         </div>
                     </div>
                     {% endif %}
                 </div>
                 
-                <!-- Books Grid - نفس تصميم كروت الكاتيجوري -->
+                <!-- شبكة الكتب -->
                 <div id="books-container" class="books-grid">
                     {% for book in books %}
-                    <div class="book-card-container book-card-hover bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col">
-                        <!-- Book Image -->
-                        <div class="book-image-container relative overflow-hidden bg-gray-100 dark:bg-gray-900">
+                    <div class="book-card shadow-lg fade-in-up">
+                        <!-- صورة الكتاب -->
+                        <div class="book-image-container relative">
                             {% if book.cover_image %}
                             <img src="{{ book.cover_image.url }}" 
                                  alt="{{ book.title }}" 
-                                 class="book-image-zoom w-full h-full object-cover">
+                                 class="book-image">
                             {% else %}
-                            <div class="book-image-fallback">
-                                <i class="fas fa-book-open text-5xl text-white"></i>
+                            <div class="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 flex items-center justify-center">
+                                <i class="fas fa-book-open text-5xl text-blue-500"></i>
                             </div>
                             {% endif %}
                             
-                            <!-- Badges -->
-                            <div class="absolute top-0 right-0 flex flex-col gap-2 p-3">
+                            <!-- شارات -->
+                            <div class="absolute top-3 right-3 flex flex-col gap-2">
                                 {% if book.is_free %}
                                 <span class="book-badge badge-free">
                                     مجاني
@@ -776,7 +645,7 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Rating -->
+                            <!-- التقييم -->
                             <div class="rating-stars">
                                 <div class="flex items-center">
                                     {% with avg_rating=book.average_rating|default:0 %}
@@ -795,9 +664,9 @@
                             </div>
                         </div>
                         
-                        <!-- Book Content -->
-                        <div class="book-content-container p-6">
-                            <!-- Category -->
+                        <!-- محتوى الكتاب -->
+                        <div class="book-content-container">
+                            <!-- الفئة -->
                             <div class="mb-3">
                                 <span class="inline-flex items-center bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-medium">
                                     <i class="fas fa-bookmark text-xs ml-1"></i>
@@ -805,23 +674,25 @@
                                 </span>
                             </div>
                             
-                            <!-- Title -->
-                            <h3 class="book-title text-xl font-bold text-gray-800 dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                <a href="{% url 'book_detail' book.slug %}">{{ book.title }}</a>
+                            <!-- العنوان -->
+                            <h3 class="book-title text-lg font-bold text-gray-800 dark:text-white mb-2">
+                                <a href="{% url 'book_detail' book.slug %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                    {{ book.title }}
+                                </a>
                             </h3>
                             
-                            <!-- Author -->
-                            <p class="book-meta-info text-gray-600 dark:text-gray-400 mb-3">
+                            <!-- المؤلف -->
+                            <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm">
                                 <i class="fas fa-user-pen ml-1"></i>
                                 {{ book.author|truncatechars:30 }}
                             </p>
                             
-                            <!-- Description -->
+                            <!-- الوصف -->
                             <p class="book-description text-gray-600 dark:text-gray-300 text-sm mb-4">
                                 {{ book.description|truncatechars:120 }}
                             </p>
                             
-                            <!-- Additional Info -->
+                            <!-- معلومات إضافية -->
                             <div class="grid grid-cols-3 gap-2 text-xs text-gray-500 dark:text-gray-400 mb-6">
                                 <div class="flex items-center justify-center">
                                     <i class="fas fa-calendar ml-1"></i>
@@ -837,10 +708,10 @@
                                 </div>
                             </div>
                             
-                            <!-- Actions - نفس أزرار الكاتيجوري -->
+                            <!-- الأزرار -->
                             <div class="mt-auto flex justify-between items-center">
                                 <a href="{% url 'book_detail' book.slug %}" 
-                                   class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-xl text-sm transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg flex items-center action-button">
+                                   class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2.5 px-5 rounded-xl text-sm transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg flex items-center">
                                     <i class="fas fa-eye ml-2"></i>
                                     التفاصيل
                                 </a>
@@ -864,10 +735,10 @@
                         </div>
                     </div>
                     {% empty %}
-                    <!-- Empty State - نفس تصميم الكاتيجوري -->
+                    <!-- حالة فارغة -->
                     <div class="col-span-full">
-                        <div class="empty-state bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 text-center">
-                            <div class="w-32 h-32 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <div class="empty-state">
+                            <div class="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mx-auto mb-8">
                                 <i class="fas fa-search text-5xl text-gray-400 dark:text-gray-500"></i>
                             </div>
                             <h3 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">
@@ -881,7 +752,7 @@
                                 {% if request.GET.q %}
                                 لم نتمكن من العثور على كتب تطابق "{{ request.GET.q }}". حاول البحث بكلمات مختلفة.
                                 {% else %}
-                                لا توجد كتب متاحة حالياً في هذا التصنيف. الرجاء المحاولة لاحقاً.
+                                لا توجد كتب متاحة حالياً. الرجاء المحاولة لاحقاً.
                                 {% endif %}
                             </p>
                             <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -900,71 +771,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                
-                <!-- Pagination - نفس تصميم الكاتيجوري -->
-                {% if page_obj.paginator.num_pages > 1 %}
-                    <div class="mt-12">
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                                <div class="text-gray-600 dark:text-gray-400">
-                                    عرض <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.start_index|default:"1" }}</span> 
-                                    - <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.end_index|default:"1" }}</span> 
-                                    من <span class="font-bold text-blue-600 dark:text-blue-400">{{ page_obj.paginator.count|default:"1" }}</span> كتاب
-                                </div>
-                                
-                                <div class="flex items-center gap-2">
-                                    {% if page_obj.has_previous %}
-                                    <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                                    class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <i class="fas fa-chevron-right ml-2"></i> السابق
-                                    </a>
-                                    {% endif %}
-                                    
-                                    <div class="flex items-center gap-1">
-                                        {% for num in page_obj.paginator.page_range %}
-                                            {% if num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                                {% if page_obj.number == num %}
-                                                <span class="pagination-item bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
-                                                    {{ num }}
-                                                </span>
-                                                {% else %}
-                                                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                                                class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                    {{ num }}
-                                                </a>
-                                                {% endif %}
-                                            {% elif num == 1 or num == page_obj.paginator.num_pages %}
-                                                {% if page_obj.number == num %}
-                                                <span class="pagination-item bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
-                                                    {{ num }}
-                                                </span>
-                                                {% else %}
-                                                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                                                class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                    {{ num }}
-                                                </a>
-                                                {% endif %}
-                                            {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
-                                                <span class="pagination-item text-gray-500 dark:text-gray-400">
-                                                    ...
-                                                </span>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                    
-                                    {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
-                                    class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        التالي <i class="fas fa-chevron-left ml-2"></i>
-                                    </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-
-            <!-- Featured Books Section -->
+                            <!-- Featured Books Section -->
                 {% if not request.GET.q and not request.GET.category %}
                 <div class="mt-16">
                     <div class="mb-8">
@@ -1025,120 +832,158 @@
                     </div>
                 </div>
                 {% endif %}
+                <!-- الترقيم -->
+                {% if books.paginator.num_pages > 1 %}
+                <div class="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-gray-600 dark:text-gray-400">
+                            صفحة <span class="font-bold text-blue-600 dark:text-blue-400">{{ books.number }}</span> 
+                            من <span class="font-bold text-blue-600 dark:text-blue-400">{{ books.paginator.num_pages }}</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            {% if books.has_previous %}
+                            <a href="?page={{ books.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <i class="fas fa-chevron-right ml-2"></i> السابق
+                            </a>
+                            {% endif %}
+                            
+                            {% for num in books.paginator.page_range %}
+                                {% if num > books.number|add:'-3' and num < books.number|add:'3' %}
+                                    {% if books.number == num %}
+                                    <span class="pagination-item bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
+                                        {{ num }}
+                                    </span>
+                                    {% else %}
+                                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                       class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        {{ num }}
+                                    </a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if books.has_next %}
+                            <a href="?page={{ books.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="pagination-item border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                التالي <i class="fas fa-chevron-left ml-2"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
-    // View Toggle Functionality
     document.addEventListener('DOMContentLoaded', function() {
+        // تأثيرات GSAP
+        if (typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // تأثيرات الظهور
+            const fadeElements = document.querySelectorAll('.fade-in-up');
+            fadeElements.forEach((el, index) => {
+                gsap.from(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.8,
+                    delay: index * 0.1,
+                    ease: 'power3.out'
+                });
+            });
+            
+            // عدادات الإحصائيات
+            const statCounters = document.querySelectorAll('.stats-counter');
+            statCounters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-count')) || 0;
+                gsap.to(counter, {
+                    innerText: target,
+                    duration: 2,
+                    snap: { innerText: 1 },
+                    scrollTrigger: {
+                        trigger: counter,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    },
+                    ease: 'power2.out'
+                });
+            });
+            
+            // تأثيرات الموجات
+            const waves = document.querySelectorAll('.wave');
+            waves.forEach((wave, index) => {
+                gsap.to(wave, {
+                    backgroundPositionX: '1440px',
+                    duration: 20 + (index * 5),
+                    repeat: -1,
+                    ease: 'none'
+                });
+            });
+        }
+        
+        // تبديل العرض بين الشبكة والقائمة
         const gridViewBtn = document.getElementById('grid-view-btn');
         const listViewBtn = document.getElementById('list-view-btn');
         const booksContainer = document.getElementById('books-container');
         
-        function switchToGridView() {
-            if (!booksContainer) return;
-            
-            // Remove list view classes
-            booksContainer.classList.remove('list-view-active');
-            booksContainer.classList.add('books-grid');
-            
-            // Update button states
-            if (gridViewBtn) gridViewBtn.classList.add('active');
-            if (listViewBtn) listViewBtn.classList.remove('active');
-            
-            // Reset all book cards to grid layout
-            const bookCards = booksContainer.querySelectorAll('.book-card-container');
-            bookCards.forEach(card => {
-                card.style.flexDirection = 'column';
-                card.style.maxHeight = '500px';
-                card.style.minHeight = '400px';
-                
-                const imageContainer = card.querySelector('.book-image-container');
-                if (imageContainer) {
-                    imageContainer.style.width = '100%';
-                    imageContainer.style.height = '220px';
-                }
-                
-                const contentContainer = card.querySelector('.book-content-container');
-                if (contentContainer) {
-                    contentContainer.style.width = '100%';
-                    contentContainer.style.height = 'calc(100% - 220px)';
-                }
-            });
-        }
-        
-        function switchToListView() {
-            if (!booksContainer) return;
-            
-            // Add list view classes
-            booksContainer.classList.remove('books-grid');
-            booksContainer.classList.add('list-view-active');
-            
-            // Update button states
-            if (listViewBtn) listViewBtn.classList.add('active');
-            if (gridViewBtn) gridViewBtn.classList.remove('active');
-            
-            // Adjust all book cards to list layout
-            const bookCards = booksContainer.querySelectorAll('.book-card-container');
-            bookCards.forEach(card => {
-                card.style.flexDirection = 'row';
-                card.style.maxHeight = '200px';
-                card.style.minHeight = '200px';
-                
-                const imageContainer = card.querySelector('.book-image-container');
-                if (imageContainer) {
-                    imageContainer.style.width = '150px';
-                    imageContainer.style.height = '200px';
-                }
-                
-                const contentContainer = card.querySelector('.book-content-container');
-                if (contentContainer) {
-                    contentContainer.style.width = 'calc(100% - 150px)';
-                    contentContainer.style.height = '200px';
-                }
-            });
-        }
-        
         if (gridViewBtn && listViewBtn && booksContainer) {
-            gridViewBtn.addEventListener('click', function() {
-                if (!this.classList.contains('active')) {
-                    switchToGridView();
-                }
-            });
+            function switchToGridView() {
+                booksContainer.classList.remove('list-view-active');
+                booksContainer.classList.add('books-grid');
+                gridViewBtn.classList.add('bg-blue-500', 'text-white');
+                gridViewBtn.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                listViewBtn.classList.remove('bg-blue-500', 'text-white');
+                listViewBtn.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+            }
             
-            listViewBtn.addEventListener('click', function() {
-                if (!this.classList.contains('active')) {
-                    switchToListView();
-                }
-            });
+            function switchToListView() {
+                booksContainer.classList.remove('books-grid');
+                booksContainer.classList.add('list-view-active');
+                listViewBtn.classList.add('bg-blue-500', 'text-white');
+                listViewBtn.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                gridViewBtn.classList.remove('bg-blue-500', 'text-white');
+                gridViewBtn.classList.add('bg-gray-100', 'dark:bg-gray-700', 'text-gray-600', 'dark:text-gray-400');
+            }
+            
+            gridViewBtn.addEventListener('click', switchToGridView);
+            listViewBtn.addEventListener('click', switchToListView);
         }
         
-        // Bookmark Functionality
+        // وظيفة الإشارة المرجعية
         const bookmarkBtns = document.querySelectorAll('.bookmark-btn');
         bookmarkBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 const bookId = this.getAttribute('data-book-id');
                 const icon = this.querySelector('i');
                 
-                // Toggle bookmark state
+                // تبديل حالة الإشارة المرجعية
                 const isBookmarked = icon.classList.contains('text-yellow-500');
                 
                 if (isBookmarked) {
-                    // Remove bookmark
+                    // إزالة الإشارة المرجعية
                     icon.classList.remove('text-yellow-500');
                     this.classList.remove('bg-yellow-50', 'dark:bg-yellow-900/20');
                     this.classList.add('text-gray-400');
                 } else {
-                    // Add bookmark
+                    // إضافة الإشارة المرجعية
                     icon.classList.add('text-yellow-500');
                     this.classList.remove('text-gray-400');
                     this.classList.add('bg-yellow-50', 'dark:bg-yellow-900/20');
                 }
                 
-                // Send AJAX request
+                // إرسال طلب AJAX
                 fetch(`/books/${bookId}/bookmark/`, {
                     method: 'POST',
                     headers: {
@@ -1150,7 +995,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Show notification
+                        // إظهار إشعار
                         showNotification(
                             !isBookmarked ? 'تم إضافة الكتاب إلى المفضلة' : 'تم إزالة الكتاب من المفضلة',
                             'success'
@@ -1164,27 +1009,18 @@
             });
         });
         
-        // Download Button Animation
+        // وظيفة التحميل
         const downloadBtns = document.querySelectorAll('.download-btn');
         downloadBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Show downloading animation
-                const icon = this.querySelector('i');
-                const originalIcon = icon.className;
-                icon.className = 'fas fa-spinner fa-spin';
-                
-                setTimeout(() => {
-                    icon.className = originalIcon;
-                    this.classList.add('text-green-500');
-                    this.classList.add('bg-green-50', 'dark:bg-green-900/20');
-                    showNotification('جاري تحميل الكتاب...', 'info');
-                }, 1000);
+                // إظهار رسالة التحميل
+                showNotification('جاري تحميل الكتاب...', 'info');
             });
         });
         
-        // Notification function
+        // وظيفة إظهار الإشعارات
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `fixed top-24 right-4 ${
@@ -1200,12 +1036,12 @@
             `;
             document.body.appendChild(notification);
             
-            // Animate in
+            // تحريك الإشعار للداخل
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
             }, 10);
             
-            // Remove after 3 seconds
+            // إزالة الإشعار بعد 3 ثواني
             setTimeout(() => {
                 notification.style.transform = 'translateX(400px)';
                 setTimeout(() => {
@@ -1214,11 +1050,13 @@
             }, 3000);
         }
         
-        // Filter items hover effect
+        // تأثيرات العناصر عند المرور عليها
         const filterItems = document.querySelectorAll('.filter-item');
         filterItems.forEach(item => {
             item.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateX(5px)';
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateX(5px)';
+                }
             });
             
             item.addEventListener('mouseleave', function() {
@@ -1226,11 +1064,13 @@
             });
         });
         
-        // Category chips hover effect
+        // تأثيرات بطاقات الفئات
         const categoryChips = document.querySelectorAll('.category-chip');
         categoryChips.forEach(chip => {
             chip.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-3px)';
+                if (!this.classList.contains('active')) {
+                    this.style.transform = 'translateY(-3px)';
+                }
             });
             
             chip.addEventListener('mouseleave', function() {
@@ -1238,35 +1078,23 @@
             });
         });
         
-        // Book cards hover effect
-        const bookCards = document.querySelectorAll('.book-card-hover');
+        // تأثيرات بطاقات الكتب
+        const bookCards = document.querySelectorAll('.book-card');
         bookCards.forEach(card => {
             card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-4px)';
-                const image = this.querySelector('.book-image-zoom');
+                const image = this.querySelector('.book-image');
                 if (image) {
-                    image.style.transform = 'scale(1.05)';
+                    image.style.transform = 'scale(1.1)';
                 }
             });
             
             card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-                const image = this.querySelector('.book-image-zoom');
+                const image = this.querySelector('.book-image');
                 if (image) {
                     image.style.transform = 'scale(1)';
                 }
             });
         });
-        
-        // Format numbers
-        document.querySelectorAll('.font-bold.text-blue-600, .font-bold.text-blue-400').forEach(el => {
-            const text = el.textContent;
-            const num = parseInt(text.replace(/,/g, ''));
-            if (!isNaN(num)) {
-                el.textContent = num.toLocaleString();
-            }
-        });
     });
 </script>
-{% endblock %}
 {% endblock %}

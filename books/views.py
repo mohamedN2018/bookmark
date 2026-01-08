@@ -18,11 +18,16 @@ from django.utils import timezone
 from django.db import models
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+import os
+import csv
 
 def home(request):
+    count_book = Book.objects.count()
+    count_book_cat = Category.objects.count()
+
     # الكتب المميزة
     featured_books = Book.objects.filter(is_featured=True)[:8]
-    
+    categories = Category.objects.all()
     # أحدث الكتب
     latest_books = Book.objects.all().order_by('-created_at')[:8]
     
@@ -35,6 +40,9 @@ def home(request):
         'featured_books': featured_books,
         'latest_books': latest_books,
         'top_rated_books': top_rated_books,
+        'categories': categories,
+        'count_book': count_book,
+        'count_book_cat': count_book_cat,
     }
     return render(request, 'home.html', context)
 
@@ -141,6 +149,57 @@ def book_detail(request, slug):
     return render(request, 'books/detail.html', context)
 
 
+def categories_list(request):
+    """عرض جميع الفئات مع إحصائياتها"""
+    # الحصول على جميع الفئات
+    categories = Category.objects.annotate(
+        books_count=Count('books'),
+        avg_rating=Avg('books__reviews__rating'),
+        authors_count=Count('books__author', distinct=True)
+    ).order_by('-books_count')
+    
+    # categories = Category.objects.annotate(
+    #     books_count=Count('books')
+    # )
+
+    # max_books = max(
+    #     [cat.books_count for cat in categories],
+    #     default=1
+    # )
+
+    # for category in categories:
+    #     category.popularity = int((category.books_count / max_books) * 100)
+
+    # الفئات الرئيسية (التي ليس لها أب)
+    # main_categories = categories.filter(parent__isnull=True)
+    
+    # إحصائيات عامة
+    total_books = Book.objects.count()
+    total_categories = Category.objects.count()
+    total_authors = Book.objects.values('author').distinct().count()
+    
+    # الفئات الأكثر شيوعاً (الأعلى عدد كتب)
+    popular_categories = categories[:8]
+    
+    # الفئات التي بها كتب جديدة
+    recent_categories = Category.objects.filter(
+        books__created_at__gte=timezone.now() - timedelta(days=30)
+    ).annotate(
+        recent_books=Count('books', filter=Q(books__created_at__gte=timezone.now() - timedelta(days=30)))
+    ).distinct().order_by('-recent_books')[:6]
+    
+    context = {
+        'categories': categories,
+        # 'main_categories': main_categories,
+        'popular_categories': popular_categories,
+        'recent_categories': recent_categories,
+        'total_books': total_books,
+        'total_categories': total_categories,
+        'total_authors': total_authors,
+    }
+    
+    return render(request, 'books/categories_list.html', context)
+
 @login_required
 def add_review(request, book_id):
     book = get_object_or_404(Book, id=book_id)
@@ -199,11 +258,8 @@ def books_by_category(request, slug):
 @login_required
 def dashboard(request):
     user = request.user
-    
     # إحصائيات عامة للمستخدم
     bookmarks_count = Bookmark.objects.filter(user=user).count()
-    
-
 
     # حساب وقت القراءة الكلي
     total_reading_time = ReadingHistory.objects.filter(
@@ -302,7 +358,6 @@ def dashboard(request):
         })
     
     return render(request, 'dashboard/index.html', context)
-
 
 # إضافة نموذج UserActivity إذا لم يكن موجوداً
 class UserActivity(models.Model):
