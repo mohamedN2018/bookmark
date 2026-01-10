@@ -60,12 +60,6 @@
                         'pulse-slow': 'pulse 3s infinite',
                         'float': 'float 6s ease-in-out infinite',
                         'shimmer': 'shimmer 2s infinite',
-                        'float1': 'float1 20s infinite',
-                        'float2': 'float2 25s infinite',
-                        'float3': 'float3 30s infinite',
-                        'spin-slow': 'spin 3s linear infinite',
-                        'wave': 'wave 1.5s ease-in-out infinite',
-                        'bounce-in': 'bounceIn 0.6s ease-out',
                     },
                     keyframes: {
                         fadeIn: {
@@ -87,52 +81,28 @@
                         shimmer: {
                             '0%': { backgroundPosition: '-1000px 0' },
                             '100%': { backgroundPosition: '1000px 0' }
-                        },
-                        float1: {
-                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '33%': { transform: 'translate(30px, -50px) rotate(120deg)' },
-                            '66%': { transform: 'translate(-20px, 20px) rotate(240deg)' }
-                        },
-                        float2: {
-                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '33%': { transform: 'translate(-40px, 30px) rotate(120deg)' },
-                            '66%': { transform: 'translate(30px, -40px) rotate(240deg)' }
-                        },
-                        float3: {
-                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '33%': { transform: 'translate(50px, -20px) rotate(120deg)' },
-                            '66%': { transform: 'translate(-30px, 40px) rotate(240deg)' }
-                        },
-                        bounceIn: {
-                            '0%': { transform: 'scale(0.3)', opacity: '0' },
-                            '50%': { transform: 'scale(1.05)' },
-                            '70%': { transform: 'scale(0.9)' },
-                            '100%': { transform: 'scale(1)', opacity: '1' }
-                        },
-                        wave: {
-                            '0%, 100%': { transform: 'rotate(0deg)' },
-                            '25%': { transform: 'rotate(20deg)' },
-                            '75%': { transform: 'rotate(-15deg)' }
                         }
                     }
                 }
             }
         }
+        
     </script>
     
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/EasePack.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Custom CSS -->
     <style>
         * {
@@ -148,27 +118,14 @@
             animation: fadeIn 0.5s ease-out;
         }
         
-        /* 3D Book Card Effect */
-        .book-card-3d {
+        .book-card {
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            perspective: 1000px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
         }
         
-        .book-card-3d:hover {
-            transform: translateY(-15px) rotateX(5deg) rotateY(-5deg) scale(1.05);
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                0 0 30px rgba(59, 130, 246, 0.3);
-        }
-        
-        .book-card-3d .book-cover {
-            transform: translateZ(20px);
-        }
-        
-        .book-card-3d::before {
+        .book-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -179,20 +136,59 @@
             transform: scaleX(0);
             transform-origin: right;
             transition: transform 0.4s ease;
-            z-index: 10;
         }
         
-        .book-card-3d:hover::before {
+        .book-card:hover::before {
             transform: scaleX(1);
             transform-origin: left;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .dark .book-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .dashboard-card {
+            transform: translateY(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dashboard-card:hover::after {
+            opacity: 1;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .animate-on-scroll {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
         }
         
         /* Glassmorphism Effect */
         .glass-effect {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
         .dark .glass-effect {
@@ -265,6 +261,11 @@
             @apply focus:ring-offset-gray-900;
         }
         
+        /* Transition Utilities */
+        .transition-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         /* Gradient Text */
         .gradient-text {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -273,7 +274,29 @@
             background-clip: text;
         }
         
-        /* Floating Elements */
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+
+
+
+
+        
         .floating-element {
             position: absolute;
             border-radius: 50%;
@@ -281,7 +304,6 @@
             opacity: 0.3;
             animation-timing-function: ease-in-out;
             animation-iteration-count: infinite;
-            z-index: -1;
         }
 
         .floating-element:nth-child(1) {
@@ -310,105 +332,56 @@
             left: 80%;
             animation: float3 30s infinite;
         }
-        
-        /* 3D Transformations */
-        .transform-3d {
-            transform-style: preserve-3d;
+    </style>
+    
+    <style>
+                /* في ملف static/css/custom.css */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
+        /* تحسينات للكتب */
+        .book-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        .rotate-y-180 {
-            transform: rotateY(180deg);
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-        
-        .backface-hidden {
-            backface-visibility: hidden;
+
+        /* تأثيرات الصور */
+        .img-zoom {
+            transition: transform 0.5s ease;
         }
-        
-        /* Mobile Menu Specific */
-        .mobile-menu-container {
-            transform-origin: top center;
-            overflow: hidden;
+
+        .img-zoom:hover {
+            transform: scale(1.1);
         }
-        
-        /* Hero Section */
-        .hero-gradient {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+
+        /* تدرج الألوان */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
-        .dark .hero-gradient {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+
+        /* تأثيرات النص */
+        .text-gradient {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
-        /* Book Shelf Effect */
-        .book-shelf {
-            background: linear-gradient(to bottom, #d1d5db, #9ca3af);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .dark .book-shelf {
-            background: linear-gradient(to bottom, #4b5563, #1f2937);
-        }
-        
-        /* Pulse Animation for Notifications */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
-        }
-        
-        .pulse-glow {
-            animation: pulse-glow 2s infinite;
-        }
-        
-        /* Page Turn Effect */
-        .page-turn {
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: left center;
-        }
-        
-        .page-turn:hover {
-            transform: perspective(1000px) rotateY(-15deg) translateX(-10px);
-        }
-        
-        /* Responsive Design Fixes */
+
+        /* تحسينات للهواتف */
         @media (max-width: 640px) {
-            .book-card-3d:hover {
-                transform: translateY(-8px) scale(1.02);
-                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            .book-card {
+                margin-bottom: 1.5rem;
             }
             
-            .glass-effect {
-                backdrop-filter: blur(8px);
-            }
-            
-            .floating-element {
-                filter: blur(30px);
-            }
-            
-            .floating-element:nth-child(1) {
-                width: 200px;
-                height: 200px;
-            }
-            
-            .floating-element:nth-child(2) {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .floating-element:nth-child(3) {
-                width: 100px;
-                height: 100px;
+            .author-avatar {
+                width: 80px;
+                height: 80px;
             }
         }
-        
-        @media (max-width: 768px) {
-            .mobile-menu-slide {
-                transform: translateX(100%);
-            }
-            
-            .mobile-menu-slide.active {
-                transform: translateX(0);
-            }
-        }
+
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -420,38 +393,26 @@
                 <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-pulse"></div>
                 <div class="absolute inset-4 bg-white dark:bg-gray-900 rounded-full"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
-                    <i class="fas fa-book-open text-4xl text-primary-600 dark:text-primary-400 animate-bounce-slow"></i>
+                    <i class="fas fa-book-open text-4xl text-primary-600 dark:text-primary-400"></i>
                 </div>
             </div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2 animate-pulse">مكتبة الكتب</div>
+            <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2">مكتبة الكتب</div>
             <div class="text-gray-600 dark:text-gray-300">جاري التحميل...</div>
         </div>
     </div>
-
-    <!-- خلفية GSAP المتحركة -->
-    <div id="animated-background" class="fixed inset-0 overflow-hidden -z-10">
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-        <div class="floating-element"></div>
-    </div>
-
     <!-- شريط التنقل المحسن -->
-    <nav id="navbar" class="glass-effect fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <nav id="navbar" class="bg-white/90 dark:bg-gray-800/90 shadow-lg fixed top-0 left-0 right-0 z-50 backdrop-blur-md transition-all duration-300">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center">
                 <!-- Logo Section -->
                 <div class="flex items-center space-x-4 space-x-reverse">
-                    <a href="{% url 'home' %}" class="flex items-center space-x-2 space-x-reverse group">
-                        <div class="relative">
-                               <img src="{% static 'images/logo.png' %}" alt="logo web" class="h-12 w-auto group-hover:scale-110 transition-transform">
-
-                        </div>
-                        <div>
-                            <div class="text-2xl font-bold text-primary-600 dark:text-primary-400 gradient-text">مكتبة مصر الرقمية</div>
+                     <a href="{% url 'home' %}" class="flex items-center space-x-2 space-x-reverse group">
+                           <img src="{% static 'images/logo.png' %}" alt="logo web" class="h-12 w-auto group-hover:scale-110 transition-transform">
+                        <div class="-ml-8">
+                            <div class="text-2xl font-bold text-primary-600 dark:text-primary-400"> مكتبة مصر الرقمية </div>
                             <div class="text-xs text-gray-500 dark:text-gray-400 -mt-1">منصة القراءة الرقمية</div>
                         </div>
-                    </a>
-                    
+                    </a> 
                     <!-- Desktop Navigation -->
                     <div class="hidden lg:flex items-center space-x-1 space-x-reverse mr-6">
                         <a href="{% url 'home' %}" 
@@ -465,7 +426,6 @@
                            class="nav-link px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors relative group">
                             <i class="fas fa-book ml-2"></i>
                             الكـتب
-                            <span class="absolute bottom-0 right-1/2 transform translate-x-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-8 transition-all duration-300"></span>
                         </a>
                         
                         <!-- Categories Dropdown -->
@@ -473,9 +433,9 @@
                             <button class="flex items-center px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
                                 <i class="fas fa-th-large ml-2"></i>
                                 التصنيفات
-                                <i class="fas fa-chevron-down mr-2 text-xs transition-transform group-hover:rotate-180"></i>
+                                <i class="fas fa-chevron-down mr-2 text-xs"></i>
                             </button>
-                            <div class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect">
+                            <div class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                                 <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
                                     <span class="text-sm font-bold text-gray-800 dark:text-white">جميع التصنيفات</span>
                                 </div>
@@ -500,46 +460,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- 3D Features Menu -->
-                        <div class="relative group">
-                            <button class="flex items-center px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
-                                <i class="fas fa-cube ml-2"></i>
-                                المميزات
-                                <i class="fas fa-chevron-down mr-2 text-xs transition-transform group-hover:rotate-180"></i>
-                            </button>
-                            <div class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect transform-3d">
-                                <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="text-sm font-bold text-gray-800 dark:text-white">التجارب التفاعلية</span>
-                                </div>
-                                <div class="max-h-80 overflow-y-auto">
-                                    <a href="#3d-library" 
-                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
-                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center ml-3">
-                                            <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
-                                        </div>
-                                        <span class="flex-grow">مكتبة 3D تفاعلية</span>
-                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
-                                    </a>
-                                    <a href="#virtual-shelf" 
-                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
-                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900 flex items-center justify-center ml-3">
-                                            <i class="fas fa-layer-group text-green-600 dark:text-green-300"></i>
-                                        </div>
-                                        <span class="flex-grow">رف كتب افتراضي</span>
-                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
-                                    </a>
-                                    <a href="#reading-room" 
-                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
-                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900 flex items-center justify-center ml-3">
-                                            <i class="fas fa-chair text-yellow-600 dark:text-yellow-300"></i>
-                                        </div>
-                                        <span class="flex-grow">غرفة قراءة 3D</span>
-                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
@@ -552,7 +472,7 @@
                                 <input type="text" 
                                        name="q" 
                                        placeholder="ابحث عن كتاب، مؤلف، أو تصنيف..." 
-                                       class="py-2 px-4 pr-12 w-64 lg:w-80 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 glass-effect"
+                                       class="py-2 px-4 pr-12 w-64 lg:w-80 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
                                        id="search-input"
                                        autocomplete="off">
                                 <button type="submit" 
@@ -561,7 +481,7 @@
                                 </button>
                             </div>
                             <div id="search-results" 
-                                 class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden hidden z-50 animate-slide-down glass-effect">
+                                 class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden hidden z-50 animate-slide-down">
                             </div>
                         </form>
                     </div>
@@ -572,14 +492,14 @@
                         <!-- Notifications -->
                         <div class="relative">
                             <button id="notification-btn" 
-                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors relative pulse-glow">
+                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors relative">
                                 <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
-                                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">3</span>
+                                <span class="notification-badge">3</span>
                             </button>
                             
                             <!-- Notification Dropdown -->
                             <div id="notification-dropdown" 
-                                 class="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 hidden z-50 animate-slide-down glass-effect">
+                                 class="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 hidden z-50 animate-slide-down">
                                 <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                     <div class="flex justify-between items-center">
                                         <span class="font-bold text-gray-800 dark:text-white">الإشعارات</span>
@@ -606,14 +526,13 @@
                         <!-- User Menu -->
                         <div class="relative group">
                             <button class="flex items-center space-x-2 space-x-reverse focus-ring rounded-full p-1">
-                                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg transform-3d group-hover:rotate-y-180 transition-transform duration-500">
-                                    <span class="backface-hidden">{{ user.username|first|upper }}</span>
-                                    <i class="fas fa-user absolute inset-0 flex items-center justify-center rotate-y-180 backface-hidden"></i>
+                                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                                    {{ user.username|first|upper }}
                                 </div>
-                                <i class="fas fa-chevron-down text-gray-400 text-sm hidden lg:block transition-transform group-hover:rotate-180"></i>
+                                <i class="fas fa-chevron-down text-gray-400 text-sm hidden lg:block"></i>
                             </button>
                             
-                            <div class="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect">
+                            <div class="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                                 <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                     <div class="font-bold text-gray-800 dark:text-white">{{ user.get_full_name|default:user.username }}</div>
                                     <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
@@ -668,49 +587,30 @@
                         
                         <!-- Theme Toggle -->
                         <button id="theme-toggle" 
-                                class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring transform-3d hover:rotate-180 transition-transform duration-500">
+                                class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring">
                             <i class="fas fa-moon text-gray-600 dark:text-yellow-400"></i>
-                            <i class="fas fa-sun text-yellow-500 absolute inset-0 flex items-center justify-center rotate-y-180 backface-hidden"></i>
                         </button>
                         
                         <!-- Mobile Menu Button -->
                         <button id="mobile-menu-btn" 
-                                class="lg:hidden w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring">
+                                class="lg:hidden w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                             <i class="fas fa-bars text-gray-600 dark:text-gray-300"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Mobile Menu Overlay -->
-        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
         
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden">
-            <div class="flex flex-col h-full">
-                <!-- Mobile Header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-book text-white"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-800 dark:text-white">مكتبة الكتب</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">القائمة</div>
-                        </div>
-                    </div>
-                    <button id="mobile-menu-close" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                        <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
-                    </button>
-                </div>
-                
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="lg:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 hidden">
+            <div class="container mx-auto px-4 py-3">
                 <!-- Mobile Search -->
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="mb-4">
                     <form method="GET" action="{% url 'book_list' %}" class="relative">
                         <input type="text" 
                                name="q" 
                                placeholder="ابحث في المكتبة..." 
-                               class="w-full py-3 px-4 pr-12 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                               class="w-full py-3 px-4 pr-12 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                         <button type="submit" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <i class="fas fa-search"></i>
                         </button>
@@ -718,96 +618,56 @@
                 </div>
                 
                 <!-- Mobile Navigation -->
-                <div class="flex-1 overflow-y-auto">
-                    <div class="space-y-1 p-2">
-                        <a href="{% url 'home' %}" 
-                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center ml-3">
-                                <i class="fas fa-home text-blue-600 dark:text-blue-300"></i>
-                            </div>
-                            <span>الرئيسية</span>
-                        </a>
-                        
-                        <a href="{% url 'book_list' %}" 
-                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
-                            <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center ml-3">
-                                <i class="fas fa-book text-green-600 dark:text-green-300"></i>
-                            </div>
-                            <span>جميع الكتب</span>
-                        </a>
-                        
-                        <!-- Mobile Categories -->
-                        <div class="px-4 py-3">
-                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-2">التصنيفات</div>
-                            <div class="flex flex-wrap gap-2">
-                                {% for category in categories|slice:":6" %}
-                                <a href="{% url 'books_by_category' category.slug %}" 
-                                   class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
-                                    {{ category.name }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <!-- Mobile Features -->
-                        <div class="px-4 py-3">
-                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-2">المميزات التفاعلية</div>
-                            <div class="space-y-2">
-                                <a href="#3d-library" 
-                                   class="flex items-center px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg text-gray-700 dark:text-gray-200">
-                                    <i class="fas fa-cube ml-2 text-blue-500"></i>
-                                    <span>مكتبة 3D</span>
-                                </a>
-                                <a href="#virtual-shelf" 
-                                   class="flex items-center px-3 py-2 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 rounded-lg text-gray-700 dark:text-gray-200">
-                                    <i class="fas fa-layer-group ml-2 text-green-500"></i>
-                                    <span>رف كتب افتراضي</span>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" 
-                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
-                            <div class="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center ml-3">
-                                <i class="fas fa-tachometer-alt text-yellow-600 dark:text-yellow-300"></i>
-                            </div>
-                            <span>لوحة التحكم</span>
-                        </a>
-                        
-                        <a href="{% url 'logout' %}" 
-                           class="flex items-center px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">
-                            <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center ml-3">
-                                <i class="fas fa-sign-out-alt text-red-600 dark:text-red-300"></i>
-                            </div>
-                            <span>تسجيل الخروج</span>
-                        </a>
-                        {% else %}
-                        <div class="space-y-3 px-4 py-3">
-                            <a href="{% url 'login' %}" 
-                               class="w-full bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors flex items-center justify-center">
-                                <i class="fas fa-sign-in-alt ml-2"></i>تسجيل الدخول
+                <div class="space-y-1">
+                    <a href="{% url 'home' %}" 
+                       class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                        <i class="fas fa-home ml-3 w-6 text-center"></i>
+                        الرئيسية
+                    </a>
+                    
+                    <a href="{% url 'book_list' %}" 
+                       class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                        <i class="fas fa-book ml-3 w-6 text-center"></i>
+                        جميع الكتب
+                    </a>
+                    
+                    <!-- Mobile Categories -->
+                    <div class="px-4 py-3">
+                        <div class="font-medium text-gray-800 dark:text-gray-200 mb-2">التصنيفات</div>
+                        <div class="flex flex-wrap gap-2">
+                            {% for category in categories|slice:":6" %}
+                            <a href="{% url 'books_by_category' category.slug %}" 
+                               class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                                {{ category.name }}
                             </a>
-                            <a href="{% url 'register' %}" 
-                               class="w-full border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-3 px-4 rounded-lg text-center transition-colors">
-                                حساب جديد
-                            </a>
+                            {% endfor %}
                         </div>
-                        {% endif %}
                     </div>
-                </div>
-                
-                <!-- Mobile Footer -->
-                <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-center space-x-4 space-x-reverse">
-                        <button id="mobile-theme-toggle" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                            <i class="fas fa-moon text-gray-600 dark:text-yellow-400"></i>
-                        </button>
-                        <button id="mobile-notifications" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center relative">
-                            <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
-                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
-                        </button>
+                    
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" 
+                       class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                        <i class="fas fa-tachometer-alt ml-3 w-6 text-center"></i>
+                        لوحة التحكم
+                    </a>
+                    
+                    <a href="{% url 'logout' %}" 
+                       class="flex items-center px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">
+                        <i class="fas fa-sign-out-alt ml-3 w-6 text-center"></i>
+                        تسجيل الخروج
+                    </a>
+                    {% else %}
+                    <div class="flex space-x-3 space-x-reverse px-4 py-3">
+                        <a href="{% url 'login' %}" 
+                           class="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors">
+                            <i class="fas fa-sign-in-alt ml-2"></i>تسجيل الدخول
+                        </a>
+                        <a href="{% url 'register' %}" 
+                           class="flex-1 border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-3 px-4 rounded-lg text-center transition-colors">
+                            حساب جديد
+                        </a>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -817,7 +677,7 @@
     {% if messages %}
     <div class="container mx-auto px-4 mt-24 z-40 relative">
         {% for message in messages %}
-        <div class="message-alert bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-50 dark:bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-900/20 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 dark:border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-800 dark:text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 px-6 py-4 rounded-xl shadow-lg mb-4 flex items-start animate-slide-down glass-effect" role="alert">
+        <div class="message-alert alert-{{ message.tags }} bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-50 dark:bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-900/20 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 dark:border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-800 dark:text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 px-6 py-4 rounded-xl shadow-lg mb-4 flex items-start animate-slide-down" role="alert">
             <div class="flex-shrink-0">
                 {% if message.tags == 'success' %}
                 <i class="fas fa-check-circle text-green-500 text-xl"></i>
@@ -853,223 +713,16 @@
 
     <!-- المحتوى الرئيسي -->
     <main class="pt-22 min-h-screen">
-        {% block content %}
-        <!-- Hero Section -->
-        <section class="hero-gradient py-20 px-4 relative overflow-hidden">
-            <div class="container mx-auto relative z-10">
-                <div class="max-w-3xl mx-auto text-center">
-                    <h1 class="text-5xl md:text-6xl font-bold mb-6 gradient-text animate-fade-in">
-                        مكتبة <span class="text-primary-600">رقمية</span> متكاملة
-                    </h1>
-                    <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 animate-slide-up">
-                        اكتشف عالماً من المعرفة مع مكتبتنا الرقمية المتطورة. آلاف الكتب الإلكترونية في مختلف المجالات بين يديك.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
-                        <a href="{% url 'book_list' %}" 
-                           class="bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center">
-                            <i class="fas fa-book-open ml-2"></i>استكشاف المكتبة
-                        </a>
-                        <a href="#3d-library" 
-                           class="border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-3 px-8 rounded-full transition-all duration-300 flex items-center justify-center">
-                            <i class="fas fa-cube ml-2"></i>تجربة 3D
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- 3D Library Section -->
-        <section id="3d-library" class="py-20 px-4 relative">
-            <div class="container mx-auto">
-                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">المكتبة الافتراضية ثلاثية الأبعاد</h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <!-- 3D Scene Description -->
-                    <div class="animate-on-scroll">
-                        <h3 class="text-2xl font-bold mb-4">تجربة قراءة فريدة</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-6">
-                            استمتع بتجربة تصفح فريدة في مكتبتنا الافتراضية ثلاثية الأبعاد. تصفح الرفوف، اختر الكتب، واقرأ في بيئة تفاعلية غامرة.
-                        </p>
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center ml-3">
-                                    <i class="fas fa-vr-cardboard text-blue-600 dark:text-blue-300"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">تصفح 360 درجة</h4>
-                                    <p class="text-sm text-gray-500">استكشف المكتبة من جميع الزوايا</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center ml-3">
-                                    <i class="fas fa-hand-pointer text-green-600 dark:text-green-300"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">تفاعل مباشر</h4>
-                                    <p class="text-sm text-gray-500">انقر وسحب وتصفح الكتب بسهولة</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center ml-3">
-                                    <i class="fas fa-book-reader text-purple-600 dark:text-purple-300"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold">قراءة غامرة</h4>
-                                    <p class="text-sm text-gray-500">تجربة قراءة واقعية مع تأثيرات بصرية</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 3D Scene Placeholder -->
-                    <div class="relative h-96 animate-on-scroll">
-                        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl flex items-center justify-center">
-                            <div class="text-center">
-                                <i class="fas fa-vr-cardboard text-6xl text-primary-500 mb-4 animate-bounce-slow"></i>
-                                <p class="text-gray-600 dark:text-gray-300">المكتبة ثلاثية الأبعاد</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">(محاكاة تفاعلية باستخدام GSAP)</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Floating Books -->
-                        <div class="absolute top-8 right-8 w-16 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg transform rotate-6 animate-float"></div>
-                        <div class="absolute bottom-8 left-8 w-16 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg shadow-lg transform -rotate-6 animate-float" style="animation-delay: 0.5s;"></div>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-28 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg shadow-lg animate-float" style="animation-delay: 1s;"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <!-- خلفية GSAP المتحركة -->
+    <div id="animated-background">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
 
-        <!-- Featured Books Section -->
-        <section class="py-20 px-4 bg-gray-50 dark:bg-gray-800/50">
-            <div class="container mx-auto">
-                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">أحدث الكتب</h2>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Book Card 1 -->
-                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                        <div class="relative h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                                 alt="كتاب البرمجة المتقدم" 
-                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
-                            <div class="absolute top-4 left-4 bg-primary-500 text-white px-3 py-1 rounded-full text-sm">
-                                جديد
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">البرمجة المتقدمة</h3>
-                            <p class="text-gray-600 dark:text-gray-300 mb-4">دليل شامل لتقنيات البرمجة الحديثة والمتقدمة</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-primary-600 dark:text-primary-400 font-bold">د. أحمد محمد</span>
-                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
-                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Book Card 2 -->
-                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                        <div class="relative h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1531346688376-ab6275c4725e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                                 alt="علم النفس الحديث" 
-                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
-                            <div class="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
-                                الأكثر قراءة
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">علم النفس الحديث</h3>
-                            <p class="text-gray-600 dark:text-gray-300 mb-4">استكشاف أعماق النفس البشرية</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-primary-600 dark:text-primary-400 font-bold">د. سارة خالد</span>
-                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
-                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Book Card 3 -->
-                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                        <div class="relative h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1456513080510-3445092d4b7a?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                                 alt="التسويق الرقمي" 
-                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
-                            <div class="absolute top-4 left-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm">
-                                مفضل
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">التسويق الرقمي</h3>
-                            <p class="text-gray-600 dark:text-gray-300 mb-4">استراتيجيات التسويق في العصر الرقمي</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-primary-600 dark:text-primary-400 font-bold">محمد علي</span>
-                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
-                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Book Card 4 -->
-                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                        <div class="relative h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                                 alt="فن القيادة" 
-                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
-                            <div class="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
-                                موصى به
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">فن القيادة</h3>
-                            <p class="text-gray-600 dark:text-gray-300 mb-4">أسرار القيادة الناجحة</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-primary-600 dark:text-primary-400 font-bold">نورة أحمد</span>
-                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
-                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="text-center mt-12">
-                    <a href="{% url 'book_list' %}" 
-                       class="inline-flex items-center text-primary-600 dark:text-primary-400 font-bold hover:underline">
-                        عرض جميع الكتب
-                        <i class="fas fa-arrow-left mr-2"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
 
-        <!-- Virtual Bookshelf -->
-        <section id="virtual-shelf" class="py-20 px-4">
-            <div class="container mx-auto">
-                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">رف الكتب الافتراضي</h2>
-                
-                <div class="relative h-64 mb-12">
-                    <!-- Bookshelf -->
-                    <div class="absolute inset-x-0 bottom-0 h-32 book-shelf rounded-lg"></div>
-                    
-                    <!-- Books on Shelf -->
-                    <div class="absolute bottom-32 left-1/4 w-12 h-40 bg-gradient-to-br from-blue-500 to-purple-600 rounded transform rotate-3 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
-                    <div class="absolute bottom-32 left-2/4 w-12 h-36 bg-gradient-to-br from-green-500 to-teal-600 rounded transform -rotate-3 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
-                    <div class="absolute bottom-32 right-1/4 w-12 h-44 bg-gradient-to-br from-red-500 to-pink-600 rounded transform rotate-6 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
-                    <div class="absolute bottom-32 right-1/3 w-12 h-32 bg-gradient-to-br from-yellow-500 to-orange-600 rounded transform -rotate-2 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
-                </div>
-                
-                <div class="text-center max-w-2xl mx-auto">
-                    <h3 class="text-2xl font-bold mb-4">نظام رفوف ذكي</h3>
-                    <p class="text-gray-600 dark:text-gray-300">
-                        رتب كتبك المفضلة في رف افتراضي، وتصفحها بشكل تفاعلي مع إمكانية السحب والإفلات وتغيير الترتيب حسب رغبتك.
-                    </p>
-                </div>
-            </div>
-        </section>
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
     <!-- التذييل المحسن -->
@@ -1181,155 +834,230 @@
 
     <!-- JavaScript المحسن -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize GSAP
-            if (typeof gsap !== 'undefined') {
-                gsap.registerPlugin(ScrollTrigger);
-                
-                // Animated background elements
-                gsap.to('.floating-element:nth-child(1)', {
-                    duration: 20,
-                    x: 'random(-100, 100)',
-                    y: 'random(-50, 50)',
-                    rotation: 'random(0, 360)',
-                    ease: 'power1.inOut',
-                    repeat: -1,
-                    yoyo: true
-                });
-                
-                gsap.to('.floating-element:nth-child(2)', {
-                    duration: 25,
-                    x: 'random(-80, 80)',
-                    y: 'random(-40, 40)',
-                    rotation: 'random(0, 360)',
-                    ease: 'power1.inOut',
-                    repeat: -1,
-                    yoyo: true
-                });
-                
-                gsap.to('.floating-element:nth-child(3)', {
-                    duration: 30,
-                    x: 'random(-60, 60)',
-                    y: 'random(-30, 30)',
-                    rotation: 'random(0, 360)',
-                    ease: 'power1.inOut',
-                    repeat: -1,
-                    yoyo: true
-                });
+        // Fixed GSAP Initialization
+        let gsapInitialized = false;
+        
+        function initGSAP() {
+            if (typeof gsap !== 'undefined' && !gsapInitialized) {
+                gsap.registerPlugin(ScrollTrigger, TextPlugin);
+                gsapInitialized = true;
+                console.log('GSAP initialized successfully');
             }
+        }
+        
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            
+            // Initialize GSAP
+            initGSAP();
             
             // Hide loading overlay
             setTimeout(() => {
                 const loadingOverlay = document.getElementById('loading-overlay');
                 if (loadingOverlay) {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 500);
+                    gsap.to(loadingOverlay, {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            loadingOverlay.style.display = 'none';
+                        }
+                    });
                 }
             }, 1000);
             
-            // Mobile Menu Functionality
+            // DOM Elements
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenuClose = document.getElementById('mobile-menu-close');
             const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-            
-            function openMobileMenu() {
-                mobileMenu.classList.remove('translate-x-full');
-                mobileMenuOverlay.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-            
-            function closeMobileMenu() {
-                mobileMenu.classList.add('translate-x-full');
-                mobileMenuOverlay.classList.add('hidden');
-                document.body.style.overflow = '';
-            }
-            
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', openMobileMenu);
-            }
-            
-            if (mobileMenuClose) {
-                mobileMenuClose.addEventListener('click', closeMobileMenu);
-            }
-            
-            if (mobileMenuOverlay) {
-                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-            }
-            
-            // Theme Toggle
             const themeToggle = document.getElementById('theme-toggle');
-            const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            const backToTopBtn = document.getElementById('back-to-top');
+            const notificationBtn = document.getElementById('notification-btn');
+            const notificationDropdown = document.getElementById('notification-dropdown');
             
-            function toggleTheme() {
-                const isDark = document.body.classList.contains('dark');
-                const icon = themeToggle?.querySelector('.fa-moon') || themeToggle?.querySelector('.fa-sun');
-                const mobileIcon = mobileThemeToggle?.querySelector('.fa-moon') || mobileThemeToggle?.querySelector('.fa-sun');
-                
-                if (isDark) {
-                    document.body.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                    if (icon) {
-                        icon.classList.remove('fa-sun', 'text-yellow-400');
-                        icon.classList.add('fa-moon');
-                    }
-                    if (mobileIcon) {
-                        mobileIcon.classList.remove('fa-sun', 'text-yellow-400');
-                        mobileIcon.classList.add('fa-moon');
-                    }
-                } else {
-                    document.body.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                    if (icon) {
-                        icon.classList.remove('fa-moon');
-                        icon.classList.add('fa-sun', 'text-yellow-400');
-                    }
-                    if (mobileIcon) {
-                        mobileIcon.classList.remove('fa-moon');
-                        mobileIcon.classList.add('fa-sun', 'text-yellow-400');
-                    }
-                }
-                
-                // Add rotation animation
-                if (themeToggle) {
-                    themeToggle.style.transform = 'rotate(180deg)';
-                    setTimeout(() => {
-                        themeToggle.style.transform = '';
-                    }, 500);
-                }
+            // Navbar Animation
+            if (typeof gsap !== 'undefined') {
+                gsap.from('#navbar', {
+                    y: -100,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                });
             }
             
+            // Mobile Menu Toggle
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    
+                    if (typeof gsap !== 'undefined') {
+                        if (isHidden) {
+                            mobileMenu.classList.remove('hidden');
+                            gsap.fromTo(mobileMenu,
+                                { 
+                                    opacity: 0,
+                                    height: 0,
+                                    y: -20
+                                },
+                                { 
+                                    opacity: 1,
+                                    height: 'auto',
+                                    y: 0,
+                                    duration: 0.3,
+                                    ease: 'power2.out'
+                                }
+                            );
+                        } else {
+                            gsap.to(mobileMenu, {
+                                opacity: 0,
+                                height: 0,
+                                y: -20,
+                                duration: 0.3,
+                                ease: 'power2.in',
+                                onComplete: () => {
+                                    mobileMenu.classList.add('hidden');
+                                }
+                            });
+                        }
+                    } else {
+                        mobileMenu.classList.toggle('hidden');
+                    }
+                });
+            }
+            
+            // Enhanced Theme Toggle
             if (themeToggle) {
-                themeToggle.addEventListener('click', toggleTheme);
+                themeToggle.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    const body = document.body;
+                    const isDark = body.classList.contains('dark');
+                    
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(body, {
+                            backgroundColor: isDark ? '#f9fafb' : '#0f172a',
+                            duration: 0.5,
+                            ease: 'power2.inOut'
+                        });
+                    }
+                    
+                    if (isDark) {
+                        body.classList.remove('dark');
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                        icon.classList.remove('text-yellow-400');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        body.classList.add('dark');
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                        icon.classList.add('text-yellow-400');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                    
+                    // Button animation
+                    if (typeof gsap !== 'undefined') {
+                        gsap.fromTo(this,
+                            { rotation: 0 },
+                            { 
+                                rotation: 360,
+                                duration: 0.5,
+                                ease: 'back.out(1.7)'
+                            }
+                        );
+                    }
+                });
+                
+                // Load saved theme
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    themeToggle.querySelector('i').classList.remove('fa-moon');
+                    themeToggle.querySelector('i').classList.add('fa-sun', 'text-yellow-400');
+                }
             }
             
-            if (mobileThemeToggle) {
-                mobileThemeToggle.addEventListener('click', toggleTheme);
-            }
-            
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark');
-                const icon = themeToggle?.querySelector('.fa-moon');
-                const mobileIcon = mobileThemeToggle?.querySelector('.fa-moon');
-                if (icon) {
-                    icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun', 'text-yellow-400');
-                }
-                if (mobileIcon) {
-                    mobileIcon.classList.remove('fa-moon');
-                    mobileIcon.classList.add('fa-sun', 'text-yellow-400');
-                }
+            // Enhanced Search Functionality
+            if (searchInput) {
+                let searchTimeout;
+                
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.trim();
+                    
+                    clearTimeout(searchTimeout);
+                    
+                    if (query.length < 2) {
+                        if (searchResults) {
+                            searchResults.classList.add('hidden');
+                        }
+                        return;
+                    }
+                    
+                    searchTimeout = setTimeout(() => {
+                        // Show loading skeleton
+                        if (searchResults) {
+                            searchResults.innerHTML = `
+                                <div class="py-4">
+                                    <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
+                                    <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
+                                    <div class="skeleton w-full h-12 rounded-lg"></div>
+                                </div>
+                            `;
+                            searchResults.classList.remove('hidden');
+                        }
+                        
+                        // Simulate API call
+                        setTimeout(() => {
+                            if (searchResults) {
+                                searchResults.innerHTML = `
+                                    <div class="py-2">
+                                        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                            <span class="font-bold text-gray-800 dark:text-white">نتائج البحث</span>
+                                        </div>
+                                        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                                            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center ml-3">
+                                                    <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
+                                                </div>
+                                                <div class="flex-grow">
+                                                    <p class="font-medium text-gray-800 dark:text-white">كتاب إلكتروني متقدم</p>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">أحمد محمد</p>
+                                                </div>
+                                            </a>
+                                            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                                <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center ml-3">
+                                                    <i class="fas fa-book-open text-green-600 dark:text-green-300"></i>
+                                                </div>
+                                                <div class="flex-grow">
+                                                    <p class="font-medium text-gray-800 dark:text-white">أساسيات البرمجة</p>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">سارة خالد</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+                                            <a href="{% url 'book_list' %}?q=${encodeURIComponent(query)}" 
+                                               class="text-primary-600 dark:text-primary-400 font-medium hover:underline text-sm">
+                                                عرض جميع النتائج لـ "${query}"
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }, 500);
+                    }, 300);
+                });
+                
+                // Hide search results on outside click
+                document.addEventListener('click', function(event) {
+                    if (searchResults && !searchResults.contains(event.target) && !searchInput.contains(event.target)) {
+                        searchResults.classList.add('hidden');
+                    }
+                });
             }
             
             // Back to Top Button
-            const backToTopBtn = document.getElementById('back-to-top');
-            
             if (backToTopBtn) {
-                window.addEventListener('scroll', () => {
+                window.addEventListener('scroll', function() {
                     if (window.scrollY > 300) {
                         backToTopBtn.classList.remove('translate-y-10', 'opacity-0');
                         backToTopBtn.classList.add('translate-y-0', 'opacity-100');
@@ -1339,104 +1067,149 @@
                     }
                 });
                 
-                backToTopBtn.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                backToTopBtn.addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
                 });
             }
             
-            // Auto-hide messages
-            setTimeout(() => {
-                document.querySelectorAll('.message-alert').forEach(alert => {
-                    alert.style.opacity = '0';
-                    alert.style.transform = 'translateY(-20px)';
-                    setTimeout(() => alert.remove(), 300);
+            // Notification Dropdown
+            if (notificationBtn && notificationDropdown) {
+                notificationBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isHidden = notificationDropdown.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        notificationDropdown.classList.remove('hidden');
+                        if (typeof gsap !== 'undefined') {
+                            gsap.fromTo(notificationDropdown,
+                                { opacity: 0, y: -10 },
+                                { opacity: 1, y: 0, duration: 0.2 }
+                            );
+                        }
+                    } else {
+                        notificationDropdown.classList.add('hidden');
+                    }
                 });
-            }, 5000);
+                
+                // Close on outside click
+                document.addEventListener('click', function(event) {
+                    if (!notificationDropdown.contains(event.target) && !notificationBtn.contains(event.target)) {
+                        notificationDropdown.classList.add('hidden');
+                    }
+                });
+            }
             
-            // Initialize scroll animations
-            function initScrollAnimations() {
+            // Enhanced Scroll Animations
+            function initEnhancedScrollAnimations() {
+                if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+                    console.warn('GSAP not available for scroll animations');
+                    return;
+                }
+                
+                // Animate elements on scroll
                 const animatedElements = document.querySelectorAll('.animate-on-scroll');
                 
-                animatedElements.forEach(el => {
-                    const rect = el.getBoundingClientRect();
-                    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
-                    
-                    if (isVisible) {
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0)';
-                    }
-                });
-            }
-            
-            window.addEventListener('scroll', initScrollAnimations);
-            initScrollAnimations();
-            
-            // Search functionality
-            const searchInput = document.getElementById('search-input');
-            const searchResults = document.getElementById('search-results');
-            
-            if (searchInput && searchResults) {
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.trim();
-                    
-                    if (query.length < 2) {
-                        searchResults.classList.add('hidden');
-                        return;
-                    }
-                    
-                    // Simulate search results
-                    searchResults.innerHTML = `
-                        <div class="p-4">
-                            <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
-                            <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
-                            <div class="skeleton w-full h-12 rounded-lg"></div>
-                        </div>
-                    `;
-                    searchResults.classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                        searchResults.innerHTML = `
-                            <div class="p-2">
-                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="font-bold text-gray-800 dark:text-white">نتائج البحث</span>
-                                </div>
-                                <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                                    <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center ml-3">
-                                            <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
-                                        </div>
-                                        <div class="flex-grow">
-                                            <p class="font-medium text-gray-800 dark:text-white">${query}</p>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">نتائج البحث</p>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                    }, 500);
+                animatedElements.forEach((el, index) => {
+                    gsap.fromTo(el,
+                        {
+                            opacity: 0,
+                            y: 50
+                        },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.8,
+                            delay: index * 0.1,
+                            scrollTrigger: {
+                                trigger: el,
+                                start: "top 85%",
+                                end: "bottom 60%",
+                                toggleActions: "play none none none"
+                            }
+                        }
+                    );
                 });
                 
-                document.addEventListener('click', function(event) {
-                    if (!searchResults.contains(event.target) && !searchInput.contains(event.target)) {
-                        searchResults.classList.add('hidden');
-                    }
+                // Book cards animation
+                const bookCards = document.querySelectorAll('.book-card');
+                bookCards.forEach((card, index) => {
+                    gsap.fromTo(card,
+                        {
+                            opacity: 0,
+                            y: 40,
+                            scale: 0.95
+                        },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            duration: 0.6,
+                            delay: index * 0.1,
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 90%",
+                                toggleActions: "play none none none"
+                            }
+                        }
+                    );
+                });
+                
+                // Create parallax effect for hero sections
+                const heroSections = document.querySelectorAll('.hero-gradient, .hero-section');
+                heroSections.forEach(section => {
+                    gsap.to(section, {
+                        backgroundPosition: '50% 100px',
+                        ease: 'none',
+                        scrollTrigger: {
+                            trigger: section,
+                            start: 'top top',
+                            end: 'bottom top',
+                            scrub: true
+                        }
+                    });
                 });
             }
+            
+            // Initialize scroll animations
+            initEnhancedScrollAnimations();
+            
+            // Auto-hide messages after 5 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.message-alert').forEach(alert => {
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(alert, {
+                            opacity: 0,
+                            y: -20,
+                            duration: 0.3,
+                            onComplete: () => alert.remove()
+                        });
+                    } else {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateY(-20px)';
+                        setTimeout(() => alert.remove(), 300);
+                    }
+                });
+            }, 5000);
         });
         
         // Handle window resize
         window.addEventListener('resize', function() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-            
+            // Close mobile menu on resize to desktop
             if (window.innerWidth >= 1024) {
-                if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
-                    mobileMenu.classList.add('translate-x-full');
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
                 }
-                if (mobileMenuOverlay && !mobileMenuOverlay.classList.contains('hidden')) {
-                    mobileMenuOverlay.classList.add('hidden');
-                    document.body.style.overflow = '';
-                }
+            }
+        });
+        
+        // Handle content change event (for SPA)
+        document.addEventListener('contentChanged', function() {
+            if (typeof initEnhancedScrollAnimations === 'function') {
+                initEnhancedScrollAnimations();
             }
         });
     </script>
