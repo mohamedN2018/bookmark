@@ -82,3 +82,39 @@ class Source(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)[:100]
         super().save(*args, **kwargs)
+
+
+class ImportJob(models.Model):
+    """سجل تشغيل عملية استيراد من مصدر."""
+
+    class Status(models.TextChoices):
+        RUNNING = "RUNNING", "قيد التشغيل"
+        DONE = "DONE", "اكتمل"
+        FAILED = "FAILED", "فشل"
+
+    source = models.ForeignKey(Source, on_delete=models.PROTECT, related_name="import_jobs", verbose_name="المصدر")
+    status = models.CharField("الحالة", max_length=10, choices=Status.choices, default=Status.RUNNING)
+    params = models.JSONField("المعاملات", default=dict, blank=True)
+    seen = models.PositiveIntegerField("سجلات مقروءة", default=0)
+    created = models.PositiveIntegerField("أُنشئ", default=0)
+    updated = models.PositiveIntegerField("حُدّث", default=0)
+    skipped = models.PositiveIntegerField("تُخطّي", default=0)
+    duplicates = models.PositiveIntegerField("مكرر", default=0)
+    files_downloaded = models.PositiveIntegerField("ملفات نُزّلت", default=0)
+    bytes_downloaded = models.BigIntegerField("حجم التنزيل (بايت)", default=0)
+    errors = models.PositiveIntegerField("أخطاء", default=0)
+    log = models.TextField("السجل", blank=True)
+    cursor = models.TextField("نقطة الاستكمال", blank=True, help_text="resumption token أو موضع للاستكمال لاحقًا.")
+    started_at = models.DateTimeField("بدأ", auto_now_add=True)
+    finished_at = models.DateTimeField("انتهى", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "عملية استيراد"
+        verbose_name_plural = "عمليات الاستيراد"
+        ordering = ["-started_at"]
+
+    def __str__(self):
+        return f"{self.source} — {self.started_at:%Y-%m-%d %H:%M} ({self.get_status_display()})"
+
+    def add_log(self, line):
+        self.log = (self.log + line + "\n")[-20000:]

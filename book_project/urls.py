@@ -11,7 +11,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("healthz/", core_views.health, name="health"),
     path("privacy/", core_views.privacy, name="privacy"),
-    path("", include("books.urls")),
+    path("", include("accounts.urls")),
+    path("", include("library.urls")),
+    path("", include("catalog.urls")),
 ]
 
 # Django يخدم /media/ (الأغلفة والصور) ويحجب ملفات الكتب المحمية

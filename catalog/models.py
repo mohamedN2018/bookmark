@@ -192,6 +192,9 @@ class Subject(TimeStamped):
         self.normalized_name = normalize_key(f"{self.name} {self.name_en}")
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse("topic_detail", kwargs={"slug": self.slug})
+
     def ancestors(self):
         node, chain = self.parent, []
         while node is not None and node not in chain:
@@ -241,6 +244,9 @@ class Person(TimeStamped):
             self.slug = unique_slug(self, self.name, 255)
         self.normalized_name = normalize_key(f"{self.name} {self.native_name}")
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("person_detail", kwargs={"slug": self.slug})
 
 
 class Publisher(TimeStamped):
@@ -330,7 +336,7 @@ class Work(TimeStamped, Verifiable):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse("book_detail", kwargs={"slug": self.slug})
+        return reverse("work_detail", kwargs={"slug": self.slug})
 
     @property
     def authors(self):

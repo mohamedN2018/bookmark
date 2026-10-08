@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}مكتبتي - {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<h1>مكتبتي</h1>
+
+<section class="section">
+    <div class="section-head"><h2>المحفوظات ({{ saved|length }})</h2></div>
+    {% if saved %}<div class="book-grid">{% for work in saved %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    {% else %}<p class="notice">لم تحفظ أي مصدر بعد. استخدم زر "احفظ" في صفحة أي مصدر.</p>{% endif %}
+</section>
+
+<section class="section">
+    <div class="section-head"><h2>فتحتها مؤخرًا</h2></div>
+    {% if recent %}<div class="book-grid">{% for work in recent %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    {% else %}<p class="notice">لا شيء بعد.</p>{% endif %}
+</section>
+
+<section class="section">
+    <div class="section-head"><h2>تقييماتي ({{ ratings|length }})</h2></div>
+    {% if ratings %}
+    <ul>{% for r in ratings %}<li><a href="{{ r.work.get_absolute_url }}">{{ r.work.title }}</a> — {{ r.score }}/5</li>{% endfor %}</ul>
+    {% else %}<p class="notice">لم تقيّم أي مصدر بعد.</p>{% endif %}
+</section>
+{% endblock %}

@@ -74,3 +74,15 @@ docker compose -f docker-compose.test.yml down -v
 
 `db.sqlite3` و`media/` ما زالت في المستودع لأنها مصدر النقل الأول. بعد التأكد من نجاح الانتقال إلى PostgreSQL
 يمكن إزالتها من المستودع؛ محتواها يبقى في تاريخ git.
+
+## ملء المكتبة بالكتب (بعد النشر)
+
+من Terminal الخدمة `book_project` في Dokploy:
+
+```sh
+python manage.py import_source gutenberg                                   # الكتب العلمية في الملكية العامة
+python manage.py import_source oapen                                       # كتب أكاديمية مفتوحة (روابط PDF)
+python manage.py import_source arxiv --set cs --days 30 --download         # أبحاث، مع استضافة المرخصة CC
+```
+
+التفاصيل والخيارات في [INGESTION.md](INGESTION.md). تأكد من مساحة القرص قبل رفع `--max-total-mb`.

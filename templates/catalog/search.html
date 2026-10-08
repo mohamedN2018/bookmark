@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{% if query %}نتائج "{{ query }}"{% else %}كل المصادر{% endif %} - {{ SITE_NAME }}{% endblock %}
+{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}
+{% block head %}{% if query or request.GET %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if query %}نتائج البحث عن "{{ query }}"{% else %}كل المصادر{% endif %}</h1>
+<p class="muted">{{ total }} نتيجة{% if current_subject %} في «{{ current_subject.name }}»{% endif %}</p>
+
+<div class="two-col filters-first">
+    <aside class="panel filters" aria-label="تصفية النتائج">
+        <form method="get" action="{% url 'search' %}">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            <fieldset>
+                <legend>الوصول</legend>
+                <div class="form-field">
+                    <label class="visually-hidden" for="f-access">الوصول</label>
+                    <select id="f-access" name="access" class="inline-select">
+                        <option value="">الكل</option>
+                        <option value="free" {% if access == 'free' %}selected{% endif %}>مجاني قانونيًا (مُتحقق)</option>
+                        <option value="paid" {% if access == 'paid' %}selected{% endif %}>مدفوع</option>
+                        <option value="metadata" {% if access == 'metadata' %}selected{% endif %}>بيانات وصفية فقط</option>
+                    </select>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>اللغة</legend>
+                <div class="form-field">
+                    <label class="visually-hidden" for="f-lang">اللغة</label>
+                    <select id="f-lang" name="language" class="inline-select">
+                        <option value="">كل اللغات</option>
+                        {% for code, label in languages %}<option value="{{ code }}" {% if language == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>نوع المصدر</legend>
+                <div class="form-field">
+                    <label class="visually-hidden" for="f-type">نوع المصدر</label>
+                    <select id="f-type" name="type" class="inline-select">
+                        <option value="">كل الأنواع</option>
+                        {% for code, label in content_types %}<option value="{{ code }}" {% if content_type == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>الموضوع</legend>
+                <div class="form-field">
+                    <label class="visually-hidden" for="f-subject">الموضوع</label>
+                    <select id="f-subject" name="subject" class="inline-select">
+                        <option value="">كل الموضوعات</option>
+                        {% for subject in subjects %}<option value="{{ subject.slug }}" {% if current_subject.slug == subject.slug %}selected{% endif %}>{{ subject.name }}</option>{% endfor %}
+                    </select>
+                </div>
+            </fieldset>
+            <button class="btn btn-block" type="submit">تطبيق</button>
+            {% if request.GET %}<p class="small"><a href="{% url 'search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">إزالة التصفية</a></p>{% endif %}
+        </form>
+    </aside>
+
+    <section aria-label="النتائج">
+        {% if page_obj.object_list %}
+            <div class="book-grid">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
+            {% include "catalog/_pagination.html" %}
+        {% else %}
+            <div class="panel stack">
+                <h2>لم نجد مصدرًا مناسبًا بعد</h2>
+                <p>الفهرس لا يحتوي حاليًا على مصدر يطابق بحثك{% if request.GET.access or request.GET.language or request.GET.type or request.GET.subject %} مع التصفية المختارة{% endif %}.</p>
+                {% if related_subjects %}
+                <div>
+                    <h3>موضوعات قريبة</h3>
+                    <ul class="chip-list">{% for subject in related_subjects %}<li><a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a></li>{% endfor %}</ul>
+                </div>
+                {% endif %}
+                {% if external_searches %}
+                <div>
+                    <h3>ابحث في مصادر مفتوحة خارجية</h3>
+                    <p class="small muted">روابط بحث في قواعد بيانات علمية ومكتبات مفتوحة. نتائجها تخضع لشروط كل موقع.</p>
+                    <ul>{% for name, url in external_searches %}<li><a href="{{ url }}" rel="noopener nofollow" target="_blank">{{ name }}</a></li>{% endfor %}</ul>
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

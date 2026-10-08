@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}تسجيل الدخول - {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="panel auth-card">
+    <h1>تسجيل الدخول</h1>
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+        {{ form.non_field_errors }}
+        <div class="form-field">
+            <label for="id_username">اسم المستخدم</label>
+            <input id="id_username" name="username" type="text" autocomplete="username" required maxlength="150" value="{{ form.username.value|default:'' }}">
+        </div>
+        <div class="form-field">
+            <label for="id_password">كلمة المرور</label>
+            <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <label class="check"><input type="checkbox" name="remember-me"> تذكرني على هذا الجهاز</label>
+        <p></p>
+        <button class="btn btn-block" type="submit">دخول</button>
+    </form>
+    <p class="small">ليس لديك حساب؟ <a href="{% url 'register' %}">أنشئ حسابًا</a></p>
+</section>
+{% endblock %}

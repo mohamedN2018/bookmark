@@ -110,6 +110,8 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "sources.apps.SourcesConfig",
     "catalog.apps.CatalogConfig",
+    "library.apps.LibraryConfig",
+    "accounts.apps.AccountsConfig",
     "books.apps.BooksConfig",
 ]
 
@@ -139,7 +141,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.site",
-                "books.context_processors.categories_context",
             ],
         },
     },
@@ -201,7 +202,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"
+LOGIN_REDIRECT_URL = "my_library"
 LOGOUT_REDIRECT_URL = "home"
 
 
@@ -249,6 +250,9 @@ PROTECTED_MEDIA_PREFIXES = ("books/pdfs/",)
 # محاولات الدخول الفاشلة المسموحة لكل اسم مستخدم خلال النافذة الزمنية
 LOGIN_MAX_FAILURES = config("LOGIN_MAX_FAILURES", default=10, cast=int)
 LOGIN_FAILURE_WINDOW_SECONDS = config("LOGIN_FAILURE_WINDOW_SECONDS", default=900, cast=int)
+
+# حد إجمالي لحجم الملفات المنزّلة في عملية استيراد واحدة (ميجابايت)
+IMPORT_MAX_TOTAL_MB = config("IMPORT_MAX_TOTAL_MB", default=5000, cast=int)
 
 # حدود رفع الملفات
 MAX_PDF_UPLOAD_MB = config("MAX_PDF_UPLOAD_MB", default=200, cast=int)

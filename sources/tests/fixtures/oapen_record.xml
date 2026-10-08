@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="static/style.xsl"?><OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"><responseDate>2026-10-08T15:47:59Z</responseDate><request verb="GetRecord" identifier="oai:library.oapen.org:20.500.12657/101963" metadataPrefix="xoai">https://library.oapen.org/oai/request</request><GetRecord><record><header><identifier>oai:library.oapen.org:20.500.12657/101963</identifier><datestamp>2025-05-16T11:24:10Z</datestamp><setSpec>com_20.500.12657_5</setSpec><setSpec>col_20.500.12657_6</setSpec></header><metadata><metadata xmlns="http://www.lyncode.com/xoai" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.lyncode.com/xoai http://www.lyncode.com/xsd/xoai.xsd">
+<element name="dc">
+<element name="contributor">
+<element name="editor">
+<element name="none">
+<field name="value">DZHW</field>
+<field name="authority">3c6eea50-aa69-4ed1-80bc-6f8fbc933f40</field>
+<field name="confidence">500</field>
+<field name="value">DAAD</field>
+<field name="authority">18730ed0-d6e8-4cda-bfef-ad3ca86f9d49</field>
+<field name="confidence">500</field>
+</element>
+</element>
+</element>
+<element name="date">
+<element name="accessioned">
+<element name="none">
+<field name="value">2025-05-16T10:07:58Z</field>
+</element>
+</element>
+<element name="available">
+<element name="none">
+<field name="value">2025-05-16T10:07:58Z</field>
+</element>
+</element>
+<element name="issued">
+<element name="none">
+<field name="value">2022</field>
+</element>
+</element>
+</element>
+<element name="identifier">
+<element name="none">
+<field name="value">ONIX_20250516T120243_9783763967605_82</field>
+</element>
+<element name="uri">
+<element name="none">
+<field name="value">https://library.oapen.org/handle/20.500.12657/101963</field>
+</element>
+</element>
+</element>
+<element name="description">
+<element name="abstract">
+<element name="none">
+<field name="value">The study has been analysing the the international nature of studies, research and universities in Germany since 2001. As well as highlighting the trends in the German higher education and research sector, it presents data relating to particularly relevant study regions such as the USA, the United Kingdom and Asia. The study integrates the international data published by the OECD and UNESCO with the national data from the Federal Statistical Office. In combination with other indicators, it provides a valid basis for long-term analysis. Wissenschaft weltoffen is published as separate German and English editions. It is available free of charge at wbv-open-access.de.</field>
+</element>
+</element>
+</element>
+<element name="language">
+<element name="none">
+<field name="originalValue">English</field>
+<field name="value">eng</field>
+</element>
+</element>
+<element name="subject">
+<element name="classification">
+<element name="none">
+<field name="value">thema EDItEUR::J Society and Social Sciences::JN Education::JNM Higher education, tertiary education</field>
+</element>
+</element>
+<element name="other">
+<element name="none">
+<field name="value">OECD</field>
+<field name="value">UNESCO</field>
+<field name="value">Internationalisierung</field>
+<field name="value">Internationalität</field>
+<field name="value">Studierende</field>
+<field name="value">Hochschulverwaltung</field>
+<field name="value">Mobilität</field>
+<field name="value">Datenanalyse</field>
+<field name="value">Forschungsstandort</field>
+<field name="value">Bildungsstudie</field>
+<field name="value">Wissenschaftssystem</field>
+<field name="value">higher education</field>
+<field name="value">higher education research</field>
+<field name="value">internationalisation</field>
+<field name="value">higher education studies</field>
+<field name="value">students</field>
+<field name="value">student life</field>
+<field name="value">educational study</field>
+</element>
+</element>
+</element>
+<element name="title">
+<element name="none">
+<field name="value">Wissenschaft weltoffen 2021</field>
+</element>
+<element name="alternative">
+<element name="none">
+<field name="value">Facts and Figures on the International Nature of Studies and Research in Germany and Worldwide</field>
+</element>
+</element>
+</element>
+<element name="type">
+<element name="none">
+<field name="value">book</field>
+</element>
+</element>
+</element>
+<element name="oapen">
+<element name="identifier">
+<element name="doi">
+<element name="none">
+<field name="value">10.3278/7004002tew</field>
+</element>
+</element>
+</element>
+<element name="relation">
+<element name="isPublishedBy">
+<element name="none">
+<field name="value">f7856a72-559a-4348-85fb-31ae0749f099</field>
+<field name="authority">f7856a72-559a-4348-85fb-31ae0749f099</field>
+<field name="confidence">600</field>
+</element>
+</element>
+<element name="isbn">
+<element name="none">
+<field name="value">9783763967605</field>
+<field name="value">9783763967599</field>
+</element>
+</element>
+</element>
+<element name="pages">
+<element name="none">
+<field name="value">120</field>
+</element>
+</element>
+<element name="place">
+<element name="publication">
+<element name="none">
+<field name="value">Bielefeld</field>
+</element>
+</element>
+</element>
+</element>
+<element name="bundles">
+<element name="bundle">
+<field name="name">ORIGINAL</field>
+<element name="bitstreams">
+<element name="bitstream">
+<field name="name">9783763967605.pdf</field>
+<field name="originalName">9783763967605.pdf</field>
+<field name="format">application/pdf</field>
+<field name="size">16226217</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/1/9783763967605.pdf</field>
+<field name="checksum">b268de8d344faf7d1b98da18a2ee3da0</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">1</field>
+<field name="dctitle">9783763967605.pdf</field>
+<field name="oapenrelationisbn">9783763967605</field>
+<field name="rightsuri">https://creativecommons.org/licenses/by-sa/4.0/</field>
+<field name="rights">CC-BY-SA</field>
+</element>
+</element>
+</element>
+<element name="bundle">
+<field name="name">TEXT</field>
+<element name="bitstreams">
+<element name="bitstream">
+<field name="name">9783763967605.pdf.txt</field>
+<field name="originalName">9783763967605.pdf.txt</field>
+<field name="description">Extracted text</field>
+<field name="format">text/plain</field>
+<field name="size">465097</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/2/9783763967605.pdf.txt</field>
+<field name="checksum">a81e207e6e3eaf8d27d5a9578cb009d1</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">2</field>
+<field name="dctitle">9783763967605.pdf.txt</field>
+</element>
+</element>
+</element>
+<element name="bundle">
+<field name="name">THUMBNAIL</field>
+<element name="bitstreams">
+<element name="bitstream">
+<field name="name">9783763967605.pdf.jpg</field>
+<field name="originalName">9783763967605.pdf.jpg</field>
+<field name="description">Generated Thumbnail</field>
+<field name="format">image/jpeg</field>
+<field name="size">5612</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/3/9783763967605.pdf.jpg</field>
+<field name="checksum">897afa477b32065e543af2d13232b48b</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">3</field>
+<field name="dctitle">9783763967605.pdf.jpg</field>
+</element>
+</element>
+</element>
+<element name="bundle">
+<field name="name">EXPORT</field>
+<element name="bitstreams">
+<element name="bitstream">
+<field name="name">0001aa21-4644-43b3-929f-5b1cfbd35f97.marc.xml</field>
+<field name="format">application/octet-stream</field>
+<field name="size">7454</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/4/0001aa21-4644-43b3-929f-5b1cfbd35f97.marc.xml</field>
+<field name="checksum">274a2c6f439b62d898d8db10c8eccd8e</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">4</field>
+<field name="dctitle">0001aa21-4644-43b3-929f-5b1cfbd35f97.marc.xml</field>
+</element>
+<element name="bitstream">
+<field name="name">0001aa21-4644-43b3-929f-5b1cfbd35f97.onix_3.0.xml</field>
+<field name="format">application/octet-stream</field>
+<field name="size">7076</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/5/0001aa21-4644-43b3-929f-5b1cfbd35f97.onix_3.0.xml</field>
+<field name="checksum">4e89dcd6168e02ac5d7ce8831f0a04b2</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">5</field>
+<field name="dctitle">0001aa21-4644-43b3-929f-5b1cfbd35f97.onix_3.0.xml</field>
+</element>
+<element name="bitstream">
+<field name="name">0001aa21-4644-43b3-929f-5b1cfbd35f97.ris</field>
+<field name="format">application/octet-stream</field>
+<field name="size">1485</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/6/0001aa21-4644-43b3-929f-5b1cfbd35f97.ris</field>
+<field name="checksum">f15a2889d479c6eb600f5a73dce63058</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">6</field>
+<field name="dctitle">0001aa21-4644-43b3-929f-5b1cfbd35f97.ris</field>
+</element>
+<element name="bitstream">
+<field name="name">0001aa21-4644-43b3-929f-5b1cfbd35f97.tsv</field>
+<field name="format">application/octet-stream</field>
+<field name="size">480</field>
+<field name="url">https://library.oapen.org/bitstream/20.500.12657/101963/-1/0001aa21-4644-43b3-929f-5b1cfbd35f97.tsv</field>
+<field name="checksum">b54c458c50e7b3a85c1cd1651cfaf53e</field>
+<field name="checksumAlgorithm">MD5</field>
+<field name="sid">-1</field>
+<field name="dctitle">0001aa21-4644-43b3-929f-5b1cfbd35f97.tsv</field>
+</element>
+</element>
+</element>
+</element>
+<element name="others">
+<field name="uuid">0001aa21-4644-43b3-929f-5b1cfbd35f97</field>
+<field name="handle">20.500.12657/101963</field>
+<field name="identifier">oai:library.oapen.org:20.500.12657/101963</field>
+<field name="lastModifyDate">2025-05-16 11:24:10.125</field>
+</element>
+<element name="repository">
+<field name="name">OAPEN Library</field>
+<field name="mail">info@oapen.org</field>
+</element>
+<element name="linkedItemsMetadata">
+<element name="oapen.relation.isPublishedBy">
+<field name="uuid">f7856a72-559a-4348-85fb-31ae0749f099</field>
+<field name="handle">20.500.12657/47780</field>
+<element name="publisher.name">
+<field name="value">wbv Media</field>
+</element>
+</element>
+</element>
+<element name="fieldsWithParentData"/>
+</metadata></metadata></record></GetRecord></OAI-PMH>
