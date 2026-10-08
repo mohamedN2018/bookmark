@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load static %}
 
-{% block title %}تسجيل الدخول - المكتبة السرية{% endblock %}
+{% block title %}تسجيل الدخول - مكتبة الكتب{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 py-12 mt-12 px-4 sm:px-6 lg:px-8">
@@ -19,7 +19,7 @@
                                 <i class="fas fa-book text-white text-xl"></i>
                             </div>
                             <div class="text-right">
-                                <h1 class="text-3xl font-bold text-gray-900">المكتبة السرية</h1>
+                                <h1 class="text-3xl font-bold text-gray-900">مكتبة الكتب</h1>
                                 <div class="w-20 h-1 bg-blue-500 rounded-full mt-2"></div>
                             </div>
                         </div>
@@ -75,6 +75,23 @@
                         </div>
                     </div>
 
+                    <!-- إحصائيات -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="text-xl font-bold text-blue-600">50K+</div>
+                                <div class="text-xs text-gray-600">قارئ نشط</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="text-xl font-bold text-blue-600">100K+</div>
+                                <div class="text-xs text-gray-600">كتاب متاح</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="text-xl font-bold text-blue-600">500K+</div>
+                                <div class="text-xs text-gray-600">مراجعة</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -88,7 +105,6 @@
 
                     <form class="space-y-6" method="POST" id="login-form">
                         {% csrf_token %}
-                        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
                         
                         <!-- رسائل الخطأ -->
                         {% if form.errors %}
@@ -163,6 +179,9 @@
                                 </label>
                             </div>
                             
+                            <a href="#" class="text-sm text-blue-600 hover:text-blue-500 hover:underline">
+                                نسيت كلمة المرور؟
+                            </a>
                         </div>
                         
                         <!-- زر تسجيل الدخول -->

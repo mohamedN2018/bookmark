@@ -1,0 +1,1446 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}مكتبة الكتب - منصة القراءة الرقمية{% endblock %}</title>
+    
+    <!-- Meta Tags for SEO -->
+    <meta name="description" content="منصة القراءة الرقمية الأولى في العالم العربي. اكتشف آلاف الكتب الإلكترونية في مختلف المجالات.">
+    <meta name="keywords" content="كتب, قراءة, مكتبة رقمية, كتب عربية, كتب إلكترونية, ثقافة, معرفة">
+    <meta name="author" content="مكتبة الكتب">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="مكتبة الكتب - منصة القراءة الرقمية">
+    <meta property="og:description" content="منصة القراءة الرقمية الأولى في العالم العربي">
+    <meta property="og:type" content="website">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-down': 'slideDown 0.5s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'float1': 'float1 20s infinite',
+                        'float2': 'float2 25s infinite',
+                        'float3': 'float3 30s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'wave': 'wave 1.5s ease-in-out infinite',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' }
+                        },
+                        float1: {
+                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '33%': { transform: 'translate(30px, -50px) rotate(120deg)' },
+                            '66%': { transform: 'translate(-20px, 20px) rotate(240deg)' }
+                        },
+                        float2: {
+                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '33%': { transform: 'translate(-40px, 30px) rotate(120deg)' },
+                            '66%': { transform: 'translate(30px, -40px) rotate(240deg)' }
+                        },
+                        float3: {
+                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
+                            '33%': { transform: 'translate(50px, -20px) rotate(120deg)' },
+                            '66%': { transform: 'translate(-30px, 40px) rotate(240deg)' }
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        wave: {
+                            '0%, 100%': { transform: 'rotate(0deg)' },
+                            '25%': { transform: 'rotate(20deg)' },
+                            '75%': { transform: 'rotate(-15deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/EasePack.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Enhanced Animations */
+        .page-transition {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* 3D Book Card Effect */
+        .book-card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .book-card-3d:hover {
+            transform: translateY(-15px) rotateX(5deg) rotateY(-5deg) scale(1.05);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 30px rgba(59, 130, 246, 0.3);
+        }
+        
+        .book-card-3d .book-cover {
+            transform: translateZ(20px);
+        }
+        
+        .book-card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+            z-index: 10;
+        }
+        
+        .book-card-3d:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #2563eb, #7c3aed);
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        
+        /* Selection Color */
+        ::selection {
+            background-color: rgba(59, 130, 246, 0.3);
+            color: #1e40af;
+        }
+        
+        .dark ::selection {
+            background-color: rgba(96, 165, 250, 0.3);
+            color: #dbeafe;
+        }
+        
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        .dark .skeleton {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        /* RTL Specific */
+        .rtl-grid {
+            direction: rtl;
+        }
+        
+        /* Focus Styles */
+        .focus-ring {
+            @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+        }
+        
+        .dark .focus-ring {
+            @apply focus:ring-offset-gray-900;
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            z-index: -1;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: 10%;
+            left: 10%;
+            animation: float1 20s infinite;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            bottom: 15%;
+            right: 10%;
+            animation: float2 25s infinite;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            top: 50%;
+            left: 80%;
+            animation: float3 30s infinite;
+        }
+        
+        /* 3D Transformations */
+        .transform-3d {
+            transform-style: preserve-3d;
+        }
+        
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        
+        /* Mobile Menu Specific */
+        .mobile-menu-container {
+            transform-origin: top center;
+            overflow: hidden;
+        }
+        
+        /* Hero Section */
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+        
+        .dark .hero-gradient {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        }
+        
+        /* Book Shelf Effect */
+        .book-shelf {
+            background: linear-gradient(to bottom, #d1d5db, #9ca3af);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .dark .book-shelf {
+            background: linear-gradient(to bottom, #4b5563, #1f2937);
+        }
+        
+        /* Pulse Animation for Notifications */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        /* Page Turn Effect */
+        .page-turn {
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: left center;
+        }
+        
+        .page-turn:hover {
+            transform: perspective(1000px) rotateY(-15deg) translateX(-10px);
+        }
+        
+        /* Responsive Design Fixes */
+        @media (max-width: 640px) {
+            .book-card-3d:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            }
+            
+            .glass-effect {
+                backdrop-filter: blur(8px);
+            }
+            
+            .floating-element {
+                filter: blur(30px);
+            }
+            
+            .floating-element:nth-child(1) {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .floating-element:nth-child(2) {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .floating-element:nth-child(3) {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-slide {
+                transform: translateX(100%);
+            }
+            
+            .mobile-menu-slide.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-800 font-cairo dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300" dir="rtl">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white dark:bg-gray-900 z-[100] flex items-center justify-center transition-opacity duration-500">
+        <div class="text-center">
+            <div class="relative w-32 h-32 mx-auto mb-6">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full animate-pulse"></div>
+                <div class="absolute inset-4 bg-white dark:bg-gray-900 rounded-full"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="fas fa-book-open text-4xl text-primary-600 dark:text-primary-400 animate-bounce-slow"></i>
+                </div>
+            </div>
+            <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2 animate-pulse">مكتبة الكتب</div>
+            <div class="text-gray-600 dark:text-gray-300">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <!-- خلفية GSAP المتحركة -->
+    <div id="animated-background" class="fixed inset-0 overflow-hidden -z-10">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- شريط التنقل المحسن -->
+    <nav id="navbar" class="glass-effect fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo Section -->
+                <div class="flex items-center space-x-4 space-x-reverse">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2 space-x-reverse group">
+                        <div class="relative">
+                               <img src="{% static 'images/logo.png' %}" alt="logo web" class="h-12 w-auto group-hover:scale-110 transition-transform">
+
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-primary-600 dark:text-primary-400 gradient-text">مكتبة مصر الرقمية</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 -mt-1">منصة القراءة الرقمية</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <div class="hidden lg:flex items-center space-x-1 space-x-reverse mr-6">
+                        <a href="{% url 'home' %}" 
+                           class="nav-link px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors relative group">
+                            <i class="fas fa-home ml-2"></i>
+                            الرئيسية
+                            <span class="absolute bottom-0 right-1/2 transform translate-x-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-8 transition-all duration-300"></span>
+                        </a>
+                        
+                        <a href="{% url 'book_list' %}" 
+                           class="nav-link px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors relative group">
+                            <i class="fas fa-book ml-2"></i>
+                            الكـتب
+                            <span class="absolute bottom-0 right-1/2 transform translate-x-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-8 transition-all duration-300"></span>
+                        </a>
+                        
+                        <!-- Categories Dropdown -->
+                        <div class="relative group">
+                            <button class="flex items-center px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                                <i class="fas fa-th-large ml-2"></i>
+                                التصنيفات
+                                <i class="fas fa-chevron-down mr-2 text-xs transition-transform group-hover:rotate-180"></i>
+                            </button>
+                            <div class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect">
+                                <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="text-sm font-bold text-gray-800 dark:text-white">جميع التصنيفات</span>
+                                </div>
+                                <div class="max-h-80 overflow-y-auto">
+                                    {% for category in categories|slice:":10" %}
+                                    <a href="{% url 'books_by_category' category.slug %}" 
+                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                        <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center ml-3 group-hover/item:bg-primary-100 dark:group-hover/item:bg-primary-900 transition-colors">
+                                            <i class="fas fa-bookmark text-sm text-gray-600 dark:text-gray-400 group-hover/item:text-primary-600"></i>
+                                        </div>
+                                        <span class="flex-grow">{{ category.name }}</span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                            {{ category.book_count }}
+                                        </span>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                                <div class="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
+                                    <a href="{% url 'categories_list' %}" class="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline">
+                                        عرض جميع التصنيفات
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 3D Features Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                                <i class="fas fa-cube ml-2"></i>
+                                المميزات
+                                <i class="fas fa-chevron-down mr-2 text-xs transition-transform group-hover:rotate-180"></i>
+                            </button>
+                            <div class="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect transform-3d">
+                                <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="text-sm font-bold text-gray-800 dark:text-white">التجارب التفاعلية</span>
+                                </div>
+                                <div class="max-h-80 overflow-y-auto">
+                                    <a href="#3d-library" 
+                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center ml-3">
+                                            <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
+                                        </div>
+                                        <span class="flex-grow">مكتبة 3D تفاعلية</span>
+                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
+                                    </a>
+                                    <a href="#virtual-shelf" 
+                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-100 to-teal-100 dark:from-green-900 dark:to-teal-900 flex items-center justify-center ml-3">
+                                            <i class="fas fa-layer-group text-green-600 dark:text-green-300"></i>
+                                        </div>
+                                        <span class="flex-grow">رف كتب افتراضي</span>
+                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
+                                    </a>
+                                    <a href="#reading-room" 
+                                       class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900 dark:to-orange-900 flex items-center justify-center ml-3">
+                                            <i class="fas fa-chair text-yellow-600 dark:text-yellow-300"></i>
+                                        </div>
+                                        <span class="flex-grow">غرفة قراءة 3D</span>
+                                        <i class="fas fa-external-link-alt text-xs text-gray-400"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Section -->
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <!-- Search Bar -->
+                    <div class="relative hidden md:block">
+                        <form method="GET" action="{% url 'book_list' %}" id="search-form" class="relative">
+                            <div class="relative">
+                                <input type="text" 
+                                       name="q" 
+                                       placeholder="ابحث عن كتاب، مؤلف، أو تصنيف..." 
+                                       class="py-2 px-4 pr-12 w-64 lg:w-80 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 glass-effect"
+                                       id="search-input"
+                                       autocomplete="off">
+                                <button type="submit" 
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div id="search-results" 
+                                 class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden hidden z-50 animate-slide-down glass-effect">
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- User Actions -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        {% if user.is_authenticated %}
+                        <!-- Notifications -->
+                        <div class="relative">
+                            <button id="notification-btn" 
+                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors relative pulse-glow">
+                                <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
+                                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">3</span>
+                            </button>
+                            
+                            <!-- Notification Dropdown -->
+                            <div id="notification-dropdown" 
+                                 class="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 hidden z-50 animate-slide-down glass-effect">
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-bold text-gray-800 dark:text-white">الإشعارات</span>
+                                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline">تحديد الكل كمقروء</button>
+                                    </div>
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    <!-- Sample Notifications -->
+                                    <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
+                                        <div class="flex items-start">
+                                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center ml-3">
+                                                <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
+                                            </div>
+                                            <div class="flex-grow">
+                                                <p class="text-sm text-gray-800 dark:text-gray-200">كتاب جديد في تخصصك المفضل</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">منذ 2 ساعة</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 space-x-reverse focus-ring rounded-full p-1">
+                                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg transform-3d group-hover:rotate-y-180 transition-transform duration-500">
+                                    <span class="backface-hidden">{{ user.username|first|upper }}</span>
+                                    <i class="fas fa-user absolute inset-0 flex items-center justify-center rotate-y-180 backface-hidden"></i>
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-400 text-sm hidden lg:block transition-transform group-hover:rotate-180"></i>
+                            </button>
+                            
+                            <div class="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 glass-effect">
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                    <div class="font-bold text-gray-800 dark:text-white">{{ user.get_full_name|default:user.username }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
+                                </div>
+                                
+                                <a href="{% url 'profile' %}" 
+                                   class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                    <i class="fas fa-user-circle ml-3 text-gray-400 group-hover/item:text-primary-600"></i>
+                                    <span>الملف الشخصي</span>
+                                </a>
+                                
+                                <a href="{% url 'dashboard' %}" 
+                                   class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                    <i class="fas fa-tachometer-alt ml-3 text-gray-400 group-hover/item:text-primary-600"></i>
+                                    <span>لوحة التحكم</span>
+                                </a>
+                                
+                                <a href="#" 
+                                   class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                    <i class="fas fa-bookmark ml-3 text-gray-400 group-hover/item:text-primary-600"></i>
+                                    <span>المفضلة</span>
+                                </a>
+                                
+                                {% if user.is_staff %}
+                                <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                                <a href="{% url 'admin:index' %}" 
+                                   class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group/item">
+                                    <i class="fas fa-cog ml-3 text-gray-400 group-hover/item:text-primary-600"></i>
+                                    <span>إدارة الموقع</span>
+                                </a>
+                                {% endif %}
+                                
+                                <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                                <a href="{% url 'logout' %}" 
+                                   class="flex items-center px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group/item">
+                                    <i class="fas fa-sign-out-alt ml-3"></i>
+                                    <span>تسجيل الخروج</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Auth Buttons -->
+                        <a href="{% url 'login' %}" 
+                           class="hidden md:inline-block bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-bold py-2.5 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                            <i class="fas fa-sign-in-alt ml-2"></i>تسجيل الدخول
+                        </a>
+                        <a href="{% url 'register' %}" 
+                           class="hidden md:inline-block border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-2.5 px-6 rounded-full transition-all duration-300">
+                            <i class="fas fa-user-plus ml-2"></i>حساب جديد
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle" 
+                                class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring transform-3d hover:rotate-180 transition-transform duration-500">
+                            <i class="fas fa-moon text-gray-600 dark:text-yellow-400"></i>
+                            <i class="fas fa-sun text-yellow-500 absolute inset-0 flex items-center justify-center rotate-y-180 backface-hidden"></i>
+                        </button>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button id="mobile-menu-btn" 
+                                class="lg:hidden w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus-ring">
+                            <i class="fas fa-bars text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+        
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 lg:hidden">
+            <div class="flex flex-col h-full">
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-book text-white"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800 dark:text-white">مكتبة الكتب</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">القائمة</div>
+                        </div>
+                    </div>
+                    <button id="mobile-menu-close" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                </div>
+                
+                <!-- Mobile Search -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <form method="GET" action="{% url 'book_list' %}" class="relative">
+                        <input type="text" 
+                               name="q" 
+                               placeholder="ابحث في المكتبة..." 
+                               class="w-full py-3 px-4 pr-12 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                        <button type="submit" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Mobile Navigation -->
+                <div class="flex-1 overflow-y-auto">
+                    <div class="space-y-1 p-2">
+                        <a href="{% url 'home' %}" 
+                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center ml-3">
+                                <i class="fas fa-home text-blue-600 dark:text-blue-300"></i>
+                            </div>
+                            <span>الرئيسية</span>
+                        </a>
+                        
+                        <a href="{% url 'book_list' %}" 
+                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center ml-3">
+                                <i class="fas fa-book text-green-600 dark:text-green-300"></i>
+                            </div>
+                            <span>جميع الكتب</span>
+                        </a>
+                        
+                        <!-- Mobile Categories -->
+                        <div class="px-4 py-3">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-2">التصنيفات</div>
+                            <div class="flex flex-wrap gap-2">
+                                {% for category in categories|slice:":6" %}
+                                <a href="{% url 'books_by_category' category.slug %}" 
+                                   class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+                                    {{ category.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Mobile Features -->
+                        <div class="px-4 py-3">
+                            <div class="font-medium text-gray-800 dark:text-gray-200 mb-2">المميزات التفاعلية</div>
+                            <div class="space-y-2">
+                                <a href="#3d-library" 
+                                   class="flex items-center px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg text-gray-700 dark:text-gray-200">
+                                    <i class="fas fa-cube ml-2 text-blue-500"></i>
+                                    <span>مكتبة 3D</span>
+                                </a>
+                                <a href="#virtual-shelf" 
+                                   class="flex items-center px-3 py-2 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 rounded-lg text-gray-700 dark:text-gray-200">
+                                    <i class="fas fa-layer-group ml-2 text-green-500"></i>
+                                    <span>رف كتب افتراضي</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" 
+                           class="flex items-center px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-primary-50 dark:hover:bg-gray-700 font-medium transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center ml-3">
+                                <i class="fas fa-tachometer-alt text-yellow-600 dark:text-yellow-300"></i>
+                            </div>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        
+                        <a href="{% url 'logout' %}" 
+                           class="flex items-center px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center ml-3">
+                                <i class="fas fa-sign-out-alt text-red-600 dark:text-red-300"></i>
+                            </div>
+                            <span>تسجيل الخروج</span>
+                        </a>
+                        {% else %}
+                        <div class="space-y-3 px-4 py-3">
+                            <a href="{% url 'login' %}" 
+                               class="w-full bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors flex items-center justify-center">
+                                <i class="fas fa-sign-in-alt ml-2"></i>تسجيل الدخول
+                            </a>
+                            <a href="{% url 'register' %}" 
+                               class="w-full border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-3 px-4 rounded-lg text-center transition-colors">
+                                حساب جديد
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Mobile Footer -->
+                <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-center space-x-4 space-x-reverse">
+                        <button id="mobile-theme-toggle" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                            <i class="fas fa-moon text-gray-600 dark:text-yellow-400"></i>
+                        </button>
+                        <button id="mobile-notifications" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center relative">
+                            <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الرسائل المحسنة -->
+    {% if messages %}
+    <div class="container mx-auto px-4 mt-24 z-40 relative">
+        {% for message in messages %}
+        <div class="message-alert bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-50 dark:bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-900/20 border border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 dark:border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-700 text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-800 dark:text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% elif message.tags == 'warning' %}yellow{% else %}blue{% endif %}-200 px-6 py-4 rounded-xl shadow-lg mb-4 flex items-start animate-slide-down glass-effect" role="alert">
+            <div class="flex-shrink-0">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+                {% else %}
+                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                {% endif %}
+            </div>
+            <div class="mr-3 flex-grow">
+                <div class="font-bold mb-1">
+                    {% if message.tags == 'success' %}
+                    نجاح!
+                    {% elif message.tags == 'error' %}
+                    خطأ!
+                    {% elif message.tags == 'warning' %}
+                    تحذير!
+                    {% else %}
+                    معلومة
+                    {% endif %}
+                </div>
+                <div>{{ message }}</div>
+            </div>
+            <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- المحتوى الرئيسي -->
+    <main class="pt-22 min-h-screen">
+        {% block content %}
+        <!-- Hero Section -->
+        <section class="hero-gradient py-20 px-4 relative overflow-hidden">
+            <div class="container mx-auto relative z-10">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6 gradient-text animate-fade-in">
+                        مكتبة <span class="text-primary-600">رقمية</span> متكاملة
+                    </h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 animate-slide-up">
+                        اكتشف عالماً من المعرفة مع مكتبتنا الرقمية المتطورة. آلاف الكتب الإلكترونية في مختلف المجالات بين يديك.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
+                        <a href="{% url 'book_list' %}" 
+                           class="bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center">
+                            <i class="fas fa-book-open ml-2"></i>استكشاف المكتبة
+                        </a>
+                        <a href="#3d-library" 
+                           class="border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-800 font-bold py-3 px-8 rounded-full transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-cube ml-2"></i>تجربة 3D
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3D Library Section -->
+        <section id="3d-library" class="py-20 px-4 relative">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">المكتبة الافتراضية ثلاثية الأبعاد</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <!-- 3D Scene Description -->
+                    <div class="animate-on-scroll">
+                        <h3 class="text-2xl font-bold mb-4">تجربة قراءة فريدة</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-6">
+                            استمتع بتجربة تصفح فريدة في مكتبتنا الافتراضية ثلاثية الأبعاد. تصفح الرفوف، اختر الكتب، واقرأ في بيئة تفاعلية غامرة.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center ml-3">
+                                    <i class="fas fa-vr-cardboard text-blue-600 dark:text-blue-300"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">تصفح 360 درجة</h4>
+                                    <p class="text-sm text-gray-500">استكشف المكتبة من جميع الزوايا</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center ml-3">
+                                    <i class="fas fa-hand-pointer text-green-600 dark:text-green-300"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">تفاعل مباشر</h4>
+                                    <p class="text-sm text-gray-500">انقر وسحب وتصفح الكتب بسهولة</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center ml-3">
+                                    <i class="fas fa-book-reader text-purple-600 dark:text-purple-300"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold">قراءة غامرة</h4>
+                                    <p class="text-sm text-gray-500">تجربة قراءة واقعية مع تأثيرات بصرية</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3D Scene Placeholder -->
+                    <div class="relative h-96 animate-on-scroll">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-vr-cardboard text-6xl text-primary-500 mb-4 animate-bounce-slow"></i>
+                                <p class="text-gray-600 dark:text-gray-300">المكتبة ثلاثية الأبعاد</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">(محاكاة تفاعلية باستخدام GSAP)</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Books -->
+                        <div class="absolute top-8 right-8 w-16 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg shadow-lg transform rotate-6 animate-float"></div>
+                        <div class="absolute bottom-8 left-8 w-16 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg shadow-lg transform -rotate-6 animate-float" style="animation-delay: 0.5s;"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-28 bg-gradient-to-br from-green-400 to-teal-500 rounded-lg shadow-lg animate-float" style="animation-delay: 1s;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Books Section -->
+        <section class="py-20 px-4 bg-gray-50 dark:bg-gray-800/50">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">أحدث الكتب</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <!-- Book Card 1 -->
+                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                                 alt="كتاب البرمجة المتقدم" 
+                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
+                            <div class="absolute top-4 left-4 bg-primary-500 text-white px-3 py-1 rounded-full text-sm">
+                                جديد
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">البرمجة المتقدمة</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">دليل شامل لتقنيات البرمجة الحديثة والمتقدمة</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-primary-600 dark:text-primary-400 font-bold">د. أحمد محمد</span>
+                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
+                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Card 2 -->
+                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1531346688376-ab6275c4725e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                                 alt="علم النفس الحديث" 
+                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
+                            <div class="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+                                الأكثر قراءة
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">علم النفس الحديث</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">استكشاف أعماق النفس البشرية</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-primary-600 dark:text-primary-400 font-bold">د. سارة خالد</span>
+                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
+                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Card 3 -->
+                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1456513080510-3445092d4b7a?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                                 alt="التسويق الرقمي" 
+                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
+                            <div class="absolute top-4 left-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm">
+                                مفضل
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">التسويق الرقمي</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">استراتيجيات التسويق في العصر الرقمي</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-primary-600 dark:text-primary-400 font-bold">محمد علي</span>
+                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
+                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Card 4 -->
+                    <div class="book-card-3d bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                                 alt="فن القيادة" 
+                                 class="w-full h-full object-cover book-cover transform transition-transform duration-500 hover:scale-110">
+                            <div class="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
+                                موصى به
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">فن القيادة</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">أسرار القيادة الناجحة</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-primary-600 dark:text-primary-400 font-bold">نورة أحمد</span>
+                                <button class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors">
+                                    <i class="fas fa-bookmark text-primary-600 dark:text-primary-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <a href="{% url 'book_list' %}" 
+                       class="inline-flex items-center text-primary-600 dark:text-primary-400 font-bold hover:underline">
+                        عرض جميع الكتب
+                        <i class="fas fa-arrow-left mr-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Virtual Bookshelf -->
+        <section id="virtual-shelf" class="py-20 px-4">
+            <div class="container mx-auto">
+                <h2 class="text-4xl font-bold text-center mb-12 gradient-text">رف الكتب الافتراضي</h2>
+                
+                <div class="relative h-64 mb-12">
+                    <!-- Bookshelf -->
+                    <div class="absolute inset-x-0 bottom-0 h-32 book-shelf rounded-lg"></div>
+                    
+                    <!-- Books on Shelf -->
+                    <div class="absolute bottom-32 left-1/4 w-12 h-40 bg-gradient-to-br from-blue-500 to-purple-600 rounded transform rotate-3 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
+                    <div class="absolute bottom-32 left-2/4 w-12 h-36 bg-gradient-to-br from-green-500 to-teal-600 rounded transform -rotate-3 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
+                    <div class="absolute bottom-32 right-1/4 w-12 h-44 bg-gradient-to-br from-red-500 to-pink-600 rounded transform rotate-6 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
+                    <div class="absolute bottom-32 right-1/3 w-12 h-32 bg-gradient-to-br from-yellow-500 to-orange-600 rounded transform -rotate-2 shadow-lg hover:rotate-0 transition-transform duration-300"></div>
+                </div>
+                
+                <div class="text-center max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-4">نظام رفوف ذكي</h3>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        رتب كتبك المفضلة في رف افتراضي، وتصفحها بشكل تفاعلي مع إمكانية السحب والإفلات وتغيير الترتيب حسب رغبتك.
+                    </p>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <!-- التذييل المحسن -->
+    <footer class="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+                <!-- Brand Column -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg ml-4">
+                            <i class="fas fa-book text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold">مكتبة الكتب</div>
+                            <div class="text-gray-300">منصة القراءة الرقمية الأولى</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-6 max-w-md">
+                        منصة رقمية شاملة للكتب العربية والعالمية. نهدف إلى نشر المعرفة والثقافة من خلال توفير محتوى قرائي مميز وتجربة قراءة فريدة.
+                    </p>
+                    <div class="flex space-x-4 space-x-reverse">
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-700 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">روابط سريعة</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'home' %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>الرئيسية
+                        </a></li>
+                        <li><a href="{% url 'book_list' %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>جميع الكتب
+                        </a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>عن المكتبة
+                        </a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>اتصل بنا
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">فئات الكتب</h4>
+                    <ul class="space-y-3">
+                        {% for category in categories|slice:":5" %}
+                        <li><a href="{% url 'books_by_category' category.slug %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>{{ category.name }}
+                        </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">النشرة البريدية</h4>
+                    <p class="text-gray-300 mb-4">اشترك لتصلك أحدث الكتب والعروض</p>
+                    <form method="POST" action="#" class="space-y-3">
+                        {% csrf_token %}
+                        <input type="email" 
+                               name="email" 
+                               placeholder="بريدك الإلكتروني" 
+                               class="w-full py-3 px-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                               required>
+                        <button type="submit" 
+                                class="w-full bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center">
+                            <i class="fas fa-paper-plane ml-2"></i>اشترك الآن
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-700 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-400">© {% now "Y" %} مكتبة الكتب. جميع الحقوق محفوظة.</p>
+                    </div>
+                    <div class="flex flex-wrap justify-center space-x-6 space-x-reverse text-gray-400">
+                        <a href="#" class="hover:text-white transition-colors">شروط الاستخدام</a>
+                        <a href="#" class="hover:text-white transition-colors">سياسة الخصوصية</a>
+                        <a href="#" class="hover:text-white transition-colors">سياسة ملفات تعريف الارتباط</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" 
+            class="fixed bottom-8 left-8 w-12 h-12 bg-gradient-to-r from-primary-500 to-purple-500 text-white rounded-full shadow-2xl flex items-center justify-center hover:shadow-xl transition-all duration-300 transform translate-y-10 opacity-0 z-40">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- JavaScript المحسن -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize GSAP
+            if (typeof gsap !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+                
+                // Animated background elements
+                gsap.to('.floating-element:nth-child(1)', {
+                    duration: 20,
+                    x: 'random(-100, 100)',
+                    y: 'random(-50, 50)',
+                    rotation: 'random(0, 360)',
+                    ease: 'power1.inOut',
+                    repeat: -1,
+                    yoyo: true
+                });
+                
+                gsap.to('.floating-element:nth-child(2)', {
+                    duration: 25,
+                    x: 'random(-80, 80)',
+                    y: 'random(-40, 40)',
+                    rotation: 'random(0, 360)',
+                    ease: 'power1.inOut',
+                    repeat: -1,
+                    yoyo: true
+                });
+                
+                gsap.to('.floating-element:nth-child(3)', {
+                    duration: 30,
+                    x: 'random(-60, 60)',
+                    y: 'random(-30, 30)',
+                    rotation: 'random(0, 360)',
+                    ease: 'power1.inOut',
+                    repeat: -1,
+                    yoyo: true
+                });
+            }
+            
+            // Hide loading overlay
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000);
+            
+            // Mobile Menu Functionality
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            
+            function openMobileMenu() {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenuOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            function closeMobileMenu() {
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenuOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', openMobileMenu);
+            }
+            
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', closeMobileMenu);
+            }
+            
+            if (mobileMenuOverlay) {
+                mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+            }
+            
+            // Theme Toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+            
+            function toggleTheme() {
+                const isDark = document.body.classList.contains('dark');
+                const icon = themeToggle?.querySelector('.fa-moon') || themeToggle?.querySelector('.fa-sun');
+                const mobileIcon = mobileThemeToggle?.querySelector('.fa-moon') || mobileThemeToggle?.querySelector('.fa-sun');
+                
+                if (isDark) {
+                    document.body.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    if (icon) {
+                        icon.classList.remove('fa-sun', 'text-yellow-400');
+                        icon.classList.add('fa-moon');
+                    }
+                    if (mobileIcon) {
+                        mobileIcon.classList.remove('fa-sun', 'text-yellow-400');
+                        mobileIcon.classList.add('fa-moon');
+                    }
+                } else {
+                    document.body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    if (icon) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun', 'text-yellow-400');
+                    }
+                    if (mobileIcon) {
+                        mobileIcon.classList.remove('fa-moon');
+                        mobileIcon.classList.add('fa-sun', 'text-yellow-400');
+                    }
+                }
+                
+                // Add rotation animation
+                if (themeToggle) {
+                    themeToggle.style.transform = 'rotate(180deg)';
+                    setTimeout(() => {
+                        themeToggle.style.transform = '';
+                    }, 500);
+                }
+            }
+            
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            if (mobileThemeToggle) {
+                mobileThemeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark');
+                const icon = themeToggle?.querySelector('.fa-moon');
+                const mobileIcon = mobileThemeToggle?.querySelector('.fa-moon');
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun', 'text-yellow-400');
+                }
+                if (mobileIcon) {
+                    mobileIcon.classList.remove('fa-moon');
+                    mobileIcon.classList.add('fa-sun', 'text-yellow-400');
+                }
+            }
+            
+            // Back to Top Button
+            const backToTopBtn = document.getElementById('back-to-top');
+            
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        backToTopBtn.classList.remove('translate-y-10', 'opacity-0');
+                        backToTopBtn.classList.add('translate-y-0', 'opacity-100');
+                    } else {
+                        backToTopBtn.classList.remove('translate-y-0', 'opacity-100');
+                        backToTopBtn.classList.add('translate-y-10', 'opacity-0');
+                    }
+                });
+                
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+            
+            // Auto-hide messages
+            setTimeout(() => {
+                document.querySelectorAll('.message-alert').forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-20px)';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+            
+            // Initialize scroll animations
+            function initScrollAnimations() {
+                const animatedElements = document.querySelectorAll('.animate-on-scroll');
+                
+                animatedElements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+                    
+                    if (isVisible) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', initScrollAnimations);
+            initScrollAnimations();
+            
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            
+            if (searchInput && searchResults) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.trim();
+                    
+                    if (query.length < 2) {
+                        searchResults.classList.add('hidden');
+                        return;
+                    }
+                    
+                    // Simulate search results
+                    searchResults.innerHTML = `
+                        <div class="p-4">
+                            <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
+                            <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
+                            <div class="skeleton w-full h-12 rounded-lg"></div>
+                        </div>
+                    `;
+                    searchResults.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        searchResults.innerHTML = `
+                            <div class="p-2">
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                    <span class="font-bold text-gray-800 dark:text-white">نتائج البحث</span>
+                                </div>
+                                <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                                    <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center ml-3">
+                                            <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <p class="font-medium text-gray-800 dark:text-white">${query}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">نتائج البحث</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    }, 500);
+                });
+                
+                document.addEventListener('click', function(event) {
+                    if (!searchResults.contains(event.target) && !searchInput.contains(event.target)) {
+                        searchResults.classList.add('hidden');
+                    }
+                });
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            
+            if (window.innerWidth >= 1024) {
+                if (mobileMenu && !mobileMenu.classList.contains('translate-x-full')) {
+                    mobileMenu.classList.add('translate-x-full');
+                }
+                if (mobileMenuOverlay && !mobileMenuOverlay.classList.contains('hidden')) {
+                    mobileMenuOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

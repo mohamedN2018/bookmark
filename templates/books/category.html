@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ category.name }} - المكتبة السرية{% endblock %}
+{% block title %}{{ category.name }} - مكتبة الكتب{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -480,7 +480,7 @@
                                 </div>
                                 <div class="mr-4 flex-grow">
                                     <h5 class="font-medium text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 text-sm line-clamp-2 transition-colors">{{ popular_book.title }}</h5>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ popular_book.author_display }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ popular_book.author }}</p>
                                 </div>
                                 <i class="fas fa-chevron-left text-gray-400 group-hover:text-blue-500 transition-colors"></i>
                             </a>
@@ -666,7 +666,7 @@
                                 </h4>
                                 <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 flex items-center">
                                     <i class="fas fa-user-pen ml-2 text-blue-500"></i>
-                                    {{ book.author_display }}
+                                    {{ book.author }}
                                 </p>
                                 
                                 <!-- التقييم والإحصائيات -->
@@ -1061,7 +1061,7 @@
                     const icon = this.querySelector('i');
                     
                     try {
-                        const response = await fetch(`/books/${bookId}/bookmark/`, {
+                        const response = await fetch(`/api/books/${bookId}/bookmark/`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}',
@@ -1104,7 +1104,7 @@
                     if (navigator.share) {
                         navigator.share({
                             title: title,
-                            text: `اكتشف كتاب ${title} على المكتبة السرية`,
+                            text: `اكتشف كتاب ${title} على مكتبة الكتب`,
                             url: fullUrl
                         });
                     } else {
@@ -1236,14 +1236,13 @@
                     <div class="flex items-center">
                         <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'} text-${type === 'success' ? 'green' : 'blue'}-500 text-xl ml-3"></i>
                         <div class="flex-grow">
-                            <p class="text-gray-800 dark:text-white font-medium" data-msg></p>
+                            <p class="text-gray-800 dark:text-white font-medium">${message}</p>
                         </div>
                         <button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 `;
-                notification.querySelector('[data-msg]').textContent = message;
                 
                 document.body.appendChild(notification);
                 
@@ -1269,10 +1268,19 @@
                 });
             }
             
-            function performSearch(term) {
-                // بحث حقيقي داخل هذا التصنيف
-                const params = new URLSearchParams({ category: "{{ category.slug|escapejs }}", q: term });
-                window.location.href = "{% url 'book_list' %}?" + params.toString();
+            async function performSearch(term) {
+                // محاكاة البحث
+                showNotification(`جاري البحث عن "${term}"...`, 'info');
+                
+                // تأثير تحميل
+                const booksContainer = document.getElementById('books-container');
+                booksContainer.classList.add('loading');
+                
+                // هنا سيتم إضافة منطق البحث الحقيقي
+                setTimeout(() => {
+                    booksContainer.classList.remove('loading');
+                    showNotification(`تم العثور على نتائج لـ "${term}"`, 'success');
+                }, 1000);
             }
             
             function resetSearch() {

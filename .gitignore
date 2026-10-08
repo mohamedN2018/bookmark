@@ -202,8 +202,3 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-
-# ---- المكتبة السرية ----
-staticfiles/
-static/node_modules/
-backups/

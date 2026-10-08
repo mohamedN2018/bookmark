@@ -2,8 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ book.title }} - المكتبة السرية{% endblock %}
-{% block meta_description %}{{ book.description|striptags|truncatechars:160 }}{% endblock %}
+{% block title %}{{ book.title }} - مكتبة الكتب{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -40,6 +39,11 @@
                         
                         <!-- العلامات -->
                         <div class="absolute top-4 right-4 flex flex-col space-y-2">
+                            {% if book.is_free %}
+                            <span class="bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+                                مجاني
+                            </span>
+                            {% endif %}
                             {% if book.is_featured %}
                             <span class="bg-yellow-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
                                 مميز
@@ -93,11 +97,8 @@
                                 <div>
                                     <p class="text-gray-600">المؤلف</p>
                                     <p class="font-medium text-gray-800">
-                                        {% if book.author %}
-                                        <a href="{% url 'author_detail' book.author.id %}">{{ book.author.name }}</a>
-                                        {% else %}
-                                        {{ book.author_name|default:"غير معروف" }}
-                                        {% endif %}
+                                        {% comment %} <a href="{% url 'author_books' author_data.author.id %}"> {{ book.author }} </a>  {% endcomment %}
+                                        <a href="{% url 'author_books' book.author.id %}">{{ book.author.name }}</a>
 
                                     </p>
                                 </div>
@@ -177,11 +178,19 @@
                     
                     <!-- أزرار الإجراء -->
                     <div class="flex flex-wrap gap-4">
-                        <!-- الوصول: لا نعرض "تحميل" أو "شراء" قبل التحقق من مصدر قانوني -->
-                        <div class="flex-1 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300" role="note">
-                            <div class="font-bold mb-1"><i class="fas fa-shield-alt ml-2"></i>نوع الوصول: غير محدد بعد</div>
-                            <p>لم يُتحقق بعد من مصدر قانوني لقراءة هذا العنوان أو تحميله. المتاح حاليًا هو بياناته الوصفية فقط.</p>
-                        </div>
+                        {% if book.is_free %}
+                        <a href="#" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-xl text-center transition duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-download ml-2"></i> تحميل الكتاب
+                        </a>
+                        {% else %}
+                        <a href="#" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl text-center transition duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-shopping-cart ml-2"></i> شراء الآن ({{ book.price }} جنية )
+                        </a>
+                        {% endif %}
+                        
+                        <button class="read-btn bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-4 px-6 rounded-xl transition duration-300">
+                            <i class="fas fa-book-open ml-2"></i> ابدأ القراءة
+                        </button>
                         
                         {% if user.is_authenticated %}
                         <button class="bookmark-detail-btn p-4 border-2 border-gray-300 rounded-xl hover:border-yellow-500 hover:bg-yellow-50 transition duration-300"
@@ -295,6 +304,15 @@
                             </div>
                             {% endfor %}
                         </div>
+                        
+                        <!-- تحميل المزيد -->
+                        {% if reviews.count > 3 %}
+                        <div class="mt-8 text-center">
+                            <button id="load-more-reviews" class="text-blue-600 hover:text-blue-800 font-medium">
+                                <i class="fas fa-arrow-down ml-2"></i> عرض المزيد من التقييمات
+                            </button>
+                        </div>
+                        {% endif %}
                         {% else %}
                         <div class="text-center py-8">
                             <i class="fas fa-star text-4xl text-gray-300 mb-4"></i>
@@ -323,7 +341,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-800 group-hover:text-blue-600 mb-1">{{ similar_book.title|truncatechars:25 }}</h4>
-                                        <p class="text-gray-600 text-sm mb-2">{{ similar_book.author_display }}</p>
+                                        <p class="text-gray-600 text-sm mb-2">{{ similar_book.author }}</p>
                                         <div class="flex items-center">
                                             {% with avg_rating=similar_book.average_rating %}
                                             {% for i in "12345"|make_list %}
@@ -359,12 +377,12 @@
                             <i class="fas fa-user-pen text-purple-600"></i>
                         </div>
                         <div>
-                            <h5 class="font-bold text-gray-800">{{ book.author_display }}</h5>
+                            <h5 class="font-bold text-gray-800">{{ book.author }}</h5>
                             <p class="text-sm text-gray-600">مؤلف</p>
                         </div>
                     </div>
                     <p class="text-gray-600 text-sm">
-                        {{ book.author_display }} هو مؤلف هذا الكتاب. يمكنك الاطلاع على كتب أخرى له في هذا القسم.
+                        {{ book.author }} هو مؤلف هذا الكتاب. يمكنك الاطلاع على كتب أخرى له في هذا القسم.
                     </p>
                 </div>
                 
@@ -448,6 +466,63 @@
     </div>
 </div>
 
+<!-- نموذج قراءة الكتاب -->
+<div id="reading-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+            <h3 class="text-xl font-bold text-gray-800">قارئ الكتب</h3>
+            <button id="close-reading-modal" class="text-gray-500 hover:text-gray-700 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="p-6 h-[calc(90vh-80px)] overflow-y-auto">
+            <!-- محتوى الكتاب -->
+            <div class="prose prose-lg max-w-none">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ book.title }}</h2>
+                <h3 class="text-xl text-gray-600 mb-8">بواسطة {{ book.author }}</h3>
+                
+                <div class="text-gray-700 leading-relaxed text-lg">
+                    <!-- محتوى الكتاب سيتم تحميله هنا -->
+                    {{ book.description|linebreaks }}
+                    <p class="mt-8 text-center text-gray-500">
+                        هذا نموذج لعرض محتوى الكتاب. في التطبيق الحقيقي، سيتم تحميل المحتوى الكامل للكتاب هنا.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-200 p-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-font"></i>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-600">
+                        الصفحة <span id="current-page">1</span> من <span id="total-pages">100</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="p-2 text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

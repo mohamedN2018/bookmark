@@ -1,100 +1,17 @@
-# المكتبة السرية: الإنتاج على Dokploy (نوع "Docker Compose")
-#
-# في Dokploy:
-#   - Domains: أضف الدومين للخدمة book_project على المنفذ 8000 (Traefik يتولى HTTPS).
-#   - Environment: MY_SECRET_KEY و MAIN_DOMAIN فقط مطلوبة. الباقي اختياري.
-# لا منافذ منشورة على الخادم: Traefik يوجّه الطلبات عبر شبكة Dokploy.
-# البيانات في volumes مسمّاة لأن Dokploy يعيد استنساخ الكود مع كل نشر.
-#
-# تشغيل محلي:  docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
-
-x-postgres: &postgres-env
-  POSTGRES_DB: ${POSTGRES_DB:-maktaba}
-  POSTGRES_USER: ${POSTGRES_USER:-maktaba}
-  POSTGRES_PASSWORD_FILE: /run/maktaba-secrets/postgres_password
-
+version: '3.7'
 services:
-  # يولّد كلمة مرور PostgreSQL مرة واحدة ويحفظها في volume (أو يأخذ POSTGRES_PASSWORD إن ضُبطت)
-  secrets:
-    image: alpine:3.20
-    restart: "no"
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-    volumes:
-      - secrets:/secrets
-    command:
-      - sh
-      - -c
-      - |
-        f=/secrets/postgres_password
-        if [ ! -s "$$f" ]; then
-          if [ -n "$$POSTGRES_PASSWORD" ]; then printf '%s' "$$POSTGRES_PASSWORD" > "$$f";
-          else tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 > "$$f"; fi
-        fi
-        chmod 644 "$$f"
-
-  db:
-    image: postgres:16-alpine
-    restart: always
-    environment: *postgres-env
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - secrets:/run/maktaba-secrets:ro
-    depends_on:
-      secrets:
-        condition: service_completed_successfully
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-
-  redis:
-    image: redis:7-alpine
-    restart: always
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-
   book_project:
     build: .
     restart: always
-    expose:
-      - "8000"
-    environment:
-      <<: *postgres-env
-      DB_ENGINE: postgres
-      POSTGRES_HOST: db
-      REDIS_URL: redis://redis:6379/0
-      DEBUG: ${DEBUG:-False}
-      # تمرير متغيرات Dokploy (الفارغ يُعامل كغير مضبوط ويُقرأ من .env بدلًا منه)
-      MY_SECRET_KEY: ${MY_SECRET_KEY:-}
-      MAIN_DOMAIN: ${MAIN_DOMAIN:-}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
-      SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-}
-      DOTENV_DIR: /srv/code
-      # بيانات SQLite القديمة (من المستودع، داخل الصورة) تُنقل تلقائيًا إلى PostgreSQL الفارغة
-      LEGACY_SQLITE_PATH: /usr/src/app/db.sqlite3
-      BACKUP_DIR: /usr/src/app/backups
     volumes:
-      - media:/usr/src/app/media
-      - backups:/usr/src/app/backups
-      - secrets:/run/maktaba-secrets:ro
-      - ./:/srv/code:ro
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=3).status == 200 else 1)"]
-      interval: 30s
-      timeout: 5s
-      start_period: 60s
-      retries: 3
+      - ./:/usr/src/app
+    ports:
+      # - "8080:8000"  # 8080 على جهازك، 8000 داخل الـ container
+      - "80:8000"
 
-volumes:
-  pgdata:
-  # تُملأ تلقائيًا من media/ الموجودة في الصورة عند أول إنشاء
-  media:
-  backups:
-  secrets:
+    command: >
+      gunicorn --chdir /usr/src/app
+               --access-logfile -
+               --error-logfile -
+               --bind 0.0.0.0:8000
+               book_project.wsgi:application

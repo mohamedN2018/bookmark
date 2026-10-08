@@ -1244,7 +1244,7 @@
                     </div>
                     <div class="header-text">
                         <h1>إدارة الكتب</h1>
-                        <p>مركز التحكم الشامل لالمكتبة السرية الرقمية</p>
+                        <p>مركز التحكم الشامل لمكتبة الكتب الرقمية</p>
                     </div>
                 </div>
                 
@@ -1667,7 +1667,7 @@
                                                         {% if book.cover_image %}
                                                             <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" loading="lazy">
                                                         {% else %}
-                                                            <img src="{% static 'images/default_book_cover.png' %}" alt="" loading="lazy">
+                                                            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=100&h=100&fit=crop" alt="{{ book.title }}" loading="lazy">
                                                         {% endif %}
                                                     </div>
                                                     <div class="book-info">
@@ -2076,7 +2076,7 @@
         
         function deleteBook(bookId, bookTitle) {
             if (confirm(`هل أنت متأكد من رغبتك في حذف الكتاب "${bookTitle}"؟\nهذا الإجراء لا يمكن التراجع عنه.`)) {
-                fetch(`{% url 'delete_book' 0 %}`.replace('/0/', `/${bookId}/`), {
+                fetch(`/books/delete/${bookId}/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',

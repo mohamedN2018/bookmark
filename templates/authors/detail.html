@@ -15,7 +15,7 @@
                         {% if author.avatar %}
                         <img src="{{ author.avatar.url }}" alt="{{ author.name }}" class="w-full h-full object-cover">
                         {% else %}
-                        <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-3xl font-bold text-gray-600 dark:text-gray-300" aria-hidden="true">{{ author.name|first }}</div>
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ author.id }}" alt="{{ author.name }}" class="w-full h-full object-cover">
                         {% endif %}
                     </div>
                     {% if author.is_featured %}

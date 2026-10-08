@@ -1,7 +1,0 @@
-line-length = 120
-target-version = "py311"
-extend-exclude = ["*/migrations/*", "static/node_modules"]
-
-[lint]
-select = ["E", "F", "W", "I", "B", "UP", "DJ"]
-ignore = ["DJ001"]
