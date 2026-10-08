@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}الملف الشخصي - مكتبة الكتب{% endblock %}
+{% block title %}الملف الشخصي - المكتبة السرية{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 md:py-12">
@@ -326,9 +326,15 @@
                                 
                                 <div class="space-y-4">
                                     <div class="space-y-2">
+                                        <label for="current-password-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300">كلمة المرور الحالية</label>
+                                        <input type="password" name="current_password" autocomplete="current-password"
+                                               class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl" id="current-password-input" disabled
+                                               placeholder="مطلوبة لتغيير كلمة المرور">
+                                    </div>
+                                    <div class="space-y-2">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">كلمة المرور الجديدة</label>
                                         <div class="relative">
-                                            <input type="password" name="password" 
+                                            <input type="password" name="new_password" autocomplete="new-password"
                                                    class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl" id="password-input" disabled
                                                    placeholder="أدخل كلمة مرور جديدة">
                                             <div class="absolute right-3 top-3 text-gray-400">
@@ -343,7 +349,7 @@
                                     <div class="space-y-2">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">تأكيد كلمة المرور</label>
                                         <div class="relative">
-                                            <input type="password" 
+                                            <input type="password" name="new_password_confirm" autocomplete="new-password"
                                                    class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl" id="confirm-password-input" disabled
                                                    placeholder="أعد إدخال كلمة المرور">
                                             <div class="absolute right-3 top-3 text-gray-400">
@@ -379,94 +385,26 @@
                     
                     <!-- قسم إحصائيات القراءة -->
                     <div id="reading-stats" class="profile-section bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6 border border-gray-100 dark:border-gray-700 hidden">
-                        <div class="flex justify-between items-center mb-8">
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-800 dark:text-white">إحصائيات القراءة</h3>
-                                <p class="text-gray-600 dark:text-gray-300">تتبع تقدمك في القراءة</p>
-                            </div>
-                            <button class="flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium px-4 py-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
-                                <i class="fas fa-download ml-2"></i> تصدير الإحصائيات
-                            </button>
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">إحصائيات القراءة</h3>
+                            <p class="text-gray-600 dark:text-gray-300">أرقام من سجلك الفعلي فقط.</p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-2xl border border-blue-200 dark:border-blue-800/30">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <p class="text-gray-600 dark:text-gray-300">إجمالي وقت القراءة</p>
-                                        <h4 class="text-2xl font-bold text-gray-800 dark:text-white">
-                                            {% if total_reading_hours %}
-                                                {{ total_reading_hours|floatformat:0 }} ساعة
-                                            {% else %}
-                                                0 ساعة
-                                            {% endif %}
-                                        </h4>
-                                    </div>
-                                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                                        <i class="fas fa-clock text-2xl text-blue-600 dark:text-blue-400"></i>
-                                    </div>
-                                </div>
-                                <div class="flex items-center text-green-600 dark:text-green-400 text-sm">
-                                    <i class="fas fa-arrow-up ml-1"></i>
-                                    <span>15% زيادة عن الشهر الماضي</span>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300">مصادر فتحتها</p>
+                                <h4 class="text-2xl font-bold text-gray-800 dark:text-white">{{ reading_history_count }}</h4>
                             </div>
-                            
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-6 rounded-2xl border border-green-200 dark:border-green-800/30">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <p class="text-gray-600 dark:text-gray-300">متوسط الصفحات/يوم</p>
-                                        <h4 class="text-2xl font-bold text-gray-800 dark:text-white">24 صفحة</h4>
-                                    </div>
-                                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                                        <i class="fas fa-file-alt text-2xl text-green-600 dark:text-green-400"></i>
-                                    </div>
-                                </div>
-                                <div class="flex items-center text-green-600 dark:text-green-400 text-sm">
-                                    <i class="fas fa-arrow-up ml-1"></i>
-                                    <span>8% زيادة عن الشهر الماضي</span>
-                                </div>
+                            <div class="p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300">مصادر محفوظة</p>
+                                <h4 class="text-2xl font-bold text-gray-800 dark:text-white">{{ bookmarks_count }}</h4>
                             </div>
-                            
-                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-6 rounded-2xl border border-purple-200 dark:border-purple-800/30">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div>
-                                        <p class="text-gray-600 dark:text-gray-300">الكتب المكتملة</p>
-                                        <h4 class="text-2xl font-bold text-gray-800 dark:text-white">7 كتب</h4>
-                                    </div>
-                                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                                        <i class="fas fa-check-circle text-2xl text-purple-600 dark:text-purple-400"></i>
-                                    </div>
-                                </div>
-                                <div class="flex items-center text-green-600 dark:text-green-400 text-sm">
-                                    <i class="fas fa-arrow-up ml-1"></i>
-                                    <span>2 كتب هذا الشهر</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- رسم بياني مبسط -->
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
-                            <div class="flex justify-between items-center mb-6">
-                                <h4 class="text-lg font-semibold text-gray-800 dark:text-white">نشاط القراءة الشهري</h4>
-                                <div class="flex space-x-2 space-x-reverse">
-                                    <button class="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-lg text-sm font-medium">2024</button>
-                                    <button class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm font-medium">2023</button>
-                                </div>
-                            </div>
-                            <div class="h-48 flex items-end space-x-4 space-x-reverse justify-center" id="reading-chart">
-                                {% for i in "123456"|make_list %}
-                                <div class="flex flex-col items-center">
-                                    <div class="w-8 bg-gradient-to-t from-primary-500 to-primary-400 rounded-t-lg mb-2 transition-all duration-300 hover:h-16" 
-                                         style="height: {{ forloop.counter|add:'2' }}px;" 
-                                         data-value="{{ forloop.counter|add:'2' }}0"></div>
-                                    <span class="text-gray-600 dark:text-gray-400 text-sm">الشهر {{ forloop.counter }}</span>
-                                </div>
-                                {% endfor %}
+                            <div class="p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300">تقييماتك</p>
+                                <h4 class="text-2xl font-bold text-gray-800 dark:text-white">{{ reviews_count }}</h4>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- قسم التفضيلات -->
                     <div id="settings" class="profile-section bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 hidden">
                         <div class="mb-8">
@@ -631,9 +569,15 @@
                 <button id="cancel-delete" class="px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold rounded-xl transition duration-200">
                     إلغاء
                 </button>
-                <button id="confirm-delete" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <i class="fas fa-trash-alt ml-2"></i> حذف الحساب
-                </button>
+                <form method="POST" action="{% url 'delete_account' %}" id="delete-account-form" class="flex items-center gap-3">
+                    {% csrf_token %}
+                    <input type="password" name="password" required autocomplete="current-password"
+                           placeholder="كلمة المرور للتأكيد" aria-label="كلمة المرور للتأكيد"
+                           class="p-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm">
+                    <button type="submit" id="confirm-delete" class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fas fa-trash-alt ml-2"></i> حذف الحساب
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -720,7 +664,7 @@
         const editBtn = document.getElementById('edit-profile-btn');
         const cancelBtn = document.getElementById('cancel-edit-btn');
         const profileButtons = document.getElementById('profile-buttons');
-        const editableInputs = ['email-input', 'first-name-input', 'last-name-input', 'password-input', 'confirm-password-input'];
+        const editableInputs = ['email-input', 'first-name-input', 'last-name-input', 'current-password-input', 'password-input', 'confirm-password-input'];
         
         if (editBtn) {
             editBtn.addEventListener('click', function() {
@@ -776,9 +720,10 @@
                 });
                 
                 // إعادة تعيين القيم
-                document.getElementById('email-input').value = '{{ user.email }}';
-                document.getElementById('first-name-input').value = '{{ user.first_name|default:'' }}';
-                document.getElementById('last-name-input').value = '{{ user.last_name|default:'' }}';
+                document.getElementById('email-input').value = '{{ user.email|escapejs }}';
+                document.getElementById('first-name-input').value = '{{ user.first_name|default:''|escapejs }}';
+                document.getElementById('last-name-input').value = '{{ user.last_name|default:''|escapejs }}';
+                document.getElementById('current-password-input').value = '';
                 document.getElementById('password-input').value = '';
                 document.getElementById('confirm-password-input').value = '';
                 
@@ -934,25 +879,6 @@
         if (confirmCheckbox) {
             confirmCheckbox.addEventListener('change', function() {
                 confirmDelete.disabled = !this.checked;
-            });
-        }
-        
-        if (confirmDelete) {
-            confirmDelete.addEventListener('click', function() {
-                if (!this.disabled) {
-                    // إضافة تأثير تحميل
-                    const originalHTML = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الحذف...';
-                    this.disabled = true;
-                    
-                    // محاكاة طلب AJAX
-                    setTimeout(() => {
-                        alert('هذه خاصية تجريبية. في الإصدار الكامل سيتم حذف الحساب فعلياً.');
-                        this.innerHTML = originalHTML;
-                        this.disabled = false;
-                        closeDeleteModal();
-                    }, 1500);
-                }
             });
         }
         

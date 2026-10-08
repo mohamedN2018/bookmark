@@ -1,45 +1,30 @@
-# pull official base image
-FROM python:3.11.3-alpine
+FROM python:3.12-slim
 
-# set work directory
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    TZ=Africa/Cairo
+
 WORKDIR /usr/src/app
 
-# install dependencies for psycopg2 and Django
-RUN apk update && apk add --no-cache \
-    build-base \
-    gcc \
-    python3-dev \
-    musl-dev \
-    libffi-dev \
-    openssl-dev \
-    tzdata \
-    postgresql-dev
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
-# set timezone
-ENV TZ=Africa/Cairo
+ARG REQUIREMENTS=requirements.txt
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install --upgrade pip && pip install -r ${REQUIREMENTS}
 
-# upgrade pip & install pipenv
-RUN pip3 install --upgrade pip
-RUN pip3 install pipenv
-
-# Copy files first Pipfile and Pipfile.lock
 COPY . .
 
-# After files copied
-RUN pipenv requirements > requirements.txt
-RUN pip3 install -r requirements.txt
+RUN useradd --create-home --uid 1000 app \
+    && mkdir -p /usr/src/app/media /usr/src/app/staticfiles /usr/src/app/backups \
+    && chown -R app:app /usr/src/app
+# لا USER هنا: الحاوي يبدأ كـ root فقط ليصلح ملكية الـ volumes المركّبة،
+# ثم deploy/entrypoint.sh ينزل إلى المستخدم app (setpriv) قبل تشغيل أي شيء آخر.
 
-
-# create static dir
-RUN mkdir -p /usr/src/app/static/ && chmod 755 /usr/src/app/static/
-
-# run Django migrations & collectstatic
-RUN python manage.py migrate
-RUN python manage.py collectstatic --noinput
-
-# expose port
 EXPOSE 8000
 
-# start server with gunicorn
-CMD ["gunicorn", "--chdir", "/usr/src/app", "--access-logfile", "-", "--error-logfile", "-", "--bind", "0.0.0.0:8000", "book_project.wsgi:application"]
-# CMD ["gunicorn", "--chdir", "/usr/src/app", "--bind", "0.0.0.0:8000", "book_project.wsgi:application"]
+# migrate + collectstatic تتم عند التشغيل (entrypoint) وليس أثناء البناء
+ENTRYPOINT ["sh", "/usr/src/app/deploy/entrypoint.sh"]
+CMD ["gunicorn", "book_project.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "60", "--access-logfile", "-", "--error-logfile", "-"]

@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}لوحة التحكم - مكتبة الكتب{% endblock %}
+{% block title %}لوحة التحكم - المكتبة السرية{% endblock %}
 
 {% block content %}
 
@@ -505,24 +505,13 @@
             const chartContainer = document.getElementById('statistics-chart');
             
             if (statBtns.length > 0 && chartContainer) {
-                // بيانات افتراضية للرسم البياني
-                const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
-                const booksData = [65, 59, 80, 81, 56, 55];
-                const usersData = [28, 48, 40, 19, 86, 27];
-                
-                // استخدام البيانات الحقيقية إذا كانت متوفرة
-                {% if monthly_stats %}
-                    const monthlyStats = {{ monthly_stats|safe }};
-                    const realBooksData = monthlyStats.map(stat => stat.books);
-                    const realUsersData = monthlyStats.map(stat => stat.users);
-                    
-                    if (realBooksData.length === 6) {
-                        booksData = realBooksData;
-                    }
-                    if (realUsersData.length === 6) {
-                        usersData = realUsersData;
-                    }
-                {% endif %}
+                // بيانات حقيقية فقط (من json_script)؛ لا بيانات افتراضية
+                const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+                const statsEl = document.getElementById('monthly-stats-data');
+                const monthlyStats = statsEl ? (JSON.parse(statsEl.textContent) || []) : [];
+                const months = monthlyStats.map(stat => monthNames[stat.month - 1]);
+                const booksData = monthlyStats.map(stat => stat.books);
+                const usersData = monthlyStats.map(stat => stat.users);
                 
                 // وظيفة رسم الرسم البياني
                 function drawChart(dataType) {
@@ -530,7 +519,7 @@
                     const data = dataType === 'books' ? booksData : usersData;
                     const color = dataType === 'books' ? '#3b82f6' : '#10b981';
                     
-                    const maxValue = Math.max(...data);
+                    const maxValue = Math.max(1, ...data);
                     
                     data.forEach((value, index) => {
                         const barHeight = (value / maxValue) * 180;
@@ -637,9 +626,10 @@
                 notification.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} ml-2"></i>
-                        <span>${message}</span>
+                        <span data-msg></span>
                     </div>
                 `;
+                notification.querySelector('[data-msg]').textContent = message;
                 
                 document.body.appendChild(notification);
                 

@@ -4,16 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}مكتبة الكتب - منصة القراءة الرقمية{% endblock %}</title>
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
     
     <!-- Meta Tags for SEO -->
-    <meta name="description" content="منصة القراءة الرقمية الأولى في العالم العربي. اكتشف آلاف الكتب الإلكترونية في مختلف المجالات.">
-    <meta name="keywords" content="كتب, قراءة, مكتبة رقمية, كتب عربية, كتب إلكترونية, ثقافة, معرفة">
-    <meta name="author" content="مكتبة الكتب">
+    <meta name="description" content="{% block meta_description %}{{ SITE_NAME }}: فهرس عربي للمصادر العلمية والتقنية، مع روابط الوصول القانونية لكل مصدر.{% endblock %}">
+    <meta property="og:site_name" content="{{ SITE_NAME }}">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="مكتبة الكتب - منصة القراءة الرقمية">
-    <meta property="og:description" content="منصة القراءة الرقمية الأولى في العالم العربي">
+    <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+    <meta property="og:description" content="{{ SITE_TAGLINE }}">
     <meta property="og:type" content="website">
     
     <!-- Tailwind CSS -->
@@ -396,7 +395,7 @@
                     <i class="fas fa-book-open text-4xl text-primary-600 dark:text-primary-400"></i>
                 </div>
             </div>
-            <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2">مكتبة الكتب</div>
+            <div class="text-2xl font-bold text-gray-800 dark:text-white mb-2">المكتبة السرية</div>
             <div class="text-gray-600 dark:text-gray-300">جاري التحميل...</div>
         </div>
     </div>
@@ -407,10 +406,10 @@
                 <!-- Logo Section -->
                 <div class="flex items-center space-x-4 space-x-reverse">
                      <a href="{% url 'home' %}" class="flex items-center space-x-2 space-x-reverse group">
-                           <img src="{% static 'images/logo.png' %}" alt="logo web" class="h-12 w-auto group-hover:scale-110 transition-transform">
+                           <img src="{% static 'images/logo.png' %}" alt="{{ SITE_NAME }}" class="h-12 w-auto group-hover:scale-110 transition-transform">
                         <div class="-ml-8">
-                            <div class="text-2xl font-bold text-primary-600 dark:text-primary-400"> مكتبة مصر الرقمية </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 -mt-1">منصة القراءة الرقمية</div>
+                            <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">المكتبة السرية</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 -mt-1">{{ SITE_TAGLINE }}</div>
                         </div>
                     </a> 
                     <!-- Desktop Navigation -->
@@ -489,40 +488,6 @@
                     <!-- User Actions -->
                     <div class="flex items-center space-x-2 space-x-reverse">
                         {% if user.is_authenticated %}
-                        <!-- Notifications -->
-                        <div class="relative">
-                            <button id="notification-btn" 
-                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors relative">
-                                <i class="fas fa-bell text-gray-600 dark:text-gray-300"></i>
-                                <span class="notification-badge">3</span>
-                            </button>
-                            
-                            <!-- Notification Dropdown -->
-                            <div id="notification-dropdown" 
-                                 class="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl py-2 hidden z-50 animate-slide-down">
-                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-bold text-gray-800 dark:text-white">الإشعارات</span>
-                                        <button class="text-sm text-primary-600 dark:text-primary-400 hover:underline">تحديد الكل كمقروء</button>
-                                    </div>
-                                </div>
-                                <div class="max-h-96 overflow-y-auto">
-                                    <!-- Sample Notifications -->
-                                    <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
-                                        <div class="flex items-start">
-                                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center ml-3">
-                                                <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
-                                            </div>
-                                            <div class="flex-grow">
-                                                <p class="text-sm text-gray-800 dark:text-gray-200">كتاب جديد في تخصصك المفضل</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">منذ 2 ساعة</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- User Menu -->
                         <div class="relative group">
                             <button class="flex items-center space-x-2 space-x-reverse focus-ring rounded-full p-1">
@@ -550,12 +515,6 @@
                                     <span>لوحة التحكم</span>
                                 </a>
                                 
-                                <a href="#" 
-                                   class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group/item">
-                                    <i class="fas fa-bookmark ml-3 text-gray-400 group-hover/item:text-primary-600"></i>
-                                    <span>المفضلة</span>
-                                </a>
-                                
                                 {% if user.is_staff %}
                                 <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                                 <a href="{% url 'admin:index' %}" 
@@ -566,11 +525,13 @@
                                 {% endif %}
                                 
                                 <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                                <a href="{% url 'logout' %}" 
-                                   class="flex items-center px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group/item">
-                                    <i class="fas fa-sign-out-alt ml-3"></i>
-                                    <span>تسجيل الخروج</span>
-                                </a>
+                                <form method="POST" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full flex items-center px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group/item">
+                                        <i class="fas fa-sign-out-alt ml-3"></i>
+                                        <span>تسجيل الخروج</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         {% else %}
@@ -651,11 +612,13 @@
                         لوحة التحكم
                     </a>
                     
-                    <a href="{% url 'logout' %}" 
-                       class="flex items-center px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">
-                        <i class="fas fa-sign-out-alt ml-3 w-6 text-center"></i>
-                        تسجيل الخروج
-                    </a>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full flex items-center px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors">
+                            <i class="fas fa-sign-out-alt ml-3 w-6 text-center"></i>
+                            تسجيل الخروج
+                        </button>
+                    </form>
                     {% else %}
                     <div class="flex space-x-3 space-x-reverse px-4 py-3">
                         <a href="{% url 'login' %}" 
@@ -729,7 +692,7 @@
     <footer class="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-16 pb-8">
         <div class="container mx-auto px-4">
             <!-- Main Footer Content -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <!-- Brand Column -->
                 <div class="lg:col-span-2">
                     <div class="flex items-center mb-6">
@@ -737,27 +700,13 @@
                             <i class="fas fa-book text-white text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold">مكتبة الكتب</div>
-                            <div class="text-gray-300">منصة القراءة الرقمية الأولى</div>
+                            <div class="text-2xl font-bold">المكتبة السرية</div>
+                            <div class="text-gray-300">{{ SITE_TAGLINE }}</div>
                         </div>
                     </div>
                     <p class="text-gray-300 mb-6 max-w-md">
-                        منصة رقمية شاملة للكتب العربية والعالمية. نهدف إلى نشر المعرفة والثقافة من خلال توفير محتوى قرائي مميز وتجربة قراءة فريدة.
+                        فهرس عربي للمصادر العلمية والتقنية. نوضح لكل مصدر من أين جاء، وما نوع الوصول إليه، وأين يمكن قراءته بشكل قانوني.
                     </p>
-                    <div class="flex space-x-4 space-x-reverse">
-                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-700 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                    </div>
                 </div>
                 
                 <!-- Quick Links -->
@@ -768,20 +717,20 @@
                             <i class="fas fa-chevron-left text-xs ml-2"></i>الرئيسية
                         </a></li>
                         <li><a href="{% url 'book_list' %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
-                            <i class="fas fa-chevron-left text-xs ml-2"></i>جميع الكتب
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>كل المصادر
                         </a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors flex items-center">
-                            <i class="fas fa-chevron-left text-xs ml-2"></i>عن المكتبة
+                        <li><a href="{% url 'all_authors' %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>المؤلفون
                         </a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition-colors flex items-center">
-                            <i class="fas fa-chevron-left text-xs ml-2"></i>اتصل بنا
+                        <li><a href="{% url 'categories_list' %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
+                            <i class="fas fa-chevron-left text-xs ml-2"></i>التصنيفات
                         </a></li>
                     </ul>
                 </div>
                 
                 <!-- Categories -->
                 <div>
-                    <h4 class="text-xl font-bold mb-6">فئات الكتب</h4>
+                    <h4 class="text-xl font-bold mb-6">التصنيفات</h4>
                     <ul class="space-y-3">
                         {% for category in categories|slice:":5" %}
                         <li><a href="{% url 'books_by_category' category.slug %}" class="text-gray-300 hover:text-white transition-colors flex items-center">
@@ -791,36 +740,16 @@
                     </ul>
                 </div>
                 
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="text-xl font-bold mb-6">النشرة البريدية</h4>
-                    <p class="text-gray-300 mb-4">اشترك لتصلك أحدث الكتب والعروض</p>
-                    <form method="POST" action="#" class="space-y-3">
-                        {% csrf_token %}
-                        <input type="email" 
-                               name="email" 
-                               placeholder="بريدك الإلكتروني" 
-                               class="w-full py-3 px-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                               required>
-                        <button type="submit" 
-                                class="w-full bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center">
-                            <i class="fas fa-paper-plane ml-2"></i>اشترك الآن
-                        </button>
-                    </form>
-                </div>
             </div>
             
             <!-- Bottom Footer -->
             <div class="border-t border-gray-700 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <div class="mb-4 md:mb-0">
-                        <p class="text-gray-400">© {% now "Y" %} مكتبة الكتب. جميع الحقوق محفوظة.</p>
+                        <p class="text-gray-400">© {% now "Y" %} {{ SITE_NAME }}</p>
                     </div>
-                    <div class="flex flex-wrap justify-center space-x-6 space-x-reverse text-gray-400">
-                        <a href="#" class="hover:text-white transition-colors">شروط الاستخدام</a>
-                        <a href="#" class="hover:text-white transition-colors">سياسة الخصوصية</a>
-                        <a href="#" class="hover:text-white transition-colors">سياسة ملفات تعريف الارتباط</a>
-                    </div>
+                    <a href="{% url 'privacy' %}" class="text-gray-400 hover:text-white transition-colors">سياسة الخصوصية</a>
+
                 </div>
             </div>
         </div>
@@ -977,74 +906,67 @@
                 }
             }
             
-            // Enhanced Search Functionality
+            // اقتراحات البحث: بيانات حقيقية من الخادم، تُعرض كنص (textContent) لمنع XSS
             if (searchInput) {
                 let searchTimeout;
-                
+                let searchController;
+                const suggestUrl = "{% url 'search_suggest' %}";
+                const listUrl = "{% url 'book_list' %}";
+
+                const renderResults = (query, results) => {
+                    searchResults.replaceChildren();
+                    const wrap = document.createElement('div');
+                    wrap.className = 'py-2';
+                    if (results.length === 0) {
+                        const empty = document.createElement('p');
+                        empty.className = 'px-4 py-3 text-sm text-gray-600 dark:text-gray-300';
+                        empty.textContent = 'لم نجد مصدرًا مطابقًا بعد.';
+                        wrap.appendChild(empty);
+                    }
+                    results.forEach((item) => {
+                        const link = document.createElement('a');
+                        link.href = item.url;
+                        link.className = 'block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+                        const title = document.createElement('p');
+                        title.className = 'font-medium text-gray-800 dark:text-white';
+                        title.textContent = item.title;
+                        link.appendChild(title);
+                        if (item.author) {
+                            const author = document.createElement('p');
+                            author.className = 'text-sm text-gray-500 dark:text-gray-400';
+                            author.textContent = item.author;
+                            link.appendChild(author);
+                        }
+                        wrap.appendChild(link);
+                    });
+                    const all = document.createElement('a');
+                    all.href = listUrl + '?q=' + encodeURIComponent(query);
+                    all.className = 'block px-4 py-3 border-t border-gray-100 dark:border-gray-700 text-primary-600 dark:text-primary-400 font-medium hover:underline text-sm';
+                    all.textContent = 'عرض كل النتائج';
+                    wrap.appendChild(all);
+                    searchResults.appendChild(wrap);
+                    searchResults.classList.remove('hidden');
+                };
+
                 searchInput.addEventListener('input', function() {
                     const query = this.value.trim();
-                    
                     clearTimeout(searchTimeout);
-                    
+                    if (!searchResults) return;
                     if (query.length < 2) {
-                        if (searchResults) {
-                            searchResults.classList.add('hidden');
-                        }
+                        searchResults.classList.add('hidden');
                         return;
                     }
-                    
                     searchTimeout = setTimeout(() => {
-                        // Show loading skeleton
-                        if (searchResults) {
-                            searchResults.innerHTML = `
-                                <div class="py-4">
-                                    <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
-                                    <div class="skeleton w-full h-12 rounded-lg mb-2"></div>
-                                    <div class="skeleton w-full h-12 rounded-lg"></div>
-                                </div>
-                            `;
-                            searchResults.classList.remove('hidden');
-                        }
-                        
-                        // Simulate API call
-                        setTimeout(() => {
-                            if (searchResults) {
-                                searchResults.innerHTML = `
-                                    <div class="py-2">
-                                        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                                            <span class="font-bold text-gray-800 dark:text-white">نتائج البحث</span>
-                                        </div>
-                                        <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                                            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center ml-3">
-                                                    <i class="fas fa-book text-blue-600 dark:text-blue-300"></i>
-                                                </div>
-                                                <div class="flex-grow">
-                                                    <p class="font-medium text-gray-800 dark:text-white">كتاب إلكتروني متقدم</p>
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">أحمد محمد</p>
-                                                </div>
-                                            </a>
-                                            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                                <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center ml-3">
-                                                    <i class="fas fa-book-open text-green-600 dark:text-green-300"></i>
-                                                </div>
-                                                <div class="flex-grow">
-                                                    <p class="font-medium text-gray-800 dark:text-white">أساسيات البرمجة</p>
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">سارة خالد</p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                                            <a href="{% url 'book_list' %}?q=${encodeURIComponent(query)}" 
-                                               class="text-primary-600 dark:text-primary-400 font-medium hover:underline text-sm">
-                                                عرض جميع النتائج لـ "${query}"
-                                            </a>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        }, 500);
-                    }, 300);
+                        if (searchController) searchController.abort();
+                        searchController = new AbortController();
+                        fetch(suggestUrl + '?q=' + encodeURIComponent(query), {
+                            signal: searchController.signal,
+                            headers: { 'Accept': 'application/json' },
+                        })
+                            .then((r) => (r.ok ? r.json() : { results: [] }))
+                            .then((data) => renderResults(query, data.results || []))
+                            .catch(() => {});
+                    }, 250);
                 });
                 
                 // Hide search results on outside click
