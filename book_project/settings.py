@@ -108,6 +108,8 @@ INSTALLED_APPS = [
     "crispy_forms",
     # Local
     "core.apps.CoreConfig",
+    "sources.apps.SourcesConfig",
+    "catalog.apps.CatalogConfig",
     "books.apps.BooksConfig",
 ]
 
