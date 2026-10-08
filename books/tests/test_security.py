@@ -127,3 +127,16 @@ def test_settings_post_does_not_claim_success(client, staff):
     text = resp.content.decode()
     assert "تم إنشاء النسخة الاحتياطية بنجاح!" not in text
     assert "غير مفعّلة" in text
+
+
+@pytest.mark.django_db
+def test_login_is_rate_limited_per_username(client, user, settings):
+    from django.core.cache import cache
+
+    cache.clear()
+    settings.LOGIN_MAX_FAILURES = 3
+    for _ in range(3):
+        client.post(reverse("login"), {"username": "reader", "password": "wrong"})
+    resp = client.post(reverse("login"), {"username": "reader", "password": "S3cure-pass-123"})
+    assert resp.status_code == 429
+    assert "_auth_user_id" not in client.session

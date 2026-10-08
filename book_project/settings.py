@@ -43,16 +43,19 @@ MAIN_DOMAIN = config("MAIN_DOMAIN", default="localhost").strip().rstrip("/")
 _MAIN_ORIGIN = MAIN_DOMAIN if "://" in MAIN_DOMAIN else f"https://{MAIN_DOMAIN}"
 _MAIN_HOST = _MAIN_ORIGIN.split("://", 1)[1].split("/", 1)[0].split(":", 1)[0]
 
+# نطاق الإنتاج الحالي مضمّن دائمًا في القيمة الافتراضية
+PRODUCTION_HOST = "bookmark.deplois.net"
+
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
-    default=f"{_MAIN_HOST},localhost,127.0.0.1",
+    default=f"{_MAIN_HOST},{PRODUCTION_HOST},localhost,127.0.0.1",
     cast=Csv(),
 )
 
 # Django >= 4 يتطلب scheme في كل origin
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default=f"{_MAIN_ORIGIN},https://{_MAIN_HOST},http://{_MAIN_HOST}",
+    default=f"{_MAIN_ORIGIN},https://{_MAIN_HOST},http://{_MAIN_HOST},https://{PRODUCTION_HOST}",
     cast=Csv(),
 )
 

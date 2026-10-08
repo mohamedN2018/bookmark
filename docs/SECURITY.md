@@ -15,9 +15,11 @@
 | S11 | تسريب `str(e)` | أُزيل | — |
 | S12 | `\|safe` داخل `<script>` | `json_script` | — |
 | S14* | DOM XSS: نص البحث في `innerHTML` (بحث وهمي في الهيدر وفي صفحة التصنيف) والإشعارات | `textContent` | — |
-| S15 | migrate أثناء build، `.env` و DB داخل الصورة | `.dockerignore`، migrate عند التشغيل، مستخدم غير root | — |
-| — | rate limiting على login/register | nginx `limit_req` 10/دقيقة | — |
-| — | ملفات الكتب قابلة للوصول عبر `/media/` | محجوبة في nginx وفي خادم التطوير | `test_dev_media_server_blocks_book_files` |
+| S15 | migrate أثناء build، `.env` و DB داخل الصورة | `.dockerignore`، migrate عند التشغيل، التطبيق يعمل كمستخدم غير root (`setpriv`) | — |
+| — | كلمة مرور قاعدة البيانات | مولّدة عشوائيًا، ليست في المستودع، وقاعدة البيانات غير منشورة على أي منفذ | — |
+| — | تخمين كلمات المرور | حد 10 محاولات فاشلة لكل اسم مستخدم خلال 15 دقيقة (Redis cache) | `test_login_is_rate_limited_per_username` |
+| — | ملفات الكتب قابلة للوصول عبر `/media/` | محجوبة في `serve_public_media` | `test_book_pdfs_are_not_served_in_production` |
+| — | ملفات مرفوعة تُنفّذ كـ HTML | `Content-Security-Policy: default-src 'none'` على `/media/` | — |
 
 ## متبقٍ (المرحلة 12)
 
