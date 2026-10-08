@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}حساب جديد - {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="panel auth-card">
+    <h1>إنشاء حساب</h1>
+    <p class="muted small">الحساب يتيح حفظ المصادر وتقييمها. لا حاجة لحساب للبحث والقراءة.</p>
+    <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}{% include "accounts/_field.html" %}{% endfor %}
+        <p class="small">بإنشاء الحساب فأنت اطلعت على <a href="{% url 'privacy' %}" target="_blank">سياسة الخصوصية</a>.</p>
+        <button class="btn btn-block" type="submit">إنشاء الحساب</button>
+    </form>
+    <p class="small">لديك حساب؟ <a href="{% url 'login' %}">سجّل الدخول</a></p>
+</section>
+{% endblock %}

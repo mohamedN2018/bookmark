@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}حسابي - {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<h1>حسابي</h1>
+<div class="two-col">
+    <section class="panel">
+        <h2>البيانات</h2>
+        <p class="muted small">اسم المستخدم: <strong>{{ user.username }}</strong> · عضو منذ {{ user.date_joined|date:"Y-m-d" }}</p>
+        <form method="post" action="{% url 'profile' %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% include "accounts/_field.html" with field=form.first_name %}
+            {% include "accounts/_field.html" with field=form.last_name %}
+            {% include "accounts/_field.html" with field=form.email %}
+            <h3>تغيير كلمة المرور (اختياري)</h3>
+            {% include "accounts/_field.html" with field=form.current_password %}
+            {% include "accounts/_field.html" with field=form.new_password %}
+            {% include "accounts/_field.html" with field=form.new_password_confirm %}
+            <button class="btn" type="submit">حفظ</button>
+        </form>
+    </section>
+    <section class="panel">
+        <h2>حذف الحساب</h2>
+        <p class="small">يحذف حسابك ومحفوظاتك وتقييماتك وسجلك نهائيًا. لا يمكن التراجع.</p>
+        <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <div class="form-field">
+                <label for="delete-password">كلمة المرور للتأكيد</label>
+                <input id="delete-password" name="password" type="password" autocomplete="current-password" required>
+            </div>
+            <button class="btn btn-danger" type="submit">حذف الحساب نهائيًا</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

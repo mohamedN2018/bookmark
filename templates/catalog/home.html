@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}
+
+{% block head %}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "WebSite", "name": "{{ SITE_NAME|escapejs }}", "url": "{{ request.scheme }}://{{ request.get_host }}/",
+ "potentialAction": {"@type": "SearchAction", "target": "{{ request.scheme }}://{{ request.get_host }}{% url 'search' %}?q={search_term_string}", "query-input": "required name=search_term_string"}}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="search-hero">
+    <h1>اكتشف المعرفة</h1>
+    <p class="muted">ابحث بالعربية أو الإنجليزية. لكل مصدر نوضح من أين جاء، وما نوع الوصول إليه، وأين تقرؤه بشكل قانوني.</p>
+    <form class="search-box" role="search" action="{% url 'search' %}" method="get" data-suggest="{% url 'search_suggest' %}">
+        <label class="visually-hidden" for="hero-search">ابحث في الفهرس</label>
+        <input id="hero-search" type="search" name="q" placeholder="مثال: الذكاء الاصطناعي، Python البرمجة، 978-0-13-235088-4" autocomplete="off" maxlength="200">
+        <button type="submit" aria-label="بحث">⌕</button>
+        <div class="suggestions" role="listbox" hidden></div>
+    </form>
+</section>
+
+<section aria-label="أرقام الفهرس">
+    <div class="stats">
+        <div class="stat"><div class="stat-value">{{ stats.works }}</div><div class="stat-label">مصدر مفهرس</div></div>
+        <div class="stat"><div class="stat-value">{{ stats.free }}</div><div class="stat-label">متاح مجانًا بشكل قانوني</div></div>
+        <div class="stat"><div class="stat-value">{{ stats.people }}</div><div class="stat-label">مؤلف ومساهم</div></div>
+        <div class="stat"><div class="stat-value">{{ stats.subjects }}</div><div class="stat-label">موضوع في التصنيف</div></div>
+    </div>
+    <p class="small muted">أرقام فعلية من قاعدة البيانات لحظة فتح الصفحة.</p>
+</section>
+
+{% if latest %}
+<section class="section">
+    <div class="section-head"><h2>أضيف حديثًا</h2><a href="{% url 'search' %}">كل المصادر</a></div>
+    <div class="grid">{% for work in latest %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if open_access %}
+<section class="section">
+    <div class="section-head"><h2>متاح مجانًا بشكل قانوني</h2><a href="{% url 'search' %}?access=free">المزيد</a></div>
+    <div class="grid">{% for work in open_access %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if arabic %}
+<section class="section">
+    <div class="section-head"><h2>مصادر عربية</h2><a href="{% url 'search' %}?language=ar">المزيد</a></div>
+    <div class="grid">{% for work in arabic %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if beginner %}
+<section class="section">
+    <div class="section-head"><h2>للمبتدئين</h2></div>
+    <div class="grid">{% for work in beginner %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if advanced %}
+<section class="section">
+    <div class="section-head"><h2>مراجع متقدمة</h2></div>
+    <div class="grid">{% for work in advanced %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="section-head"><h2>تصفح الموضوعات</h2><a href="{% url 'topics' %}">شجرة التصنيف كاملة</a></div>
+    <ul class="chip-list">
+        {% for subject in top_subjects %}<li><a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a></li>{% endfor %}
+    </ul>
+</section>
+
+{% if people %}
+<section class="section">
+    <div class="section-head"><h2>مؤلفون</h2><a href="{% url 'people' %}">كل المؤلفين</a></div>
+    <ul class="chip-list">
+        {% for person in people %}<li><a class="badge" href="{{ person.get_absolute_url }}">{{ person.name }} ({{ person.n }})</a></li>{% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}

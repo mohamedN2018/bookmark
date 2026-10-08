@@ -110,6 +110,8 @@ INSTALLED_APPS = [
     "core.apps.CoreConfig",
     "sources.apps.SourcesConfig",
     "catalog.apps.CatalogConfig",
+    "library.apps.LibraryConfig",
+    "accounts.apps.AccountsConfig",
     "books.apps.BooksConfig",
 ]
 
@@ -139,7 +141,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.site",
-                "books.context_processors.categories_context",
             ],
         },
     },
@@ -201,7 +202,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"
+LOGIN_REDIRECT_URL = "my_library"
 LOGOUT_REDIRECT_URL = "home"
 
 
@@ -257,6 +258,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# الروابط المدخلة بدون scheme تُعامل كـ https (السلوك الافتراضي في Django 6)
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 

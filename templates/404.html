@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}الصفحة غير موجودة - {{ SITE_NAME }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="panel stack">
+    <h1>الصفحة غير موجودة</h1>
+    <p>ربما نُقل المصدر أو تغيّر رابطه. جرّب البحث:</p>
+    <form class="search-box narrow" role="search" action="{% url 'search' %}" method="get">
+        <label class="visually-hidden" for="nf-search">بحث</label>
+        <input id="nf-search" type="search" name="q" maxlength="200">
+        <button type="submit" aria-label="بحث">⌕</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} - {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% if subject.description %}{{ subject.description|truncatechars:160 }}{% else %}مصادر علمية وتقنية في موضوع {{ subject.name }}.{% endif %}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="مسار التنقل">
+    <ol>
+        <li><a href="{% url 'topics' %}">الموضوعات</a></li>
+        {% for a in ancestors %}<li><a href="{{ a.get_absolute_url }}">{{ a.name }}</a></li>{% endfor %}
+        <li aria-current="page">{{ subject.name }}</li>
+    </ol>
+</nav>
+<h1>{{ subject.name }}</h1>
+{% if subject.name_en %}<p class="muted" dir="ltr">{{ subject.name_en }}</p>{% endif %}
+{% if subject.description %}{{ subject.description|linebreaks }}{% endif %}
+
+{% if children %}
+<section class="section">
+    <h2>موضوعات فرعية</h2>
+    <ul class="chip-list">{% for c in children %}<li><a class="badge badge-subject" href="{{ c.get_absolute_url }}">{{ c.name }} ({{ c.n }})</a></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="section">
+    <div class="section-head"><h2>المصادر ({{ total }})</h2><a href="{% url 'search' %}?subject={{ subject.slug|urlencode }}">بحث وتصفية</a></div>
+    {% if page_obj.object_list %}
+        <div class="grid">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
+        {% include "catalog/_pagination.html" %}
+    {% else %}
+        <p class="notice">لا توجد مصادر مفهرسة في هذا الموضوع بعد.</p>
+    {% endif %}
+</section>
+{% endblock %}

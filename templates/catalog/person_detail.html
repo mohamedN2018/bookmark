@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ person.name }} - {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% if person.bio %}{{ person.bio|striptags|truncatechars:160 }}{% else %}مصادر {{ person.name }} في {{ SITE_NAME }}.{% endif %}{% endblock %}
+{% block og_type %}profile{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "Person", "name": "{{ person.name|escapejs }}", "url": "{{ request.scheme }}://{{ request.get_host }}{{ person.get_absolute_url }}"{% if person.orcid %}, "sameAs": ["https://orcid.org/{{ person.orcid }}"]{% endif %}}
+</script>
+{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="مسار التنقل"><ol><li><a href="{% url 'people' %}">المؤلفون</a></li><li aria-current="page">{{ person.name }}</li></ol></nav>
+<div class="two-col">
+    <article class="stack">
+        <h1>{{ person.name }}</h1>
+        {% if person.native_name %}<p class="muted" dir="auto">{{ person.native_name }}</p>{% endif %}
+        {% if roles %}<p class="muted">{{ roles|join:"، " }}</p>{% endif %}
+        {% if person.bio %}<div dir="auto">{{ person.bio|linebreaks }}</div>{% endif %}
+        <section>
+            <h2>المصادر في الفهرس ({{ works|length }})</h2>
+            <div class="list-records">{% for work in works %}{% include "catalog/_record.html" %}{% endfor %}</div>
+        </section>
+    </article>
+    <aside class="panel">
+        <h2>معلومات</h2>
+        <table class="meta-table">
+            {% if person.birth_year %}<tr><th scope="row">الميلاد</th><td>{{ person.birth_year }}</td></tr>{% endif %}
+            {% if person.death_year %}<tr><th scope="row">الوفاة</th><td>{{ person.death_year }}</td></tr>{% endif %}
+            {% if person.nationality %}<tr><th scope="row">الجنسية</th><td>{{ person.nationality }}</td></tr>{% endif %}
+            {% if person.orcid %}<tr><th scope="row">ORCID</th><td><a class="ltr" href="https://orcid.org/{{ person.orcid }}" rel="noopener">{{ person.orcid }}</a></td></tr>{% endif %}
+            {% if person.website %}<tr><th scope="row">الموقع</th><td><a href="{{ person.website }}" rel="noopener nofollow">{{ person.website|truncatechars:40 }}</a></td></tr>{% endif %}
+            {% if person.wikipedia_url %}<tr><th scope="row">ويكيبيديا</th><td><a href="{{ person.wikipedia_url }}" rel="noopener">المقالة</a></td></tr>{% endif %}
+        </table>
+        {% if person.info_source %}<p class="small muted">مصدر المعلومات: {{ person.info_source }}</p>{% endif %}
+    </aside>
+</div>
+{% endblock %}

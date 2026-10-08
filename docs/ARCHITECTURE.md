@@ -16,10 +16,19 @@ proxy المنصة (TLS) ──► gunicorn/Django ──► PostgreSQL
 
 | التطبيق | المسؤولية |
 |---|---|
-| `core` | خدمات مشتركة: health check، سياق الموقع (الاسم/الشعار)، validators للملفات المرفوعة، URL converter للـ slugs العربية، صفحة الخصوصية، خدمة media مع حجب ملفات الكتب |
-| `books` | النماذج الحالية (Book, Author, Category, Review, Bookmark, ReadingHistory, UserActivity) والواجهات |
+| `core` | خدمات مشتركة: health، سياق الموقع، validators للملفات، تطبيع العربية (`arabic.py`)، قراءة الإعدادات (`env.py`)، URL converter للـ slugs العربية، خدمة media مع حجب ملفات الكتب |
+| `sources` | سجل المصادر (`Source`) |
+| `catalog` | الفهرس: Work, Edition, Person, Contribution, Publisher, Series, Subject, WorkTranslation, AccessLink + الصفحات العامة والبحث |
+| `library` | مكتبة المستخدم: SavedWork, Rating, ReadingEntry |
+| `accounts` | الدخول، التسجيل، الملف الشخصي، حذف الحساب (بلا نماذج) |
+| `books` | النموذج القديم (للقراءة فقط في الإدارة). البيانات نُقلت إلى `catalog` و`library` |
 
-المراحل القادمة تضيف: `catalog` (Work/Edition/Contributor/Subject/AccessLink)، `sources`، `ingestion`، `search`، `library`، `contributions`، `analytics`، `seo`.
+## الواجهة
+
+- قوالب Django بلا أطر خارجية: `static/css/maktaba.css` (نظام تصميم بمتغيرات CSS، RTL بخصائص منطقية، فاتح/داكن، mobile-first)
+  و`static/js/maktaba.js` (الوضع الداكن، اقتراحات البحث، الحفظ). لا Tailwind CDN ولا GSAP.
+- كل صفحة تعمل بدون JavaScript (النماذج عادية؛ JS تحسين فقط).
+- الروابط القديمة (`/category/…`، `/categories/`، `/author/<id>/`، `/dashboard/…`) تُحوَّل بـ 301.
 
 ## الإعدادات
 

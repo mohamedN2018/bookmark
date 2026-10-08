@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}الموضوعات - {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}شجرة تصنيف المصادر العلمية والتقنية في {{ SITE_NAME }}.{% endblock %}
+{% block content %}
+<h1>الموضوعات</h1>
+<p class="muted">تصنيف علمي هرمي. الرقم بين القوسين عدد المصادر المصنفة مباشرة في الموضوع.</p>
+<div class="grid">
+    {% for root in roots %}
+    <section class="panel">
+        <h2><a href="{{ root.get_absolute_url }}">{{ root.name }}</a> <span class="muted small">({{ root.n }})</span></h2>
+        {% if root.name_en %}<p class="small muted" dir="ltr">{{ root.name_en }}</p>{% endif %}
+        <ul class="topic-tree">
+            {% for child in root.children.all %}{% if child.is_active %}<li><a href="{{ child.get_absolute_url }}">{{ child.name }}</a></li>{% endif %}{% endfor %}
+        </ul>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

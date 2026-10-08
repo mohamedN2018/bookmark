@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+
+{% block title %}{{ work.title }} - {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% if work.description %}{{ work.description|striptags|truncatechars:160 }}{% else %}{{ work.get_content_type_display }}: {{ work.title }}{% for c in authors %} — {{ c.person.name }}{% endfor %}{% endif %}{% endblock %}
+{% block og_type %}book{% endblock %}
+{% block og_title %}{{ work.title }}{% endblock %}
+{% block og_description %}{{ work.description|striptags|truncatechars:200|default:work.title }}{% endblock %}
+
+{% block head %}
+{% with edition=editions.0 %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "{% if work.content_type == 'RESEARCH_PAPER' or work.content_type == 'PREPRINT' %}ScholarlyArticle{% elif work.content_type == 'THESIS' %}Thesis{% elif work.content_type == 'DATASET' %}Dataset{% else %}Book{% endif %}",
+  "name": "{{ work.title|escapejs }}",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{{ work.get_absolute_url }}"{% if work.description %},
+  "description": "{{ work.description|striptags|truncatechars:500|escapejs }}"{% endif %}{% if authors %},
+  "author": [{% for c in authors %}{"@type": "Person", "name": "{{ c.person.name|escapejs }}"}{% if not forloop.last %}, {% endif %}{% endfor %}]{% endif %}{% if edition.publisher %},
+  "publisher": {"@type": "Organization", "name": "{{ edition.publisher.name|escapejs }}"}{% endif %}{% if edition.isbn13 %},
+  "isbn": "{{ edition.isbn13 }}"{% endif %}{% if edition.publication_year %},
+  "datePublished": "{{ edition.publication_year }}"{% endif %}{% if edition.language %},
+  "inLanguage": "{{ edition.language }}"{% endif %}{% if edition.page_count %},
+  "numberOfPages": {{ edition.page_count }}{% endif %}
+}
+</script>
+{% endwith %}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+  {"@type": "ListItem", "position": 1, "name": "الرئيسية", "item": "{{ request.scheme }}://{{ request.get_host }}/"},
+  {"@type": "ListItem", "position": 2, "name": "المصادر", "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'search' %}"},
+  {"@type": "ListItem", "position": 3, "name": "{{ work.title|escapejs }}"}
+]}
+</script>
+{% endblock %}
+
+{% block content %}
+{% with edition=editions.0 subject=work.subjects.all.0 %}
+<nav class="breadcrumbs" aria-label="مسار التنقل">
+    <ol>
+        <li><a href="{% url 'home' %}">الرئيسية</a></li>
+        {% if subject %}{% for ancestor in subject.ancestors %}<li><a href="{{ ancestor.get_absolute_url }}">{{ ancestor.name }}</a></li>{% endfor %}<li><a href="{{ subject.get_absolute_url }}">{{ subject.name }}</a></li>{% else %}<li><a href="{% url 'search' %}">المصادر</a></li>{% endif %}
+        <li aria-current="page">{{ work.title|truncatechars:60 }}</li>
+    </ol>
+</nav>
+
+<div class="two-col">
+    <article class="stack">
+        <header class="work-head {% if edition.cover_image or edition.cover_url %}has-cover{% endif %}">
+            {% if edition.cover_image %}
+                <img class="cover" src="{{ edition.cover_image.url }}" alt="غلاف {{ work.title }}" loading="lazy">
+            {% elif edition.cover_url %}
+                <img class="cover" src="{{ edition.cover_url }}" alt="غلاف {{ work.title }}" loading="lazy" referrerpolicy="no-referrer">
+            {% endif %}
+            <div>
+                <p class="record-type">{{ work.get_content_type_display }}{% if work.difficulty %} · المستوى: {{ work.get_difficulty_display }}{% endif %}</p>
+                <h1 class="work-title">{{ work.title }}</h1>
+                {% if work.subtitle %}<p class="work-subtitle">{{ work.subtitle }}</p>{% endif %}
+                {% if work.original_title and work.original_title != work.title %}<p class="muted">العنوان الأصلي: <span dir="auto">{{ work.original_title }}</span></p>{% endif %}
+                {% if authors %}<p>{% for c in authors %}<a href="{{ c.person.get_absolute_url }}">{{ c.person.name }}</a>{% if not forloop.last %}، {% endif %}{% endfor %}</p>{% endif %}
+                <div class="record-foot">
+                    {% if edition %}{% include "catalog/_access_badge.html" with status=edition.access_summary %}{% else %}{% include "catalog/_access_badge.html" with status="METADATA_ONLY" %}{% endif %}
+                    {% if work.verification_status == "VERIFIED" %}<span class="badge badge-free">بيانات مُتحقق منها</span>{% else %}<span class="badge">بيانات غير مُتحقق منها بعد</span>{% endif %}
+                </div>
+                {% if user.is_authenticated %}
+                <form class="access-actions" method="post" action="{% url 'toggle_save' work.id %}" data-save-toggle>
+                    {% csrf_token %}
+                    <button class="btn btn-quiet" type="submit" aria-pressed="{{ is_saved|yesno:'true,false' }}">{% if is_saved %}محفوظ ✓{% else %}احفظ{% endif %}</button>
+                </form>
+                {% endif %}
+            </div>
+        </header>
+
+        <section class="panel" aria-labelledby="meta-title">
+            <h2 id="meta-title">البيانات الوصفية</h2>
+            <table class="meta-table">
+                {% if other_contributors %}{% for c in other_contributors %}<tr><th scope="row">{{ c.get_role_display }}</th><td><a href="{{ c.person.get_absolute_url }}">{{ c.person.name }}</a></td></tr>{% endfor %}{% endif %}
+                {% if edition.publisher %}<tr><th scope="row">الناشر</th><td>{{ edition.publisher.name }}</td></tr>{% endif %}
+                {% if edition.publication_year %}<tr><th scope="row">سنة النشر</th><td>{{ edition.publication_year }}</td></tr>{% endif %}
+                {% if edition.edition_statement %}<tr><th scope="row">الطبعة</th><td>{{ edition.edition_statement }}</td></tr>{% endif %}
+                {% if edition.series %}<tr><th scope="row">السلسلة</th><td>{{ edition.series.name }}{% if edition.volume %} — المجلد {{ edition.volume }}{% endif %}</td></tr>{% endif %}
+                {% if edition.language %}<tr><th scope="row">اللغة</th><td>{{ edition.get_language_display }}</td></tr>{% endif %}
+                {% if work.original_language and work.original_language != edition.language %}<tr><th scope="row">اللغة الأصلية</th><td>{{ work.get_original_language_display }}</td></tr>{% endif %}
+                {% if edition.page_count %}<tr><th scope="row">عدد الصفحات</th><td>{{ edition.page_count }}</td></tr>{% endif %}
+                {% if edition.isbn13 %}<tr><th scope="row">ISBN-13</th><td><span class="ltr">{{ edition.isbn13 }}</span></td></tr>{% endif %}
+                {% if edition.isbn10 %}<tr><th scope="row">ISBN-10</th><td><span class="ltr">{{ edition.isbn10 }}</span></td></tr>{% endif %}
+                {% with doi=edition.doi|default:work.doi %}{% if doi %}<tr><th scope="row">DOI</th><td><a class="ltr" href="https://doi.org/{{ doi }}" rel="noopener">{{ doi }}</a></td></tr>{% endif %}{% endwith %}
+                {% if work.subjects.all %}<tr><th scope="row">الموضوعات</th><td><ul class="chip-list">{% for s in work.subjects.all %}<li><a class="badge badge-subject" href="{{ s.get_absolute_url }}">{{ s.name }}</a></li>{% endfor %}</ul></td></tr>{% endif %}
+                {% if work.keywords %}<tr><th scope="row">كلمات مفتاحية</th><td>{{ work.keywords|join:"، " }}</td></tr>{% endif %}
+            </table>
+        </section>
+
+        {% if work.description %}
+        <section aria-labelledby="desc-title">
+            <h2 id="desc-title">الوصف</h2>
+            <div dir="auto">{{ work.description|linebreaks }}</div>
+        </section>
+        {% endif %}
+
+        {% if work.why_it_matters %}
+        <section aria-labelledby="why-title">
+            <h2 id="why-title">لماذا هذا المصدر مهم؟</h2>
+            {{ work.why_it_matters|linebreaks }}
+        </section>
+        {% endif %}
+
+        {% if editions|length > 1 %}
+        <section aria-labelledby="editions-title">
+            <h2 id="editions-title">الطبعات ({{ editions|length }})</h2>
+            {% for e in editions %}
+            <div class="edition-row">
+                <strong>{{ e.display_title }}</strong>
+                <span class="muted small">{% if e.edition_statement %}{{ e.edition_statement }} · {% endif %}{% if e.language %}{{ e.get_language_display }} · {% endif %}{% if e.publisher %}{{ e.publisher.name }} · {% endif %}{{ e.publication_year|default:"" }}</span>
+                {% if e.isbn13 %}<span class="ltr small">ISBN {{ e.isbn13 }}</span>{% endif %}
+                {% include "catalog/_access_badge.html" with status=e.access_summary %}
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if translations_of or translated_from %}
+        <section aria-labelledby="tr-title">
+            <h2 id="tr-title">الترجمات</h2>
+            <ul>
+                {% for t in translated_from %}<li>ترجمة لـ <a href="{{ t.original.get_absolute_url }}">{{ t.original.title }}</a>{% if t.translator %} — ترجمة {{ t.translator.name }}{% endif %}{% if t.year %} ({{ t.year }}){% endif %}</li>{% endfor %}
+                {% for t in translations_of %}<li><a href="{{ t.translated.get_absolute_url }}">{{ t.translated.title }}</a> — {{ t.get_language_display }}{% if t.translator %}، ترجمة {{ t.translator.name }}{% endif %}{% if t.year %} ({{ t.year }}){% endif %}</li>{% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <section id="ratings" aria-labelledby="ratings-title">
+            <h2 id="ratings-title">تقييمات القرّاء ({{ rating_count }})</h2>
+            {% if ratings %}
+                {% for r in ratings %}
+                <div class="edition-row">
+                    <strong>{{ r.user.username }}</strong> <span aria-label="{{ r.score }} من 5">{{ r.score }}/5</span>
+                    <span class="muted small">{{ r.updated_at|date:"Y-m-d" }}</span>
+                    {% if r.comment %}<p dir="auto">{{ r.comment }}</p>{% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="muted">لا تقييمات بعد.</p>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <form class="panel" method="post" action="{% url 'rate_work' work.id %}">
+                {% csrf_token %}
+                <fieldset class="form-field bare">
+                    <legend>{% if user_rating %}عدّل تقييمك{% else %}قيّم هذا المصدر{% endif %}</legend>
+                    <div class="stars">
+                        {% for i in "54321" %}<input type="radio" id="star{{ i }}" name="score" value="{{ i }}" {% if user_rating.score|stringformat:"s" == i %}checked{% endif %} required><label for="star{{ i }}" aria-label="{{ i }} من 5">★</label>{% endfor %}
+                    </div>
+                </fieldset>
+                <div class="form-field">
+                    <label for="rating-comment">تعليق (اختياري)</label>
+                    <textarea id="rating-comment" name="comment" rows="3" maxlength="2000">{{ user_rating.comment|default:"" }}</textarea>
+                </div>
+                <button class="btn" type="submit">حفظ التقييم</button>
+            </form>
+            {% else %}
+            <p><a href="{% url 'login' %}?next={{ request.path|urlencode }}">سجّل الدخول</a> لتقييم هذا المصدر.</p>
+            {% endif %}
+        </section>
+    </article>
+
+    <aside class="stack" aria-label="الوصول إلى المصدر">
+        <section class="panel">
+            <h2>الوصول إلى المصدر</h2>
+            {% for e in editions %}{% for link in e.access_links.all %}
+                {% if link.is_trusted or link.link_type == "OFFICIAL_PAGE" or link.link_type == "PURCHASE" %}
+                <div class="access-option">
+                    <div>{% include "catalog/_access_badge.html" with status=link.access_status %}{% if editions|length > 1 %} <span class="small muted">{{ e }}</span>{% endif %}</div>
+                    <div class="access-actions">
+                        {% if link.allows_free_access %}
+                            {% if link.hosted_file and link.can_serve_hosted_file %}
+                                <a class="btn" href="{% url 'hosted_file' link.id %}">تحميل</a>
+                            {% elif link.url and link.link_type == "DOWNLOAD" %}
+                                <a class="btn" href="{{ link.url }}" rel="noopener nofollow" target="_blank">تحميل من المصدر</a>
+                            {% elif link.url %}
+                                <a class="btn" href="{{ link.url }}" rel="noopener nofollow" target="_blank">قراءة المصدر</a>
+                            {% endif %}
+                        {% elif link.link_type == "PURCHASE" and link.url %}
+                            <a class="btn btn-outline" href="{{ link.url }}" rel="noopener nofollow" target="_blank">شراء الكتاب</a>
+                        {% elif link.link_type == "PREVIEW" and link.url %}
+                            <a class="btn btn-outline" href="{{ link.url }}" rel="noopener nofollow" target="_blank">معاينة</a>
+                        {% elif link.url %}
+                            <a class="btn btn-outline" href="{{ link.url }}" rel="noopener nofollow" target="_blank">فتح المصدر الرسمي</a>
+                        {% endif %}
+                    </div>
+                    <dl class="transparency">
+                        <dt>المصدر</dt><dd>{{ link.source.name|default:"غير محدد" }}</dd>
+                        <dt>آخر تحقق</dt><dd>{% if link.last_checked_at %}{{ link.last_checked_at|date:"Y-m-d" }}{% elif link.verified_at %}{{ link.verified_at|date:"Y-m-d" }}{% else %}لم يُفحص بعد{% endif %}</dd>
+                        {% if link.license %}<dt>الرخصة</dt><dd>{% if link.license_url %}<a href="{{ link.license_url }}" rel="noopener">{{ link.license }}</a>{% else %}{{ link.license }}{% endif %}</dd>{% endif %}
+                        {% if link.source_owner %}<dt>المالك</dt><dd>{{ link.source_owner }}</dd>{% endif %}
+                        {% if link.url %}<dt>الرابط الأصلي</dt><dd class="ltr">{{ link.url|truncatechars:60 }}</dd>{% endif %}
+                        {% if link.is_broken %}<dt>تنبيه</dt><dd>المصدر غير متاح حاليًا</dd>{% endif %}
+                    </dl>
+                </div>
+                {% endif %}
+            {% endfor %}{% endfor %}
+
+            {% if not edition or edition.access_summary == "METADATA_ONLY" or edition.access_summary == "UNKNOWN" %}
+            <p class="notice small">
+                لم نتحقق بعد من مصدر قانوني لقراءة هذا العمل أو تحميله. المتاح هنا هو بياناته الوصفية فقط.
+                {% if edition.access_summary == "UNKNOWN" %}توجد روابط قيد مراجعة الحقوق ولا تُعرض حتى يُتحقق منها.{% endif %}
+            </p>
+            {% endif %}
+        </section>
+
+        {% if related %}
+        <section class="panel">
+            <h2>في نفس الموضوع</h2>
+            <ul>{% for w in related %}<li><a href="{{ w.get_absolute_url }}">{{ w.title }}</a></li>{% endfor %}</ul>
+        </section>
+        {% endif %}
+
+        {% if same_author %}
+        <section class="panel">
+            <h2>للمؤلف نفسه</h2>
+            <ul>{% for w in same_author %}<li><a href="{{ w.get_absolute_url }}">{{ w.title }}</a></li>{% endfor %}</ul>
+        </section>
+        {% endif %}
+    </aside>
+</div>
+{% endwith %}
+{% endblock %}

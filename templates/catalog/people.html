@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}المؤلفون - {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1>المؤلفون والمساهمون</h1>
+<form class="search-box narrow" role="search" method="get" action="{% url 'people' %}">
+    <label class="visually-hidden" for="people-q">ابحث عن مؤلف</label>
+    <input id="people-q" type="search" name="q" value="{{ query }}" placeholder="اسم المؤلف" maxlength="100">
+    <button type="submit" aria-label="بحث">⌕</button>
+</form>
+<p class="muted">{{ total }} شخص</p>
+{% if page_obj.object_list %}
+<ul class="grid plain-list">
+    {% for person in page_obj %}
+    <li class="record">
+        <h2 class="record-title"><a href="{{ person.get_absolute_url }}">{{ person.name }}</a></h2>
+        {% if person.native_name %}<p class="record-meta" dir="auto">{{ person.native_name }}</p>{% endif %}
+        <p class="record-meta">{{ person.n }} مصدر في الفهرس</p>
+    </li>
+    {% endfor %}
+</ul>
+{% include "catalog/_pagination.html" %}
+{% else %}
+<p class="notice">لا نتائج.</p>
+{% endif %}
+{% endblock %}
