@@ -7,6 +7,10 @@
 {% block content %}
 <h1>{% if query %}نتائج البحث عن "{{ query }}"{% else %}كل المصادر{% endif %}</h1>
 <p class="muted">{{ total }} نتيجة{% if current_subject %} في «{{ current_subject.name }}»{% endif %}</p>
+{% if approximate %}<p class="notice small" role="status"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> لم نجد تطابقًا تامًا مع "{{ query }}"، هذه أقرب النتائج إملائيًا.</p>{% endif %}
+{% if related_subjects and page_obj.object_list %}
+<ul class="chip-list" aria-label="موضوعات مرتبطة">{% for s in related_subjects %}<li><a class="badge badge-subject" href="{{ s.get_absolute_url }}">{{ s.name }}</a></li>{% endfor %}</ul>
+{% endif %}
 
 <div class="two-col filters-first">
     <aside class="panel filters" aria-label="تصفية النتائج">
@@ -54,6 +58,18 @@
                     </select>
                 </div>
             </fieldset>
+            <fieldset>
+                <legend>الترتيب</legend>
+                <div class="form-field">
+                    <label class="visually-hidden" for="f-order">الترتيب</label>
+                    <select id="f-order" name="order" class="inline-select">
+                        <option value="" {% if not order %}selected{% endif %}>{% if query %}الأكثر صلة{% else %}الأحدث إضافة{% endif %}</option>
+                        <option value="year" {% if order == 'year' %}selected{% endif %}>الأحدث نشرًا</option>
+                        <option value="newest" {% if order == 'newest' %}selected{% endif %}>الأحدث إضافة</option>
+                        <option value="title" {% if order == 'title' %}selected{% endif %}>العنوان</option>
+                    </select>
+                </div>
+            </fieldset>
             <button class="btn btn-block" type="submit">تطبيق</button>
             {% if request.GET %}<p class="small"><a href="{% url 'search' %}{% if query %}?q={{ query|urlencode }}{% endif %}">إزالة التصفية</a></p>{% endif %}
         </form>
@@ -71,6 +87,12 @@
                 <div>
                     <h3>موضوعات قريبة</h3>
                     <ul class="chip-list">{% for subject in related_subjects %}<li><a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a></li>{% endfor %}</ul>
+                </div>
+                {% endif %}
+                {% if popular_searches %}
+                <div>
+                    <h3>عمليات بحث شائعة</h3>
+                    <ul class="chip-list">{% for row in popular_searches %}<li><a class="badge" href="{% url 'search' %}?q={{ row.example|urlencode }}">{{ row.example }}</a></li>{% endfor %}</ul>
                 </div>
                 {% endif %}
                 {% if external_searches %}

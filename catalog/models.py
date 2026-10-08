@@ -8,6 +8,7 @@ WorkTranslation: يربط عملًا أصليًا بعمل مترجم بعد ا�
 """
 
 from django.conf import settings
+from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -311,6 +312,10 @@ class Work(TimeStamped, Verifiable):
     )
     is_featured = models.BooleanField("مميز", default=False)
     view_count = models.PositiveIntegerField("المشاهدات", default=0, editable=False)
+    # فهرس البحث: نص مطبّع يجمع العنوان والمؤلفين والموضوعات والكلمات المفتاحية والناشر والوصف.
+    # يُبنى في catalog.indexing؛ search_vector يُستخدم على PostgreSQL فقط.
+    search_document = models.TextField(blank=True, editable=False)
+    search_vector = SearchVectorField(null=True, editable=False)
     # ربط مؤقت بالنموذج القديم أثناء الانتقال
     legacy_book = models.OneToOneField(
         "books.Book", on_delete=models.SET_NULL, null=True, blank=True, related_name="work", editable=False

@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     "sources.apps.SourcesConfig",
     "catalog.apps.CatalogConfig",
     "library.apps.LibraryConfig",
+    "search.apps.SearchConfig",
     "accounts.apps.AccountsConfig",
     "books.apps.BooksConfig",
 ]

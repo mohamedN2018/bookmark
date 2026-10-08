@@ -21,6 +21,9 @@ fi
 # نقل أي كتب من النموذج القديم إلى الفهرس الجديد (لا يفعل شيئًا إن نُقلت سابقًا)
 python manage.py import_legacy_books || echo "[entrypoint] تحذير: فشل نقل الكتب القديمة إلى الفهرس."
 
+# فهرسة البحث للأعمال غير المفهرسة (لا شيء إن كانت كلها مفهرسة)
+python manage.py rebuild_search_index --missing || echo "[entrypoint] تحذير: فشل بناء فهرس البحث."
+
 if [ "${RUN_COLLECTSTATIC:-1}" = "1" ]; then
     python manage.py collectstatic --noinput -v 0
 fi

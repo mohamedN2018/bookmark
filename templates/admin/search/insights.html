@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div id="content-main">
+    <p>عمليات البحث مسجّلة دون أي بيانات عن المستخدم (لا حساب ولا IP). الفترة: آخر {{ days }} يومًا. إجمالي السجل: {{ total }}.</p>
+    <p>
+        <a href="?days=7">7 أيام</a> · <a href="?days=30">30 يومًا</a> · <a href="?days=365">سنة</a>
+    </p>
+
+    <h2>ما يبحث عنه الناس ولا نملكه (بلا نتائج)</h2>
+    <p>هذه القائمة توضح ما ينقص المكتبة. الأكثر تكرارًا أولًا.</p>
+    <table>
+        <thead><tr><th>البحث</th><th>المرات</th><th>آخر مرة</th></tr></thead>
+        <tbody>
+        {% for row in zero %}<tr><td>{{ row.example }}</td><td>{{ row.count }}</td><td>{{ row.last|date:"Y-m-d H:i" }}</td></tr>
+        {% empty %}<tr><td colspan="3">لا شيء في هذه الفترة.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+
+    <h2>الأكثر بحثًا</h2>
+    <table>
+        <thead><tr><th>البحث</th><th>المرات</th><th>آخر مرة</th></tr></thead>
+        <tbody>
+        {% for row in top %}<tr><td><a href="/books/?q={{ row.example|urlencode }}" target="_blank">{{ row.example }}</a></td><td>{{ row.count }}</td><td>{{ row.last|date:"Y-m-d H:i" }}</td></tr>
+        {% empty %}<tr><td colspan="3">لا شيء في هذه الفترة.</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

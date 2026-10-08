@@ -8,6 +8,9 @@ from django.views.decorators.http import require_GET
 
 from books.models import Author as LegacyAuthor
 from core.arabic import normalize_key
+from search.analytics import log_search, top_queries
+from search.engine import descendant_ids, free_access_exists
+from search.engine import search as run_search
 
 from .models import (
     LANGUAGE_CHOICES,
@@ -21,7 +24,6 @@ from .models import (
     Work,
     WorkTranslation,
 )
-from .search import descendant_ids, free_access_q, search_works
 
 PAGE_SIZE = 20
 SUGGEST_LIMIT = 8
@@ -54,16 +56,17 @@ def home(request):
             "works": works.count(),
             "people": Person.objects.count(),
             "subjects": Subject.objects.filter(is_active=True).count(),
-            "free": works.filter(free_access_q()).distinct().count(),
+            "free": works.filter(free_access_exists()).count(),
         },
         "latest": _work_list_qs(works.order_by("-created_at"))[:8],
-        "open_access": _work_list_qs(works.filter(free_access_q()).distinct().order_by("-created_at"))[:8],
+        "open_access": _work_list_qs(works.filter(free_access_exists()).order_by("-created_at"))[:8],
         "arabic": _work_list_qs(
             works.filter(Q(original_language="ar") | Q(editions__language="ar")).distinct().order_by("-created_at")
         )[:8],
         "beginner": _work_list_qs(works.filter(difficulty="BEGINNER").order_by("-created_at"))[:8],
         "advanced": _work_list_qs(works.filter(difficulty="ADVANCED").order_by("-created_at"))[:8],
         "top_subjects": top_subjects,
+        "popular_searches": top_queries(days=30, limit=10, min_count=2),
         "people": Person.objects.annotate(n=Count("contributions__work", distinct=True))
         .filter(n__gt=0)
         .order_by("-is_featured", "-n", "name")[:8],
@@ -79,9 +82,29 @@ def search(request):
     language = request.GET.get("language", "")
     content_type = request.GET.get("type", "")
     access = request.GET.get("access", "")
+    order = request.GET.get("order", "")
 
-    results = search_works(query, subject=subject, language=language, content_type=content_type, access=access)
-    page = Paginator(_work_list_qs(results.order_by("-created_at")), PAGE_SIZE).get_page(request.GET.get("page"))
+    result = run_search(
+        query, subject=subject, language=language, content_type=content_type, access=access, order=order
+    )
+    page = Paginator(_work_list_qs(result.queryset), PAGE_SIZE).get_page(request.GET.get("page"))
+    total = page.paginator.count
+    log_search(
+        request,
+        query,
+        result.normalized,
+        total,
+        {
+            k: v
+            for k, v in {
+                "subject": request.GET.get("subject", ""),
+                "language": language,
+                "type": content_type,
+                "access": access,
+            }.items()
+            if v
+        },
+    )
 
     filters = request.GET.copy()
     filters.pop("page", None)
@@ -89,17 +112,20 @@ def search(request):
     context = {
         "query": query,
         "page_obj": page,
-        "total": page.paginator.count,
+        "total": total,
+        "approximate": result.approximate,
         "current_subject": subject,
         "language": language,
         "content_type": content_type,
         "access": access,
+        "order": order,
         "filter_querystring": filters.urlencode(),
         "subjects": Subject.objects.filter(parent__isnull=True, is_active=True),
         "languages": LANGUAGE_CHOICES,
         "content_types": ContentType.choices,
-        "external_searches": _external_searches(query) if query and page.paginator.count == 0 else [],
-        "related_subjects": _related_subjects(query) if page.paginator.count == 0 else [],
+        "external_searches": _external_searches(query) if query and total == 0 else [],
+        "related_subjects": _related_subjects(query) if query else [],
+        "popular_searches": top_queries(days=30, limit=8, min_count=2) if query and total == 0 else [],
     }
     return render(request, "catalog/search.html", context)
 
@@ -121,7 +147,7 @@ def _external_searches(query):
         ("OpenAlex", f"https://openalex.org/works?search={q}"),
         ("Open Library", f"https://openlibrary.org/search?q={q}"),
         ("DOAB (كتب مفتوحة الوصول)", f"https://directory.doabooks.org/discover?query={q}"),
-        ("arXiv", f"https://arxiv.org/a/search?query={q}&searchtype=all"),
+        ("arXiv", f"https://arxiv.org/search/?query={q}&searchtype=all"),
         ("Project Gutenberg", f"https://www.gutenberg.org/ebooks/search/?query={q}"),
     ]
 
@@ -131,7 +157,7 @@ def search_suggest(request):
     query = request.GET.get("q", "").strip()
     if len(query) < 2:
         return JsonResponse({"results": []})
-    works = _work_list_qs(search_works(query).order_by("-created_at"))[:SUGGEST_LIMIT]
+    works = _work_list_qs(run_search(query, limit=SUGGEST_LIMIT).queryset)
     results = [
         {
             "title": w.title,
@@ -244,8 +270,8 @@ def topics(request):
 
 def topic_detail(request, slug):
     subject = get_object_or_404(Subject, slug=slug, is_active=True)
-    results = search_works(subject=subject)
-    page = Paginator(_work_list_qs(results.order_by("-created_at")), PAGE_SIZE).get_page(request.GET.get("page"))
+    result = run_search(subject=subject)
+    page = Paginator(_work_list_qs(result.queryset), PAGE_SIZE).get_page(request.GET.get("page"))
     context = {
         "subject": subject,
         "ancestors": subject.ancestors(),

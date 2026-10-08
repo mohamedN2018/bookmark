@@ -17,9 +17,10 @@ proxy المنصة (TLS) ──► gunicorn/Django ──► PostgreSQL
 | التطبيق | المسؤولية |
 |---|---|
 | `core` | خدمات مشتركة: health، سياق الموقع، validators للملفات، تطبيع العربية (`arabic.py`)، قراءة الإعدادات (`env.py`)، URL converter للـ slugs العربية، خدمة media مع حجب ملفات الكتب |
-| `sources` | سجل المصادر (`Source`) |
+| `sources` | سجل المصادر، المزوّدات (OAPEN, Gutenberg, arXiv)، خط الاستيراد، عمليات الاستيراد. انظر SOURCES.md و INGESTION.md |
 | `catalog` | الفهرس: Work, Edition, Person, Contribution, Publisher, Series, Subject, WorkTranslation, AccessLink + الصفحات العامة والبحث |
 | `library` | مكتبة المستخدم: SavedWork, Rating, ReadingEntry |
+| `search` | محرك البحث (full-text + pg_trgm + مرادفات + ترتيب بأوزان قابلة للتعديل) وسجل بحث مجهول الهوية. انظر SEARCH.md |
 | `accounts` | الدخول، التسجيل، الملف الشخصي، حذف الحساب (بلا نماذج) |
 | `books` | النموذج القديم (للقراءة فقط في الإدارة). البيانات نُقلت إلى `catalog` و`library` |
 

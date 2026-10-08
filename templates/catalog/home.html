@@ -40,6 +40,13 @@
     </div>
 </section>
 
+{% if popular_searches %}
+<section class="section" aria-labelledby="popular-title">
+    <div class="section-head"><h2 id="popular-title">الأكثر بحثًا</h2></div>
+    <ul class="chip-list">{% for row in popular_searches %}<li><a class="badge" href="{% url 'search' %}?q={{ row.example|urlencode }}"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> {{ row.example }}</a></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
 <section class="section" aria-labelledby="topics-title">
     <div class="section-head"><h2 id="topics-title">الموضوعات</h2><a href="{% url 'topics' %}">كل الموضوعات</a></div>
     <div class="topic-cards">

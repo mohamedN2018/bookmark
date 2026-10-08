@@ -15,6 +15,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from catalog.identifiers import clean_isbn, is_valid_isbn10, is_valid_isbn13, normalize_doi
+from catalog.indexing import index_works, suspended_indexing
 from catalog.models import (
     AccessLink,
     Contribution,
@@ -125,28 +126,34 @@ class ImportPipeline:
             job.skipped += 1
             return "skipped"
 
-        with transaction.atomic():
-            edition = Edition.objects.filter(source=self.source, source_record_id=record.source_record_id).first()
-            if edition is not None:
-                self._sync_links(edition, record, job)
-                job.updated += 1
-                return "updated"
+        with transaction.atomic(), suspended_indexing():
+            outcome, work_id = self._upsert(record, job)
+            # فهرسة واحدة بعد اكتمال بناء العمل (بدل فهرسة مع كل حفظ)
+            index_works([work_id])
+        return outcome
 
-            duplicate = self._find_duplicate(record)
-            if duplicate is not None and isinstance(duplicate, Edition):
-                # نفس الطبعة موجودة من مصدر آخر: نضيف طرق الوصول الجديدة فقط
-                self._sync_links(duplicate, record, job)
-                job.duplicates += 1
-                return "duplicate"
-
-            work = duplicate if isinstance(duplicate, Work) else self._create_work(record)
-            edition = self._create_edition(work, record)
+    def _upsert(self, record, job):
+        edition = Edition.objects.filter(source=self.source, source_record_id=record.source_record_id).first()
+        if edition is not None:
             self._sync_links(edition, record, job)
-            if duplicate is None:
-                job.created += 1
-                return "created"
+            job.updated += 1
+            return "updated", edition.work_id
+
+        duplicate = self._find_duplicate(record)
+        if duplicate is not None and isinstance(duplicate, Edition):
+            # نفس الطبعة موجودة من مصدر آخر: نضيف طرق الوصول الجديدة فقط
+            self._sync_links(duplicate, record, job)
             job.duplicates += 1
-            return "duplicate"
+            return "duplicate", duplicate.work_id
+
+        work = duplicate if isinstance(duplicate, Work) else self._create_work(record)
+        edition = self._create_edition(work, record)
+        self._sync_links(edition, record, job)
+        if duplicate is None:
+            job.created += 1
+            return "created", work.id
+        job.duplicates += 1
+        return "duplicate", work.id
 
     def _isbns(self, record):
         isbn13, isbn10 = "", ""
