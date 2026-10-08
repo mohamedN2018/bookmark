@@ -18,9 +18,10 @@ RUN pip install --upgrade pip && pip install -r ${REQUIREMENTS}
 COPY . .
 
 RUN useradd --create-home --uid 1000 app \
-    && mkdir -p /usr/src/app/media /usr/src/app/staticfiles \
+    && mkdir -p /usr/src/app/media /usr/src/app/staticfiles /usr/src/app/backups \
     && chown -R app:app /usr/src/app
-USER app
+# لا USER هنا: الحاوي يبدأ كـ root فقط ليصلح ملكية الـ volumes المركّبة،
+# ثم deploy/entrypoint.sh ينزل إلى المستخدم app (setpriv) قبل تشغيل أي شيء آخر.
 
 EXPOSE 8000
 

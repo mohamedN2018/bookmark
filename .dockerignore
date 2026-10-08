@@ -1,11 +1,12 @@
+# ملاحظة: db.sqlite3 و media/ تدخل الصورة عمدًا:
+# - db.sqlite3: مصدر النقل التلقائي إلى PostgreSQL (ووضع Dokploy Application القديم)
+# - media/: تملأ volume الـ media عند أول إنشاء
 .git
 .gitignore
 .env
 .env.*
 !.env.example
-*.sqlite3
 *.sqlite3-journal
-media/
 staticfiles/
 static/node_modules/
 **/__pycache__/
@@ -14,5 +15,4 @@ static/node_modules/
 .ruff_cache/
 .coverage
 htmlcov/
-docs/
 backups/

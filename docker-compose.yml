@@ -1,10 +1,12 @@
-# المكتبة السرية: بيئة الإنتاج
+# المكتبة السرية: الإنتاج على Dokploy (نوع "Docker Compose")
 #
-# لا يحتاج أي متغيرات PostgreSQL في .env:
-# - كلمة مرور قاعدة البيانات تُولَّد عشوائيًا عند أول تشغيل وتُحفظ في volume "secrets"
-#   (أو تُؤخذ من POSTGRES_PASSWORD إن كانت مضبوطة).
-# - عند أول تشغيل تُنقل بيانات db.sqlite3 القديمة تلقائيًا إلى PostgreSQL.
-# المطلوب في .env فقط: MY_SECRET_KEY و MAIN_DOMAIN (انظر .env.example).
+# في Dokploy:
+#   - Domains: أضف الدومين للخدمة book_project على المنفذ 8000 (Traefik يتولى HTTPS).
+#   - Environment: MY_SECRET_KEY و MAIN_DOMAIN فقط مطلوبة. الباقي اختياري.
+# لا منافذ منشورة على الخادم: Traefik يوجّه الطلبات عبر شبكة Dokploy.
+# البيانات في volumes مسمّاة لأن Dokploy يعيد استنساخ الكود مع كل نشر.
+#
+# تشغيل محلي:  docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
 
 x-postgres: &postgres-env
   POSTGRES_DB: ${POSTGRES_DB:-maktaba}
@@ -12,6 +14,7 @@ x-postgres: &postgres-env
   POSTGRES_PASSWORD_FILE: /run/maktaba-secrets/postgres_password
 
 services:
+  # يولّد كلمة مرور PostgreSQL مرة واحدة ويحفظها في volume (أو يأخذ POSTGRES_PASSWORD إن ضُبطت)
   secrets:
     image: alpine:3.20
     restart: "no"
@@ -51,26 +54,32 @@ services:
     restart: always
     command: ["redis-server", "--save", "", "--appendonly", "no"]
 
-  # نفس اسم الخدمة والمنفذ في النسخة القديمة، فيُستبدل الحاوي القديم تلقائيًا
   book_project:
     build: .
     restart: always
+    expose:
+      - "8000"
     environment:
       <<: *postgres-env
-      DEBUG: "False"
       DB_ENGINE: postgres
       POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
-      DOTENV_DIR: /srv/legacy
-      LEGACY_SQLITE_PATH: /srv/legacy/db.sqlite3
+      DEBUG: ${DEBUG:-False}
+      # تمرير متغيرات Dokploy (الفارغ يُعامل كغير مضبوط ويُقرأ من .env بدلًا منه)
+      MY_SECRET_KEY: ${MY_SECRET_KEY:-}
+      MAIN_DOMAIN: ${MAIN_DOMAIN:-}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+      SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-}
+      DOTENV_DIR: /srv/code
+      # بيانات SQLite القديمة (من المستودع، داخل الصورة) تُنقل تلقائيًا إلى PostgreSQL الفارغة
+      LEGACY_SQLITE_PATH: /usr/src/app/db.sqlite3
       BACKUP_DIR: /usr/src/app/backups
-    ports:
-      - "${HTTP_PORT:-80}:8000"
     volumes:
-      - ./media:/usr/src/app/media
-      - ./backups:/usr/src/app/backups
-      - ./:/srv/legacy:ro
+      - media:/usr/src/app/media
+      - backups:/usr/src/app/backups
       - secrets:/run/maktaba-secrets:ro
+      - ./:/srv/code:ro
     depends_on:
       db:
         condition: service_healthy
@@ -85,4 +94,7 @@ services:
 
 volumes:
   pgdata:
+  # تُملأ تلقائيًا من media/ الموجودة في الصورة عند أول إنشاء
+  media:
+  backups:
   secrets:

@@ -1,3 +1,5 @@
+name: maktaba-tests
+
 # تشغيل الاختبارات على PostgreSQL حقيقي:
 #   docker compose -f docker-compose.test.yml run --rm tests
 services:

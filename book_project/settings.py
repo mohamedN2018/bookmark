@@ -8,14 +8,16 @@ Django settings for المكتبة السرية.
 import os
 from pathlib import Path
 
-from decouple import AutoConfig, Csv
+from decouple import Csv
 from django.utils.translation import gettext_lazy as _
+
+from core.env import EnvConfig
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# متغيرات البيئة لها الأولوية دائمًا. ملف .env يُقرأ من DOTENV_DIR إن ضُبط
-# (في Docker: مجلد المشروع على الخادم مركّب للقراءة فقط)، وإلا من مجلد المشروع.
-config = AutoConfig(search_path=os.environ.get("DOTENV_DIR") or BASE_DIR)
+# متغيرات البيئة غير الفارغة لها الأولوية، ثم ملف .env في DOTENV_DIR
+# (في Docker: مجلد الكود مركّبًا للقراءة)، وإلا في مجلد المشروع.
+config = EnvConfig(Path(os.environ.get("DOTENV_DIR") or BASE_DIR) / ".env")
 
 
 def secret(name, default=None):

@@ -1,46 +1,59 @@
 # DEPLOYMENT
 
-## المكونات (`docker-compose.yml`)
+## Dokploy (نوع Docker Compose): الطريقة المعتمدة
 
-| الخدمة | الدور |
+1. في Dokploy: **Create Service → Compose**، المصدر: هذا المستودع، الفرع `main`، الملف `docker-compose.yml`.
+2. **Environment** (المطلوب فقط):
+   ```
+   MY_SECRET_KEY=<سلسلة عشوائية طويلة>
+   MAIN_DOMAIN=https://bookmark.deplois.net
+   ```
+   اختياري: `ALLOWED_HOSTS`، `CSRF_TRUSTED_ORIGINS`، `SECURE_HSTS_SECONDS`، `POSTGRES_PASSWORD` (يُولَّد تلقائيًا إن لم يُضبط).
+3. **Domains**: أضف `bookmark.deplois.net` للخدمة **`book_project`** على المنفذ **`8000`** مع HTTPS.
+   Dokploy يضيف إعدادات Traefik والشبكة تلقائيًا.
+4. **Deploy**. لتفعيل النشر التلقائي استخدم Webhook الخاص بخدمة الـ Compose
+   (الرابط يكون بالشكل `.../api/deploy/compose/<token>`).
+5. بعد نجاح النشر احذف/أوقف تطبيق Dokploy القديم من نوع Application حتى لا يتعارض على الدومين.
+
+### ما يحدث تلقائيًا عند أول نشر
+
+| الخطوة | التفاصيل |
 |---|---|
-| `book_project` | Django + gunicorn، منشور على `${HTTP_PORT:-80}:8000` (نفس اسم ومنفذ النسخة القديمة). يخدم `/static/` (whitenoise) و`/media/` (مع حجب `/media/books/pdfs/`) |
-| `db` | PostgreSQL 16. البيانات في volume `pgdata` |
-| `redis` | cache (و Celery لاحقًا) |
-| `secrets` | يعمل مرة عند كل تشغيل: يولّد كلمة مرور PostgreSQL إن لم تكن موجودة ويحفظها في volume `secrets` |
+| كلمة مرور PostgreSQL | تُولَّد عشوائيًا وتُحفظ في volume `secrets` (لا أسرار في المستودع) |
+| `migrate` + `collectstatic` | عند كل تشغيل للحاوي |
+| نقل البيانات القديمة | إن كانت PostgreSQL فارغة: نسخة JSON إلى volume `backups` ثم تحميل بيانات `db.sqlite3` الموجودة في المستودع. لا يتكرر بعد ذلك |
+| ملفات media | volume `media` يُملأ من مجلد `media/` الموجود في الصورة عند أول إنشاء |
 
-## النشر
+### الـ volumes (تبقى بين عمليات النشر)
+
+| Volume | المحتوى |
+|---|---|
+| `pgdata` | قاعدة البيانات |
+| `media` | الأغلفة والصور المرفوعة |
+| `backups` | نسخ JSON من عمليات النقل |
+| `secrets` | كلمة مرور PostgreSQL |
+
+> Dokploy يعيد استنساخ الكود مع كل نشر، لذا لا تُحفظ أي بيانات في مجلد الكود.
+
+## وضع Dokploy Application (القديم)
+
+الـ `Dockerfile` وحده ما زال يعمل (SQLite من المستودع داخل الصورة + media من الصورة)، فالنشر التلقائي القديم
+لا يكسر الموقع قبل الانتقال إلى Compose. لكن في هذا الوضع أي تعديل على البيانات يضيع مع كل نشر (كما كان سابقًا).
+
+## التشغيل المحلي
 
 ```sh
-git pull
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+# http://localhost:8000
 ```
-
-أو عبر Webhook منصة deplois. لا يحتاج أي خطوة يدوية:
-
-1. **كلمة مرور قاعدة البيانات**: تُولَّد عشوائيًا عند أول تشغيل (أو تؤخذ من `POSTGRES_PASSWORD` إن ضُبطت قبل أول تشغيل).
-2. **نقل البيانات القديمة**: عند كل تشغيل يتحقق `deploy/entrypoint.sh`: إن كانت PostgreSQL فارغة و`db.sqlite3` موجودًا في مجلد المشروع،
-   يصدّر نسخة JSON إلى `backups/` ثم يحمّلها. بعد ذلك لا يفعل شيئًا. ملف SQLite الأصلي لا يُعدَّل (مركّب للقراءة فقط).
-3. **الإعدادات**: يُقرأ `.env` من مجلد المشروع كما في النسخة القديمة. المطلوب فقط `MY_SECRET_KEY` و`MAIN_DOMAIN`.
-   `DEBUG` مفروض `False` في الإنتاج.
-
-تم اختبار هذا المسار بمحاكاة كاملة: تشغيل النسخة القديمة (`bb3496e`) ثم `git pull` و`docker compose up -d --build` فقط:
-الحاوي القديم استُبدل، البيانات نُقلت (13 سجل)، والنشر الثاني لم يكرر النقل.
+يحتاج `.env` في جذر المشروع فيه `MY_SECRET_KEY` (انظر `.env.example`).
 
 ## التحقق
 
 ```sh
 curl -s https://bookmark.deplois.net/healthz/   # {"status": "ok", "database": true}
-docker compose logs book_project | grep "sqlite->postgres"
 ```
-
-## الاسترجاع (rollback)
-
-البيانات القديمة لم تُمس: `db.sqlite3` و`media/` كما هي. للعودة للنسخة السابقة:
-
-```sh
-git checkout bb3496e -- . && docker compose up -d --build --remove-orphans
-```
+وفي سجلات الخدمة `book_project` ابحث عن `[sqlite->postgres]`.
 
 ## الاختبارات
 
@@ -50,13 +63,14 @@ docker compose -f docker-compose.test.yml down -v
 ```
 تشغّل: `ruff`، `makemigrations --check`، و`pytest` على PostgreSQL حقيقي.
 
-## HTTPS
+## ما تم اختباره قبل الرفع
 
-الـ proxy الخاص بالمنصة يُنهي TLS. مع `DEBUG=False` تكون الـ cookies من نوع `Secure`.
-عند التأكد أن الموقع يعمل بالكامل عبر HTTPS يمكن تفعيل `SECURE_HSTS_SECONDS` في `.env`.
+- تشغيل محلي كامل عبر compose: النقل التلقائي (13 سجل)، الصفحات، media، حجب PDF، تسجيل دخول حقيقي (CSRF + session).
+- الحاوي يعمل كمستخدم غير root (`uid 1000`).
+- وضع Application (Dockerfile فقط) يعمل بنفس البيانات.
+- إعادة النشر لا تكرر النقل.
 
 ## تنبيه: ملفات مُتتبعة في git
 
-`db.sqlite3` و`media/` ما زالت مُتتبعة في git. **لم تُزل من التتبع عمدًا**:
-إزالة ملف من التتبع ثم `git pull` على الخادم **تحذفه من القرص** هناك.
-بعد التأكد من نجاح الانتقال إلى PostgreSQL ونسخ `media/` احتياطيًا، يمكن إزالتها من التتبع بأمان.
+`db.sqlite3` و`media/` ما زالت في المستودع لأنها مصدر النقل الأول. بعد التأكد من نجاح الانتقال إلى PostgreSQL
+يمكن إزالتها من المستودع؛ محتواها يبقى في تاريخ git.

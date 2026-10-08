@@ -8,8 +8,11 @@
 
 ```sh
 cp .env.example .env   # ثم عدّل القيم
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+# http://localhost:8000
 ```
+
+النشر: Dokploy (Docker Compose). التفاصيل في [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 أو بدون Docker (SQLite للتطوير فقط):
 
