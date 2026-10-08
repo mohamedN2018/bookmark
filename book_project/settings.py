@@ -251,6 +251,9 @@ PROTECTED_MEDIA_PREFIXES = ("books/pdfs/",)
 LOGIN_MAX_FAILURES = config("LOGIN_MAX_FAILURES", default=10, cast=int)
 LOGIN_FAILURE_WINDOW_SECONDS = config("LOGIN_FAILURE_WINDOW_SECONDS", default=900, cast=int)
 
+# حد إجمالي لحجم الملفات المنزّلة في عملية استيراد واحدة (ميجابايت)
+IMPORT_MAX_TOTAL_MB = config("IMPORT_MAX_TOTAL_MB", default=5000, cast=int)
+
 # حدود رفع الملفات
 MAX_PDF_UPLOAD_MB = config("MAX_PDF_UPLOAD_MB", default=200, cast=int)
 MAX_IMAGE_UPLOAD_MB = config("MAX_IMAGE_UPLOAD_MB", default=5, cast=int)
@@ -258,9 +261,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# الروابط المدخلة بدون scheme تُعامل كـ https (السلوك الافتراضي في Django 6)
-FORMS_URLFIELD_ASSUME_HTTPS = True
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 

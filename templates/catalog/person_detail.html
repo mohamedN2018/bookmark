@@ -17,7 +17,7 @@
         {% if person.bio %}<div dir="auto">{{ person.bio|linebreaks }}</div>{% endif %}
         <section>
             <h2>المصادر في الفهرس ({{ works|length }})</h2>
-            <div class="list-records">{% for work in works %}{% include "catalog/_record.html" %}{% endfor %}</div>
+            <div class="book-grid">{% for work in works %}{% include "catalog/_record.html" %}{% endfor %}</div>
         </section>
     </article>
     <aside class="panel">

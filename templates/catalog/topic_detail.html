@@ -23,7 +23,7 @@
 <section class="section">
     <div class="section-head"><h2>المصادر ({{ total }})</h2><a href="{% url 'search' %}?subject={{ subject.slug|urlencode }}">بحث وتصفية</a></div>
     {% if page_obj.object_list %}
-        <div class="grid">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
+        <div class="book-grid">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
         {% include "catalog/_pagination.html" %}
     {% else %}
         <p class="notice">لا توجد مصادر مفهرسة في هذا الموضوع بعد.</p>

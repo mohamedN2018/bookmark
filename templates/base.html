@@ -13,11 +13,12 @@
     <meta property="og:description" content="{% block og_description %}{{ SITE_TAGLINE }}{% endblock %}">
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     <meta name="twitter:card" content="summary">
-    <meta name="theme-color" content="#0f5e57">
+    <meta name="theme-color" content="#2563eb">
     <link rel="icon" href="{% static 'images/logo.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="{% static 'css/maktaba.css' %}">
     <script src="{% static 'js/maktaba.js' %}"></script>
     {% block head %}{% endblock %}
@@ -28,33 +29,33 @@
     <header class="site-header">
         <div class="container header-row">
             <a class="brand" href="{% url 'home' %}">
-                <span class="brand-mark" aria-hidden="true">س</span>
+                <img class="brand-logo" src="{% static 'images/logo.png' %}" alt="" width="44" height="44">
                 <span class="brand-name">{{ SITE_NAME }}<span class="brand-tagline">{{ SITE_TAGLINE }}</span></span>
             </a>
 
             <form class="search-box" role="search" action="{% url 'search' %}" method="get" data-suggest="{% url 'search_suggest' %}">
                 <label class="visually-hidden" for="site-search">ابحث في الفهرس</label>
                 <input id="site-search" type="search" name="q" value="{{ query|default:'' }}" placeholder="عنوان، مؤلف، موضوع، ISBN أو DOI" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="site-suggestions" maxlength="200">
-                <button type="submit" aria-label="بحث">⌕</button>
+                <button type="submit" aria-label="بحث"><i class="fas fa-search"></i></button>
                 <div class="suggestions" id="site-suggestions" role="listbox" hidden></div>
             </form>
 
             <div class="header-tools">
-                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="تبديل الوضع الفاتح/الداكن">◐</button>
+                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="تبديل الوضع الفاتح/الداكن"><i class="fas fa-moon"></i></button>
             </div>
 
             {% with path=request.path %}
             <nav class="main-nav" aria-label="القائمة الرئيسية">
-                <a href="{% url 'search' %}" {% if path == '/books/' %}aria-current="page"{% endif %}>المصادر</a>
-                <a href="{% url 'topics' %}" {% if path|slice:':8' == '/topics/' %}aria-current="page"{% endif %}>الموضوعات</a>
-                <a href="{% url 'people' %}" {% if path == '/authors/' %}aria-current="page"{% endif %}>المؤلفون</a>
+                <a href="{% url 'search' %}" {% if path == '/books/' %}aria-current="page"{% endif %}><i class="fas fa-book" aria-hidden="true"></i> المصادر</a>
+                <a href="{% url 'topics' %}" {% if path|slice:':8' == '/topics/' %}aria-current="page"{% endif %}><i class="fas fa-layer-group" aria-hidden="true"></i> الموضوعات</a>
+                <a href="{% url 'people' %}" {% if path == '/authors/' %}aria-current="page"{% endif %}><i class="fas fa-feather" aria-hidden="true"></i> المؤلفون</a>
                 {% if user.is_authenticated %}
-                <a href="{% url 'my_library' %}" {% if path == '/library/' %}aria-current="page"{% endif %}>مكتبتي</a>
+                <a href="{% url 'my_library' %}" {% if path == '/library/' %}aria-current="page"{% endif %}><i class="fas fa-bookmark" aria-hidden="true"></i> مكتبتي</a>
                 <a href="{% url 'profile' %}">حسابي</a>
                 {% if user.is_staff %}<a href="{% url 'admin:index' %}">الإدارة</a>{% endif %}
                 <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-button" type="submit">خروج</button></form>
                 {% else %}
-                <a href="{% url 'login' %}">دخول</a>
+                <a href="{% url 'login' %}"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> دخول</a>
                 <a href="{% url 'register' %}">حساب جديد</a>
                 {% endif %}
             </nav>

@@ -65,7 +65,7 @@ def search_works(query="", *, subject=None, language="", content_type="", access
                 qs = qs.filter(id__in=ids)
 
     if subject is not None:
-        subject_ids = [subject.id, *_descendant_ids(subject)]
+        subject_ids = [subject.id, *descendant_ids(subject)]
         qs = qs.filter(subjects__id__in=subject_ids)
     if language:
         qs = qs.filter(Q(original_language=language) | Q(editions__language=language))
@@ -81,7 +81,7 @@ def search_works(query="", *, subject=None, language="", content_type="", access
     return qs.distinct()
 
 
-def _descendant_ids(subject):
+def descendant_ids(subject):
     ids, frontier = [], [subject.id]
     while frontier:
         children = list(Subject.objects.filter(parent_id__in=frontier).values_list("id", flat=True))

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Source
+from .models import ImportJob, Source
 
 
 @admin.register(Source)
@@ -20,3 +20,25 @@ class SourceAdmin(admin.ModelAdmin):
     search_fields = ("name", "domain", "owner")
     prepopulated_fields = {"slug": ("name",)}
     readonly_fields = ("last_health_check_at", "last_synced_at", "created_at", "updated_at")
+
+
+@admin.register(ImportJob)
+class ImportJobAdmin(admin.ModelAdmin):
+    list_display = (
+        "source",
+        "status",
+        "started_at",
+        "finished_at",
+        "seen",
+        "created",
+        "updated",
+        "duplicates",
+        "skipped",
+        "files_downloaded",
+        "errors",
+    )
+    list_filter = ("source", "status")
+    readonly_fields = [f.name for f in ImportJob._meta.fields]
+
+    def has_add_permission(self, request):
+        return False

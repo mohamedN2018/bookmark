@@ -21,7 +21,7 @@ from .models import (
     Work,
     WorkTranslation,
 )
-from .search import free_access_q, search_works
+from .search import descendant_ids, free_access_q, search_works
 
 PAGE_SIZE = 20
 SUGGEST_LIMIT = 8
@@ -45,11 +45,10 @@ def _work_list_qs(qs):
 
 def home(request):
     works = Work.objects.exclude(verification_status=VerificationStatus.REJECTED)
-    top_subjects = (
-        Subject.objects.filter(parent__isnull=True, is_active=True)
-        .annotate(direct=Count("works", distinct=True))
-        .order_by("sort_order")
-    )
+    top_subjects = list(Subject.objects.filter(parent__isnull=True, is_active=True).order_by("sort_order"))
+    for subject in top_subjects:
+        ids = [subject.id, *descendant_ids(subject)]
+        subject.n = works.filter(subjects__id__in=ids).distinct().count()
     context = {
         "stats": {
             "works": works.count(),

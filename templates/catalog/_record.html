@@ -1,10 +1,19 @@
 {% load catalog_tags %}{% work_summary work as s %}
-<article class="record">
-    <span class="record-type">{{ work.get_content_type_display }}{% if s.year %} · {{ s.year }}{% endif %}{% if s.languages %} · {{ s.languages|join:"، " }}{% endif %}</span>
-    <h3 class="record-title"><a href="{{ work.get_absolute_url }}">{{ work.title }}</a></h3>
-    {% if s.authors %}<p class="record-meta">{% for person in s.authors %}{{ person.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>{% endif %}
-    <div class="record-foot">
-        {% include "catalog/_access_badge.html" with status=s.access %}
-        {% for subject in work.subjects.all|slice:":2" %}<a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a>{% endfor %}
+<article class="record book-card">
+    <a class="book-cover-wrap" href="{{ work.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+        {% if s.cover %}
+            <img src="{{ s.cover }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        {% else %}
+            <span class="book-cover-fallback"><i class="fas fa-book-open"></i>{{ work.title|truncatechars:60 }}</span>
+        {% endif %}
+    </a>
+    <div class="book-badges">{% include "catalog/_access_badge.html" with status=s.access %}</div>
+    <div class="book-body">
+        <span class="record-type">{{ work.get_content_type_display }}{% if s.year %} · {{ s.year }}{% endif %}{% if s.languages %} · {{ s.languages|join:"، " }}{% endif %}</span>
+        <h3 class="record-title"><a href="{{ work.get_absolute_url }}" dir="auto">{{ work.title }}</a></h3>
+        {% if s.authors %}<p class="record-meta" dir="auto"><i class="fas fa-user-pen" aria-hidden="true"></i> {% for person in s.authors|slice:":3" %}{{ person.name }}{% if not forloop.last %}، {% endif %}{% endfor %}{% if s.authors|length > 3 %} وآخرون{% endif %}</p>{% endif %}
+        <div class="record-foot">
+            {% for subject in work.subjects.all|slice:":2" %}<a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a>{% endfor %}
+        </div>
     </div>
 </article>

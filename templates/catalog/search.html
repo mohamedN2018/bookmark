@@ -61,7 +61,7 @@
 
     <section aria-label="النتائج">
         {% if page_obj.object_list %}
-            <div class="list-records">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
+            <div class="book-grid">{% for work in page_obj %}{% include "catalog/_record.html" %}{% endfor %}</div>
             {% include "catalog/_pagination.html" %}
         {% else %}
             <div class="panel stack">

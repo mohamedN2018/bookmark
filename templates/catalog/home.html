@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load catalog_tags %}
 
 {% block title %}{{ SITE_NAME }} — {{ SITE_TAGLINE }}{% endblock %}
 
@@ -10,74 +11,87 @@
 {% endblock %}
 
 {% block content %}
-<section class="search-hero">
-    <h1>اكتشف المعرفة</h1>
-    <p class="muted">ابحث بالعربية أو الإنجليزية. لكل مصدر نوضح من أين جاء، وما نوع الوصول إليه، وأين تقرؤه بشكل قانوني.</p>
-    <form class="search-box" role="search" action="{% url 'search' %}" method="get" data-suggest="{% url 'search_suggest' %}">
-        <label class="visually-hidden" for="hero-search">ابحث في الفهرس</label>
-        <input id="hero-search" type="search" name="q" placeholder="مثال: الذكاء الاصطناعي، Python البرمجة، 978-0-13-235088-4" autocomplete="off" maxlength="200">
-        <button type="submit" aria-label="بحث">⌕</button>
-        <div class="suggestions" role="listbox" hidden></div>
-    </form>
-</section>
-
-<section aria-label="أرقام الفهرس">
-    <div class="stats">
-        <div class="stat"><div class="stat-value">{{ stats.works }}</div><div class="stat-label">مصدر مفهرس</div></div>
-        <div class="stat"><div class="stat-value">{{ stats.free }}</div><div class="stat-label">متاح مجانًا بشكل قانوني</div></div>
-        <div class="stat"><div class="stat-value">{{ stats.people }}</div><div class="stat-label">مؤلف ومساهم</div></div>
-        <div class="stat"><div class="stat-value">{{ stats.subjects }}</div><div class="stat-label">موضوع في التصنيف</div></div>
+<section class="hero" aria-labelledby="hero-title">
+    <div class="hero-inner">
+        <div>
+            <span class="hero-badge glass"><span class="dot" aria-hidden="true"></span> {{ SITE_NAME }}</span>
+            <h1 id="hero-title">المعرفة التي يصعب الوصول إليها،<span class="highlight">في مكان واحد</span></h1>
+            <p class="lead">كتب ومراجع علمية وتقنية، مع مصدر كل كتاب ونوع الوصول إليه. الكتب المفتوحة والملكية العامة تقرؤها وتحمّلها كاملة.</p>
+            <form class="search-box" role="search" action="{% url 'search' %}" method="get" data-suggest="{% url 'search_suggest' %}">
+                <label class="visually-hidden" for="hero-search">ابحث في المكتبة</label>
+                <input id="hero-search" type="search" name="q" placeholder="ابحث بعنوان، مؤلف، موضوع، ISBN..." autocomplete="off" maxlength="200">
+                <button type="submit" aria-label="بحث"><i class="fas fa-search"></i></button>
+                <div class="suggestions" role="listbox" hidden></div>
+            </form>
+            <div class="hero-actions">
+                <a class="btn btn-light" href="{% url 'search' %}?access=free"><i class="fas fa-book-open"></i> كتب كاملة مجانًا</a>
+                <a class="btn btn-ghost-light" href="{% url 'topics' %}"><i class="fas fa-layer-group"></i> تصفح الموضوعات</a>
+            </div>
+        </div>
+        <div>
+            <div class="hero-stats" aria-label="أرقام المكتبة">
+                <div class="glass"><div class="stat-value">{{ stats.works }}</div><div class="stat-label">كتاب ومرجع</div></div>
+                <div class="glass"><div class="stat-value">{{ stats.free }}</div><div class="stat-label">متاح كاملًا مجانًا</div></div>
+                <div class="glass"><div class="stat-value">{{ stats.people }}</div><div class="stat-label">مؤلف</div></div>
+                <div class="glass"><div class="stat-value">{{ stats.subjects }}</div><div class="stat-label">موضوع</div></div>
+            </div>
+            <p class="hero-note">أرقام فعلية من قاعدة البيانات.</p>
+        </div>
     </div>
-    <p class="small muted">أرقام فعلية من قاعدة البيانات لحظة فتح الصفحة.</p>
 </section>
 
-{% if latest %}
-<section class="section">
-    <div class="section-head"><h2>أضيف حديثًا</h2><a href="{% url 'search' %}">كل المصادر</a></div>
-    <div class="grid">{% for work in latest %}{% include "catalog/_record.html" %}{% endfor %}</div>
+<section class="section" aria-labelledby="topics-title">
+    <div class="section-head"><h2 id="topics-title">الموضوعات</h2><a href="{% url 'topics' %}">كل الموضوعات</a></div>
+    <div class="topic-cards">
+        {% for subject in top_subjects %}
+        <a class="record panel topic-card" href="{{ subject.get_absolute_url }}">
+            <span class="icon" aria-hidden="true"><i class="fas {{ subject.slug|subject_icon }}"></i></span>
+            <span><strong>{{ subject.name }}</strong><span class="small muted">{{ subject.n }} كتاب</span></span>
+        </a>
+        {% endfor %}
+    </div>
 </section>
-{% endif %}
 
 {% if open_access %}
 <section class="section">
-    <div class="section-head"><h2>متاح مجانًا بشكل قانوني</h2><a href="{% url 'search' %}?access=free">المزيد</a></div>
-    <div class="grid">{% for work in open_access %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    <div class="section-head"><h2>كتب كاملة مجانًا</h2><a href="{% url 'search' %}?access=free">المزيد</a></div>
+    <div class="book-grid">{% for work in open_access %}{% include "catalog/_record.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if latest %}
+<section class="section">
+    <div class="section-head"><h2>أضيف حديثًا</h2><a href="{% url 'search' %}">كل الكتب</a></div>
+    <div class="book-grid">{% for work in latest %}{% include "catalog/_record.html" %}{% endfor %}</div>
 </section>
 {% endif %}
 
 {% if arabic %}
 <section class="section">
-    <div class="section-head"><h2>مصادر عربية</h2><a href="{% url 'search' %}?language=ar">المزيد</a></div>
-    <div class="grid">{% for work in arabic %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    <div class="section-head"><h2>كتب عربية</h2><a href="{% url 'search' %}?language=ar">المزيد</a></div>
+    <div class="book-grid">{% for work in arabic %}{% include "catalog/_record.html" %}{% endfor %}</div>
 </section>
 {% endif %}
 
 {% if beginner %}
 <section class="section">
     <div class="section-head"><h2>للمبتدئين</h2></div>
-    <div class="grid">{% for work in beginner %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    <div class="book-grid">{% for work in beginner %}{% include "catalog/_record.html" %}{% endfor %}</div>
 </section>
 {% endif %}
 
 {% if advanced %}
 <section class="section">
     <div class="section-head"><h2>مراجع متقدمة</h2></div>
-    <div class="grid">{% for work in advanced %}{% include "catalog/_record.html" %}{% endfor %}</div>
+    <div class="book-grid">{% for work in advanced %}{% include "catalog/_record.html" %}{% endfor %}</div>
 </section>
 {% endif %}
-
-<section class="section">
-    <div class="section-head"><h2>تصفح الموضوعات</h2><a href="{% url 'topics' %}">شجرة التصنيف كاملة</a></div>
-    <ul class="chip-list">
-        {% for subject in top_subjects %}<li><a class="badge badge-subject" href="{{ subject.get_absolute_url }}">{{ subject.name }}</a></li>{% endfor %}
-    </ul>
-</section>
 
 {% if people %}
 <section class="section">
     <div class="section-head"><h2>مؤلفون</h2><a href="{% url 'people' %}">كل المؤلفين</a></div>
     <ul class="chip-list">
-        {% for person in people %}<li><a class="badge" href="{{ person.get_absolute_url }}">{{ person.name }} ({{ person.n }})</a></li>{% endfor %}
+        {% for person in people %}<li><a class="badge" href="{{ person.get_absolute_url }}"><i class="fas fa-feather" aria-hidden="true"></i> {{ person.name }} ({{ person.n }})</a></li>{% endfor %}
     </ul>
 </section>
 {% endif %}

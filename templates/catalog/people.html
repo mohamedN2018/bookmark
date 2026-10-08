@@ -5,7 +5,7 @@
 <form class="search-box narrow" role="search" method="get" action="{% url 'people' %}">
     <label class="visually-hidden" for="people-q">ابحث عن مؤلف</label>
     <input id="people-q" type="search" name="q" value="{{ query }}" placeholder="اسم المؤلف" maxlength="100">
-    <button type="submit" aria-label="بحث">⌕</button>
+    <button type="submit" aria-label="بحث"><i class="fas fa-search"></i></button>
 </form>
 <p class="muted">{{ total }} شخص</p>
 {% if page_obj.object_list %}
