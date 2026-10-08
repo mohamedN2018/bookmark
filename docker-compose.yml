@@ -1,17 +1,57 @@
-version: '3.7'
+# المكتبة السرية — بيئة التشغيل
+# الأسرار في .env (انظر .env.example). لا تضع كلمات مرور هنا.
 services:
-  book_project:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+  web:
     build: .
     restart: always
+    env_file: .env
+    environment:
+      DB_ENGINE: postgres
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
     volumes:
-      - ./:/usr/src/app
-    ports:
-      # - "8080:8000"  # 8080 على جهازك، 8000 داخل الـ container
-      - "80:8000"
+      - ./media:/usr/src/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
-    command: >
-      gunicorn --chdir /usr/src/app
-               --access-logfile -
-               --error-logfile -
-               --bind 0.0.0.0:8000
-               book_project.wsgi:application
+  nginx:
+    image: nginx:1.27-alpine
+    restart: always
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./deploy/nginx:/etc/nginx/conf.d:ro
+      - ./media:/srv/media:ro
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
