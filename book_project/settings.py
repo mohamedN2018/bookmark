@@ -37,7 +37,22 @@ SITE_TAGLINE = "المعرفة التي يصعب الوصول إليها، في 
 # =========================
 # SECURITY
 # =========================
-SECRET_KEY = config("MY_SECRET_KEY")
+def _fallback_secret_key():
+    """مفتاح احتياطي عند غياب MY_SECRET_KEY: يُولَّد مرة ويُحفظ في ملف، حتى لا يتوقف الموقع.
+    يُستخدم نفس المفتاح في كل العمليات لأن entrypoint (migrate) يُنشئه قبل gunicorn."""
+    import logging
+
+    from django.core.management.utils import get_random_secret_key
+
+    path = Path(config("SECRET_KEY_FALLBACK_FILE", default=str(BASE_DIR / ".secret_key")))
+    if not path.is_file():
+        path.write_text(get_random_secret_key(), encoding="utf-8")
+        path.chmod(0o600)
+    logging.getLogger(__name__).warning("MY_SECRET_KEY غير مضبوط؛ يُستخدم مفتاح مولّد محليًا من %s", path)
+    return path.read_text(encoding="utf-8").strip()
+
+
+SECRET_KEY = config("MY_SECRET_KEY", default="") or _fallback_secret_key()
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 # يقبل "example.com" أو "https://example.com"

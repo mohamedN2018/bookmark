@@ -1,11 +1,11 @@
-# ملاحظة: db.sqlite3 و media/ تدخل الصورة عمدًا:
+# ملاحظة: .env و db.sqlite3 و media/ تدخل الصورة عمدًا:
+# - .env: في وضع Dokploy Application يكتب Dokploy المتغيرات في .env داخل مجلد الكود
+#   قبل البناء، وهذا هو المصدر الوحيد لها في هذا الوضع
 # - db.sqlite3: مصدر النقل التلقائي إلى PostgreSQL (ووضع Dokploy Application القديم)
 # - media/: تملأ volume الـ media عند أول إنشاء
 .git
 .gitignore
-.env
-.env.*
-!.env.example
+.secret_key
 *.sqlite3-journal
 staticfiles/
 static/node_modules/

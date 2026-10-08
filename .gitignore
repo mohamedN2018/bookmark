@@ -207,3 +207,5 @@ __marimo__/
 staticfiles/
 static/node_modules/
 backups/
+
+.secret_key
