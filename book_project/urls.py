@@ -14,8 +14,7 @@ urlpatterns = [
     path("", include("books.urls")),
 ]
 
-if settings.DEBUG:
-    # في الإنتاج: nginx يخدم /media/ ويحجب /media/books/pdfs/
-    urlpatterns += [
-        re_path(r"^media/(?P<path>.*)$", core_views.serve_public_media),
-    ]
+# Django يخدم /media/ (الأغلفة والصور) ويحجب ملفات الكتب المحمية
+urlpatterns += [
+    re_path(r"^media/(?P<path>.*)$", core_views.serve_public_media),
+]

@@ -1,36 +1,76 @@
-# المكتبة السرية — بيئة التشغيل
-# الأسرار في .env (انظر .env.example). لا تضع كلمات مرور هنا.
+# المكتبة السرية: بيئة الإنتاج
+#
+# لا يحتاج أي متغيرات PostgreSQL في .env:
+# - كلمة مرور قاعدة البيانات تُولَّد عشوائيًا عند أول تشغيل وتُحفظ في volume "secrets"
+#   (أو تُؤخذ من POSTGRES_PASSWORD إن كانت مضبوطة).
+# - عند أول تشغيل تُنقل بيانات db.sqlite3 القديمة تلقائيًا إلى PostgreSQL.
+# المطلوب في .env فقط: MY_SECRET_KEY و MAIN_DOMAIN (انظر .env.example).
+
+x-postgres: &postgres-env
+  POSTGRES_DB: ${POSTGRES_DB:-maktaba}
+  POSTGRES_USER: ${POSTGRES_USER:-maktaba}
+  POSTGRES_PASSWORD_FILE: /run/maktaba-secrets/postgres_password
+
 services:
+  secrets:
+    image: alpine:3.20
+    restart: "no"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      - secrets:/secrets
+    command:
+      - sh
+      - -c
+      - |
+        f=/secrets/postgres_password
+        if [ ! -s "$$f" ]; then
+          if [ -n "$$POSTGRES_PASSWORD" ]; then printf '%s' "$$POSTGRES_PASSWORD" > "$$f";
+          else tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 > "$$f"; fi
+        fi
+        chmod 644 "$$f"
+
   db:
     image: postgres:16-alpine
     restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    environment: *postgres-env
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - secrets:/run/maktaba-secrets:ro
+    depends_on:
+      secrets:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
 
   redis:
     image: redis:7-alpine
     restart: always
     command: ["redis-server", "--save", "", "--appendonly", "no"]
 
-  web:
+  # نفس اسم الخدمة والمنفذ في النسخة القديمة، فيُستبدل الحاوي القديم تلقائيًا
+  book_project:
     build: .
     restart: always
-    env_file: .env
     environment:
+      <<: *postgres-env
+      DEBUG: "False"
       DB_ENGINE: postgres
       POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
+      DOTENV_DIR: /srv/legacy
+      LEGACY_SQLITE_PATH: /srv/legacy/db.sqlite3
+      BACKUP_DIR: /usr/src/app/backups
+    ports:
+      - "${HTTP_PORT:-80}:8000"
     volumes:
       - ./media:/usr/src/app/media
+      - ./backups:/usr/src/app/backups
+      - ./:/srv/legacy:ro
+      - secrets:/run/maktaba-secrets:ro
     depends_on:
       db:
         condition: service_healthy
@@ -40,18 +80,9 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=3).status == 200 else 1)"]
       interval: 30s
       timeout: 5s
+      start_period: 60s
       retries: 3
-
-  nginx:
-    image: nginx:1.27-alpine
-    restart: always
-    ports:
-      - "${HTTP_PORT:-80}:80"
-    volumes:
-      - ./deploy/nginx:/etc/nginx/conf.d:ro
-      - ./media:/srv/media:ro
-    depends_on:
-      - web
 
 volumes:
   pgdata:
+  secrets:

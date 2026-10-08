@@ -39,3 +39,7 @@ def test_health(client):
     resp = client.get("/healthz/")
     assert resp.status_code == 200
     assert resp.json() == {"status": "ok", "database": True}
+
+
+def test_book_pdfs_are_not_served_in_production(client):
+    assert client.get("/media/books/pdfs/anything.pdf").status_code == 404

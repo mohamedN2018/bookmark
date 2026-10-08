@@ -5,12 +5,28 @@ Django settings for المكتبة السرية.
 انظر .env.example و docs/DEPLOYMENT.md.
 """
 
+import os
 from pathlib import Path
 
-from decouple import Csv, config
+from decouple import AutoConfig, Csv
 from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# متغيرات البيئة لها الأولوية دائمًا. ملف .env يُقرأ من DOTENV_DIR إن ضُبط
+# (في Docker: مجلد المشروع على الخادم مركّب للقراءة فقط)، وإلا من مجلد المشروع.
+config = AutoConfig(search_path=os.environ.get("DOTENV_DIR") or BASE_DIR)
+
+
+def secret(name, default=None):
+    """يقرأ NAME أو محتوى الملف في NAME_FILE (مثل Docker secrets)."""
+    path = config(f"{name}_FILE", default="")
+    if path:
+        return Path(path).read_text(encoding="utf-8").strip()
+    if default is None:
+        return config(name)
+    return config(name, default=default)
+
 
 SITE_NAME = "المكتبة السرية"
 SITE_TAGLINE = "المعرفة التي يصعب الوصول إليها، في مكان واحد."
@@ -34,7 +50,11 @@ ALLOWED_HOSTS = config(
 )
 
 # Django >= 4 يتطلب scheme في كل origin
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default=_MAIN_ORIGIN, cast=Csv())
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default=f"{_MAIN_ORIGIN},https://{_MAIN_HOST},http://{_MAIN_HOST}",
+    cast=Csv(),
+)
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
@@ -42,9 +62,9 @@ X_FRAME_OPTIONS = "DENY"
 SESSION_COOKIE_HTTPONLY = True
 
 if not DEBUG:
-    # TLS يُنهى عند nginx / الـ reverse proxy
+    # TLS يُنهى عند الـ reverse proxy الخاص بمنصة الاستضافة
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    # التحويل لـ HTTPS مسؤولية nginx؛ فعّله هنا فقط إن كان الـ proxy يمرر X-Forwarded-Proto
+    # فعّله فقط إن كان الـ proxy أمام التطبيق يمرر X-Forwarded-Proto
     SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=False, cast=bool)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -119,7 +139,7 @@ if DB_ENGINE == "postgres":
             "ENGINE": "django.db.backends.postgresql",
             "NAME": config("POSTGRES_DB"),
             "USER": config("POSTGRES_USER"),
-            "PASSWORD": config("POSTGRES_PASSWORD"),
+            "PASSWORD": secret("POSTGRES_PASSWORD"),
             "HOST": config("POSTGRES_HOST", default="db"),
             "PORT": config("POSTGRES_PORT", default="5432"),
             "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
@@ -201,8 +221,12 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ملفات الكتب لا تُخدم للعامة إلا بعد التحقق من حالة الحقوق.
-# المسار محجوب في nginx وفي خادم التطوير.
+# Django يخدم /media/ ويحجب هذه المسارات (core.views.serve_public_media).
 PROTECTED_MEDIA_PREFIXES = ("books/pdfs/",)
+
+# محاولات الدخول الفاشلة المسموحة لكل اسم مستخدم خلال النافذة الزمنية
+LOGIN_MAX_FAILURES = config("LOGIN_MAX_FAILURES", default=10, cast=int)
+LOGIN_FAILURE_WINDOW_SECONDS = config("LOGIN_FAILURE_WINDOW_SECONDS", default=900, cast=int)
 
 # حدود رفع الملفات
 MAX_PDF_UPLOAD_MB = config("MAX_PDF_UPLOAD_MB", default=200, cast=int)

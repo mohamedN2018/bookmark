@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import TruncMonth
@@ -592,13 +594,25 @@ def register(request):
     return render(request, "auth/register.html", {"form": form, "title": "إنشاء حساب جديد"})
 
 
+def _login_failure_key(username):
+    return f"login-failures:{(username or '').strip().lower()}"
+
+
 def user_login(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
 
     if request.method == "POST":
+        # حماية من التخمين: حد للمحاولات الفاشلة لكل اسم مستخدم
+        key = _login_failure_key(request.POST.get("username"))
+        if cache.get(key, 0) >= settings.LOGIN_MAX_FAILURES:
+            messages.error(request, "محاولات كثيرة غير ناجحة. حاول مرة أخرى بعد قليل.")
+            form = AuthenticationForm(request)
+            return render(request, "auth/login.html", {"form": form, "title": "تسجيل الدخول"}, status=429)
+
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
+            cache.delete(key)
             user = form.get_user()
             login(request, user)
             if not request.POST.get("remember-me"):
@@ -606,6 +620,11 @@ def user_login(request):
                 request.session.set_expiry(0)
             messages.success(request, f"مرحباً بك مرة أخرى {user.get_username()}!")
             return redirect(_safe_next_url(request, "dashboard"))
+        cache.add(key, 0, settings.LOGIN_FAILURE_WINDOW_SECONDS)
+        try:
+            cache.incr(key)
+        except ValueError:
+            cache.set(key, 1, settings.LOGIN_FAILURE_WINDOW_SECONDS)
         messages.error(request, "اسم المستخدم أو كلمة المرور غير صحيحة.")
     else:
         form = AuthenticationForm()

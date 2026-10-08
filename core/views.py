@@ -20,10 +20,14 @@ def health(request):
 
 
 def serve_public_media(request, path):
-    """خدمة media في التطوير فقط، مع حجب ملفات الكتب المحمية (نفس قاعدة nginx)."""
+    """خدمة media العامة (أغلفة، صور مؤلفين) مع حجب ملفات الكتب المحمية."""
     if path.startswith(settings.PROTECTED_MEDIA_PREFIXES):
         raise Http404
-    return serve(request, path, document_root=settings.MEDIA_ROOT)
+    response = serve(request, path, document_root=settings.MEDIA_ROOT)
+    response["Cache-Control"] = "public, max-age=604800"
+    # لا يُنفّذ أي ملف مرفوع كصفحة HTML/JS
+    response["Content-Security-Policy"] = "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'"
+    return response
 
 
 def privacy(request):
