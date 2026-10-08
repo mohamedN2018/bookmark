@@ -15,6 +15,10 @@ class Command(BaseCommand):
         parser.add_argument("--language", action="append", default=[], help="فلترة باللغة (ISO-1)، قابلة للتكرار")
         parser.add_argument("--resume", default="", help="resumption token لاستكمال عملية سابقة (OAPEN)")
         parser.add_argument("--max-total-mb", type=int, default=None, help="حد إجمالي حجم التنزيل لهذه العملية")
+        parser.add_argument(
+            "--set", dest="oai_set", default="", help="مجموعة OAI (arXiv: cs, math, physics, q-bio, stat, eess, econ)"
+        )
+        parser.add_argument("--days", type=int, default=None, help="arXiv: السجلات المحدثة خلال آخر N يومًا")
 
     def handle(self, *args, **options):
         provider = get_provider(options["provider"])
@@ -28,6 +32,10 @@ class Command(BaseCommand):
             log=self.stdout.write,
         )
         params = {"resume_token": options["resume"]} if options["resume"] else {}
+        if options["oai_set"]:
+            params["oai_set"] = options["oai_set"]
+        if options["days"]:
+            params["days"] = options["days"]
         try:
             job = pipeline.run(**params)
         except Exception as exc:

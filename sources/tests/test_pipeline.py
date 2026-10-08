@@ -126,3 +126,24 @@ def test_job_is_recorded(fake_fetch):
     job = ImportJob.objects.get()
     assert job.status == "DONE"
     assert job.finished_at is not None
+
+
+@pytest.mark.django_db
+def test_circuit_breaker_stops_downloads_after_refusal(monkeypatch, settings, tmp_path):
+    from core.net import FetchError
+
+    settings.MEDIA_ROOT = tmp_path
+    calls = []
+
+    def refuse(url, allowed_hosts, **kwargs):
+        calls.append(url)
+        raise FetchError("HTTP 403", status=403)
+
+    monkeypatch.setattr(pipeline_module, "fetch", refuse)
+    records = [make_record("1"), make_record("2", isbns=[], title="Another Book")]
+    job = ImportPipeline(FakeProvider(records), download_files=True, log=quiet).run()
+    assert len(calls) == 1
+    assert job.created == 2
+    assert job.files_downloaded == 0
+    # رابط الملف محفوظ رغم عدم التنزيل
+    assert AccessLink.objects.filter(link_type="DOWNLOAD", hosted_file="").count() == 2

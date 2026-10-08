@@ -22,7 +22,9 @@ MAX_REDIRECTS = 5
 
 
 class FetchError(Exception):
-    pass
+    def __init__(self, message, status=None):
+        super().__init__(message)
+        self.status = status
 
 
 class UnsafeURL(FetchError):
@@ -75,7 +77,7 @@ def _open(url, allowed_hosts, timeout):
             if exc.code in (301, 302, 303, 307, 308) and exc.headers.get("Location"):
                 url = urljoin(url, exc.headers["Location"])
                 continue
-            raise FetchError(f"HTTP {exc.code}: {url}") from exc
+            raise FetchError(f"HTTP {exc.code}: {url}", status=exc.code) from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             raise FetchError(f"{exc}: {url}") from exc
     raise FetchError(f"تحويلات كثيرة: {url}")
@@ -102,7 +104,10 @@ def fetch(url, allowed_hosts, *, max_bytes=50 * 1024 * 1024, timeout=DEFAULT_TIM
                 return b"".join(chunks)
         except UnsafeURL:
             raise
-        except FetchError:
+        except FetchError as exc:
+            # رفض صريح من الخادم: لا نعيد المحاولة
+            if exc.status in (401, 403, 404, 410, 429):
+                raise
             attempt += 1
             if attempt > retries:
                 raise

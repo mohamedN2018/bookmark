@@ -1,7 +1,8 @@
 """OAPEN Library: كتب أكاديمية مفتوحة الوصول محكّمة، بترخيص Creative Commons صريح لكل ملف.
 
 الجلب عبر OAI-PMH (metadataPrefix=xoai) لأن REST API يتطلب تسجيلًا مسبقًا.
-الرخصة تُؤخذ من حقل rightsuri/rights للملف نفسه (bitstream)، والملف يُتحقق منه بـ MD5.
+الرخصة تُؤخذ من حقل rightsuri/rights للملف نفسه (bitstream). روابط ملفات PDF تُحفظ كروابط تحميل
+مباشرة من OAPEN (خادم الملفات يرفض التنزيل الآلي، فلا نستضيفها).
 """
 
 import re
@@ -51,7 +52,9 @@ class OapenProvider(SourceProvider):
     key = "oapen"
     name = "OAPEN Library"
     allowed_hosts = ("library.oapen.org",)
-    can_host_files = True
+    # خادم ملفات OAPEN يرد 403 على الطلبات الآلية (حماية من البوتات)، فلا نستضيف الملفات
+    # ونربط بها مباشرة؛ المستخدم ينزّلها من OAPEN عبر المتصفح.
+    can_host_files = False
     request_delay = 1.5
 
     def iter_records(self, resume_token="", oai_set=BOOKS_SET, on_page=None, **params):

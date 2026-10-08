@@ -7,6 +7,7 @@ Discover/Fetch (المزوّد) → Normalize (المزوّد) → Validate → 
 """
 
 import re
+import time
 
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -245,7 +246,8 @@ class ImportPipeline:
 
     # ------------------------------------------------------------------ access links
     def _link(self, edition, record, link_type, url="", **extra):
-        free = record.rights_status == FREE_RIGHTS
+        # الحقوق/الوصول مأخوذة من بيانات المصدر الرسمية للسجل نفسه
+        verified = record.rights_status == FREE_RIGHTS or record.access_verified
         defaults = {
             "source": self.source,
             "access_status": record.access_status,
@@ -254,9 +256,8 @@ class ImportPipeline:
             "license_url": record.license_url,
             "source_owner": record.source_owner[:255],
             "rights_evidence": record.rights_evidence,
-            # الحقوق مأخوذة من بيانات المصدر الرسمية للسجل نفسه
-            "verification_status": VerificationStatus.VERIFIED if free else VerificationStatus.UNVERIFIED,
-            "verified_at": timezone.now() if free else None,
+            "verification_status": VerificationStatus.VERIFIED if verified else VerificationStatus.UNVERIFIED,
+            "verified_at": timezone.now() if verified else None,
             "last_checked_at": timezone.now(),
             **extra,
         }
@@ -264,7 +265,14 @@ class ImportPipeline:
             edition=edition, link_type=link_type, url=url[:2000], defaults=defaults
         )
         if not created:
-            for field in ("access_status", "rights_status", "license", "license_url", "rights_evidence"):
+            for field in (
+                "access_status",
+                "rights_status",
+                "license",
+                "license_url",
+                "rights_evidence",
+                "verification_status",
+            ):
                 setattr(link, field, defaults[field])
             link.last_checked_at = timezone.now()
             link.save()
@@ -290,11 +298,17 @@ class ImportPipeline:
             return
         if job.bytes_downloaded + (file_ref.size or 0) > self.max_total_bytes:
             return
+        if self.provider.download_delay:
+            time.sleep(self.provider.download_delay)
         try:
             data = fetch(file_ref.url, self.provider.allowed_hosts, max_bytes=self.max_file_bytes, timeout=300)
         except FetchError as exc:
             job.add_log(f"فشل تنزيل {file_ref.url}: {exc}"[:400])
             job.errors += 1
+            if exc.status in (401, 403, 429):
+                # المصدر يرفض التنزيل الآلي: نوقف التنزيل لبقية العملية ولا نكرر الطلبات
+                self.download_files = False
+                job.add_log("أُوقف تنزيل الملفات لبقية العملية: المصدر يرفض التنزيل الآلي. تُحفظ روابط الملفات فقط.")
             return
         if not data.startswith(b"%PDF-"):
             job.add_log(f"الملف ليس PDF: {file_ref.url}")

@@ -81,7 +81,8 @@ docker compose -f docker-compose.test.yml down -v
 
 ```sh
 python manage.py import_source gutenberg                                   # الكتب العلمية في الملكية العامة
-python manage.py import_source oapen --download --max-total-mb 20000       # كتب أكاديمية مفتوحة مع ملفاتها
+python manage.py import_source oapen                                       # كتب أكاديمية مفتوحة (روابط PDF)
+python manage.py import_source arxiv --set cs --days 30 --download         # أبحاث، مع استضافة المرخصة CC
 ```
 
 التفاصيل والخيارات في [INGESTION.md](INGESTION.md). تأكد من مساحة القرص قبل رفع `--max-total-mb`.

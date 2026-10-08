@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2026-10-08T15:59:54Z</responseDate>
+                <request verb="ListRecords" metadataPrefix="arXiv" from="2026-10-01" set="cs">http://oaipmh.arxiv.org/oai</request>
+
+
+    <ListRecords>
+                    <record>
+                <header>
+        <identifier>oai:arXiv.org:2306.07197</identifier>
+        <datestamp>2026-10-01</datestamp>
+            <setSpec>cs:cs:CV</setSpec>
+            <setSpec>cs:cs:AI</setSpec>
+            <setSpec>cs:cs:LG</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>2306.07197</id>
+        <created>2024-08-14</created>
+            <updated>2026-10-01</updated>
+        <authors>
+                <author>
+                    <keyname>Li</keyname>
+                        <forenames>Lin</forenames>
+                </author>
+                <author>
+                    <keyname>Qiu</keyname>
+                        <forenames>Jianing</forenames>
+                </author>
+                <author>
+                    <keyname>Spratling</keyname>
+                        <forenames>Michael</forenames>
+                </author>
+        </authors>
+        <title>AROID: Improving Adversarial Robustness Through Online Instance-Wise Data Augmentation</title>
+            <categories>cs.CV cs.AI cs.LG</categories>
+            <comments>published at the IJCV in press</comments>
+            <journal-ref>International Journal of Computer Vision (IJCV), 133:929-50, 2024</journal-ref>
+            <doi>10.1007/s11263-024-02206-4</doi>
+            <license>http://creativecommons.org/licenses/by/4.0/</license>
+            <abstract>Deep neural networks are vulnerable to adversarial examples. Adversarial training (AT) is an effective defense against adversarial examples. However, AT is prone to overfitting which degrades robustness substantially. Recently, data augmentation (DA) was shown to be effective in mitigating robust overfitting if appropriately designed and optimized for AT. This work proposes a new method to automatically learn online, instance-wise, DA policies to improve robust generalization for AT. This is the first automated DA method specific for robustness. A novel policy learning objective, consisting of Vulnerability, Affinity and Diversity, is proposed and shown to be sufficiently effective and efficient to be practical for automatic DA generation during AT. Importantly, our method dramatically reduces the cost of policy search from the 5000 hours of AutoAugment and the 412 hours of IDBH to 9 hours, making automated DA more practical to use for adversarial robustness. This allows our method to efficiently explore a large search space for a more effective DA policy and evolve the policy as training progresses. Empirically, our method is shown to outperform all competitive DA methods across various model architectures and datasets. Our DA policy reinforced vanilla AT to surpass several state-of-the-art AT methods regarding both accuracy and robustness. It can also be combined with those advanced AT methods to further boost robustness. Code and pre-trained models are available at https://github.com/TreeLLi/AROID.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+<record>
+                <header>
+        <identifier>oai:arXiv.org:1806.11314</identifier>
+        <datestamp>2026-10-01</datestamp>
+            <setSpec>cs:cs:CV</setSpec>
+    </header>
+
+            <metadata>
+                        <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ https://oaipmh.arxiv.org/OAI/arXiv.xsd">
+        <id>1806.11314</id>
+        <created>2026-09-30</created>
+            <updated>2026-10-01</updated>
+        <authors>
+                <author>
+                    <keyname>Imamoglu</keyname>
+                        <forenames>Nevrez</forenames>
+                </author>
+                <author>
+                    <keyname>Oishi</keyname>
+                        <forenames>Yu</forenames>
+                </author>
+                <author>
+                    <keyname>Zhang</keyname>
+                        <forenames>Xiaoqiang</forenames>
+                </author>
+                <author>
+                    <keyname>Ding</keyname>
+                        <forenames>Guanqun</forenames>
+                </author>
+                <author>
+                    <keyname>Fang</keyname>
+                        <forenames>Yuming</forenames>
+                </author>
+                <author>
+                    <keyname>Kouyama</keyname>
+                        <forenames>Toru</forenames>
+                </author>
+                <author>
+                    <keyname>Nakamura</keyname>
+                        <forenames>Ryosuke</forenames>
+                </author>
+        </authors>
+        <title>Hyperspectral Image Dataset for Benchmarking on Salient Object Detection</title>
+            <categories>cs.CV</categories>
+            <comments>3 pages, 3 figures. 2 tables, appeared in the Proceedings of the 10th International Conference on Quality of Multimedia Experience (QoMEX 2018)</comments>
+            <doi>10.1109/QoMEX.2018.8463428</doi>
+            <license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license>
+            <abstract>Many works have been done on salient object detection using supervised or unsupervised approaches on colour images. Recently, a few studies demonstrated that efficient salient object detection can also be implemented by using spectral features in visible spectrum of hyperspectral images from natural scenes. However, these models on hyperspectral salient object detection were tested with a very few number of data selected from various online public dataset, which are not specifically created for object detection purposes. Therefore, here, we aim to contribute to the field by releasing a hyperspectral salient object detection dataset with a collection of 60 hyperspectral images with their respective ground-truth binary images and representative rendered colour images (sRGB). We took several aspects in consideration during the data collection such as variation in object size, number of objects, foreground-background contrast, object position on the image, and etc. Then, we prepared ground truth binary images for each hyperspectral data, where salient objects are labelled on the images. Finally, we did performance evaluation using Area Under Curve (AUC) metric on some existing hyperspectral saliency detection models in literature.
+  The dataset is publicly available on our GitHub repository and Hugging Face dataset hub.
+  Repository: https://github.com/nevrez/HS-SOD; (Old original repository https://github.com/gistairc/HS-SOD)
+  Dataset: https://huggingface.co/datasets/gsvrg/HS-SOD.</abstract>
+    </arXiv>
+
+            </metadata>
+        </record>
+</ListRecords>
+</OAI-PMH>

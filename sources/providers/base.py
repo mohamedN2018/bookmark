@@ -46,6 +46,8 @@ class NormalizedRecord:
     license_url: str = ""
     source_owner: str = ""
     rights_evidence: str = ""
+    # حالة الوصول نفسها (مثل: القراءة مجانية على موقع المصدر) مأخوذة من بيانات المصدر الرسمية
+    access_verified: bool = False
     external_ids: dict = field(default_factory=dict)
 
 
@@ -58,6 +60,8 @@ class SourceProvider:
     can_host_files = False
     # تأخير مهذّب بين الطلبات (ثوانٍ)
     request_delay = 1.0
+    # تأخير بين تنزيلات الملفات (ثوانٍ)
+    download_delay = 0.0
 
     def iter_records(self, **params):
         raise NotImplementedError

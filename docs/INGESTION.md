@@ -3,7 +3,7 @@
 ## الأمر
 
 ```sh
-python manage.py import_source <oapen|gutenberg> [--download] [--limit N] [--language ar] [--all-subjects]
+python manage.py import_source <oapen|gutenberg|arxiv> [--download] [--set cs] [--days 30] [--limit N] [--language ar] [--all-subjects]
                                                  [--max-total-mb N] [--resume TOKEN]
 ```
 
@@ -13,8 +13,12 @@ python manage.py import_source <oapen|gutenberg> [--download] [--limit N] [--lan
 # كل كتب Gutenberg العلمية (روابط قراءة/تحميل من Gutenberg)
 python manage.py import_source gutenberg
 
-# كتب OAPEN العلمية مع تنزيل ملفات PDF واستضافتها (حد 20GB لهذه العملية)
-python manage.py import_source oapen --download --max-total-mb 20000
+# كتب OAPEN العلمية (بيانات + غلاف + رابط PDF مباشر من OAPEN)
+python manage.py import_source oapen
+
+# أبحاث arXiv في الحاسب خلال آخر 30 يومًا، مع استضافة ملفات الأبحاث المرخصة CC (حد 5GB)
+python manage.py import_source arxiv --set cs --days 30 --download --max-total-mb 5000
+# مجموعات أخرى: math, physics, q-bio, stat, eess, econ
 
 # استكمال عملية OAPEN توقفت (التوكن يُطبع في آخر السجل ويُحفظ في ImportJob.cursor)
 python manage.py import_source oapen --download --resume 'xoai///col_20.500.12657_6/1200'
